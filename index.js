@@ -14,9 +14,9 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || '',
+    host: process.env.DB_HOST || 'prestamos.c34ku64umou5.us-east-1.rds.amazonaws.com',
+    user: process.env.DB_USER || 'admin',
+    password: process.env.DB_PASSWORD || 'kPXAzxs2oFHgPMH4pUAD',
     database: process.env.DB_NAME || 'prestamos'
 });
 
