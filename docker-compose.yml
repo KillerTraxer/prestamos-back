@@ -1,0 +1,33 @@
+version: '3.8' 
+
+services:
+  mysql: 
+    image: mysql:5.7  
+    container_name: mysql_container  
+    restart: unless-stopped 
+    environment:  
+      MYSQL_ROOT_PASSWORD: 1234  
+      MYSQL_DATABASE: prestamos 
+      MYSQL_PASSWORD: 1234  
+    ports:
+      - "3306:3306"  
+    volumes:
+      - mysql_data:/var/lib/mysql  
+
+  app: 
+    build: .  
+    container_name: node_app  
+    restart: unless-stopped  
+    ports:
+      - "3000:3000"
+    environment: 
+      DB_HOST: mysql  
+      DB_USER: root 
+      DB_PASSWORD: 1234 
+      DB_NAME: prestamos 
+      JWT_SECRET: tu_secreto_jwt  
+    depends_on:
+      - mysql  
+
+volumes:
+  mysql_data:  
