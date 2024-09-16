@@ -926,7 +926,7 @@ cron.schedule('17 1 * * *', async () => {
             );
         } catch (error) {
             console.error('Error al reiniciar el campo total_multas_hoy:', error);
-            
+
             sendEmailNotification(
                 'Error en la actualización diaria de multas',
                 `Error al intentar reiniciar el campo total_multas_hoy: ${error.message}`
@@ -980,6 +980,48 @@ cron.schedule('3 12 * * *', async () => {
     }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
+});
+
+// Cron job que se ejecuta cada 2 minutos
+cron.schedule('*/2 * * * *', async () => {
+    const checkConfigurationJob = async () => {
+        try {
+            // Verifica la conexión a la base de datos
+            const connection = await getConnection();
+            await connection.execute('SELECT 1');
+            console.log('Conexión a la base de datos válida');
+
+            // Verifica la configuración de nodemailer
+            const testEmail = await transporter.sendMail({
+                from: '"Prestamos"',
+                to: 'eduardogf312@gmail.com',
+                subject: 'Test Email',
+                text: 'This is a test email sent from your application.'
+            });
+
+            console.log('Correo de prueba enviado correctamente');
+
+            // Verifica la configuración de cron
+            console.log('Cron job de verificación ejecutándose correctamente');
+
+            // Envía un correo de éxito
+            sendEmailNotification(
+                'Verificación de configuración exitosa',
+                'El cron job de verificación se ejecutó correctamente.'
+            );
+
+        } catch (error) {
+            console.error('Error en la verificación de configuración:', error);
+            sendEmailNotification(
+                'Error en la verificación de configuración',
+                `Ocurrió un error durante la verificación de configuración: ${error.message}`
+            );
+        }
+    };
+
+    await checkConfigurationJob();
+}, {
+    timezone: "America/Mexico_City"
 });
 
 
