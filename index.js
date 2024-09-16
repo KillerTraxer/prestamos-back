@@ -840,7 +840,7 @@ const sendEmailNotification = (subject, body) => {
 };
 
 // Cron job que se ejecuta diariamente a las 5 a.m. hora de México
-cron.schedule('*/1 * * * *', async () => {
+cron.schedule('19 1 * * *', async () => {
     const resetAbonoDiarioQuery = 'UPDATE abonos SET abono_diario = 0 WHERE abono_diario != 0';
 
     try {
