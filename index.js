@@ -1,5 +1,5 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const cron = require('node-cron');
@@ -13,20 +13,50 @@ app.use(cors());
 
 app.use(express.json());
 
-const db = mysql.createConnection({
+const dbPool = mysql.createPool({
     host: process.env.DB_HOST || 'prestamos.c34ku64umou5.us-east-1.rds.amazonaws.com',
     user: process.env.DB_USER || 'admin',
     password: process.env.DB_PASSWORD || 'kPXAzxs2oFHgPMH4pUAD',
-    database: process.env.DB_NAME || 'prestamos'
+    database: process.env.DB_NAME || 'prestamos',
+    connectionLimit: 10, // Número máximo de conexiones simultáneas
+    connectTimeout: 10000, // Timeout de conexión en milisegundos
 });
 
-db.connect(err => {
-    if (err) {
-        console.error('Error conectando a la base de datos:', err);
-        throw err;
-    }
-    console.log('Conectado a la base de datos');
+// db.connect(err => {
+//     if (err) {
+//         console.error('Error conectando a la base de datos:', err);
+//         throw err;
+//     }
+//     console.log('Conectado a la base de datos');
+// });
+
+// Event listener para eventos de conexión
+dbPool.on('connection', function (connection) {
+    console.log('Nueva conexión a la base de datos');
 });
+
+async function checkInitialDatabaseConnection() {
+    try {
+        const connection = await dbPool.getConnection();
+        await connection.execute('SELECT 1');
+        console.log('Conexión inicial a la base de datos exitosa');
+        connection.release();
+    } catch (error) {
+        console.error('Error al verificar la conexión inicial:', error);
+    }
+}
+
+// Función para obtener una conexión del pool
+async function getConnection() {
+    try {
+        const connection = await dbPool.getConnection();
+        console.log('Conexión obtenida del pool');
+        return connection;
+    } catch (error) {
+        console.error('Error al obtener conexión del pool:', error);
+        throw error;
+    }
+}
 
 const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
@@ -46,49 +76,82 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-app.post('/login', (req, res) => {
+// app.post('/login', (req, res) => {
+//     const { email, password } = req.body;
+
+//     db.query('SELECT * FROM usuarios WHERE email = ? AND password = ?', [email, password], (err, result) => {
+//         if (err) {
+//             console.error('Error en la consulta de login:', err);
+//             throw err;
+//         }
+
+//         if (result.length > 0) {
+//             const user = result[0];
+//             console.log('Usuario autenticado:', user); // Agregar esta línea
+
+//             const token = jwt.sign({ id: user.id, role: user.role }, 'your_jwt_secret', { expiresIn: '1d' });
+//             console.log('Token generado:', token); // Agregar esta línea
+//             res.json({ token });
+//         } else {
+//             console.log('Credenciales incorrectas para:', email);
+//             res.status(401).json({ message: 'Credenciales incorrectas' });
+//         }
+//     });
+// });
+
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
-    db.query('SELECT * FROM usuarios WHERE email = ? AND password = ?', [email, password], (err, result) => {
-        if (err) {
-            console.error('Error en la consulta de login:', err);
-            throw err;
-        }
+    try {
+        const connection = await getConnection();
+        try {
+            const [rows] = await connection.execute('SELECT * FROM usuarios WHERE email = ? AND password = ?', [email, password]);
 
-        if (result.length > 0) {
-            const user = result[0];
-            console.log('Usuario autenticado:', user); // Agregar esta línea
+            if (rows.length > 0) {
+                const user = rows[0];
+                console.log('Usuario autenticado:', user);
 
-            const token = jwt.sign({ id: user.id, role: user.role }, 'your_jwt_secret', { expiresIn: '1d' });
-            console.log('Token generado:', token); // Agregar esta línea
-            res.json({ token });
-        } else {
-            console.log('Credenciales incorrectas para:', email);
-            res.status(401).json({ message: 'Credenciales incorrectas' });
+                const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+                console.log('Token generado:', token);
+                res.json({ token });
+            } else {
+                console.log('Credenciales incorrectas para:', email);
+                res.status(401).json({ message: 'Credenciales incorrectas' });
+            }
+        } finally {
+            connection.release();
         }
-    });
+    } catch (error) {
+        console.error('Error en la ruta /login:', error);
+        res.status(500).json({ message: 'Error en el servidor' });
+    }
 });
 
 
 
 
-app.get('/clientes', authenticateJWT, (req, res) => {
+app.get('/clientes', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
-    const query = `
-        SELECT c.*, COUNT(m.id) AS total_multas 
-        FROM clientes c 
-        LEFT JOIN multas m ON c.id = m.cliente_id 
-        WHERE c.trabajador_id = ? 
-        GROUP BY c.id`;
+    try {
+        const connection = await getConnection();
+        try {
+            const query = `
+                SELECT c.*, COUNT(m.id) AS total_multas 
+                FROM clientes c 
+                LEFT JOIN multas m ON c.id = m.cliente_id 
+                WHERE c.trabajador_id = ? 
+                GROUP BY c.id`;
 
-    db.query(query, [req.user.id], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo clientes:', err);
-            throw err;
+            const [rows] = await connection.execute(query, [req.user.id]);
+            res.json(rows);
+        } finally {
+            connection.release();
         }
-        res.json(result);
-    });
+    } catch (error) {
+        console.error('Error obteniendo clientes:', error);
+        res.status(500).json({ message: 'Error en el servidor' });
+    }
 });
 
 const calcularInteresTotal = (montoInicial, tasaInteres) => {
@@ -105,7 +168,7 @@ const calcularPagosDiarios = (totalAPagar, dias) => {
 
 
 
-app.post('/clientes', authenticateJWT, (req, res) => {
+app.post('/clientes', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const { nombre, ocupacion, direccion, telefono, fecha_termino, monto_inicial } = req.body;
@@ -125,47 +188,71 @@ app.post('/clientes', authenticateJWT, (req, res) => {
     const totalAPagar = calcularTotalAPagar(parseFloat(monto_inicial), interesTotal);
     const pagosDiarios = calcularPagosDiarios(totalAPagar, dias);
 
-    db.query(
-        'INSERT INTO clientes (nombre, ocupacion, direccion, telefono, fecha_inicio, fecha_termino, multas, monto_inicial, monto_actual, estado, trabajador_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [nombre, ocupacion, direccion, telefono, fecha_inicio.toISOString().split('T')[0], fechaTerminoSeleccionada.toISOString().split('T')[0], '0', monto_inicial, totalAPagar, 'pendiente', trabajador_id],
-        (err, result) => {
-            if (err) {
-                console.error('Error creando cliente:', err);
-                return res.status(500).json({ error: 'Error creando cliente' });
-            }
-            res.status(201).json({ message: 'Cliente creado', id: result.insertId, pagos_diarios: pagosDiarios });
+    try {
+        const connection = await getConnection();
+        try {
+            const query = `
+                INSERT INTO clientes (
+                    nombre, ocupacion, direccion, telefono, 
+                    fecha_inicio, fecha_termino, multas, 
+                    monto_inicial, monto_actual, estado, 
+                    trabajador_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `;
+            const [result] = await connection.execute(query, [
+                nombre, ocupacion, direccion, telefono,
+                fecha_inicio.toISOString().split('T')[0],
+                fechaTerminoSeleccionada.toISOString().split('T')[0],
+                '0', monto_inicial, totalAPagar, 'pendiente',
+                trabajador_id
+            ]);
+            res.status(201).json({
+                message: 'Cliente creado',
+                id: result.insertId,
+                pagos_diarios: pagosDiarios
+            });
+        } finally {
+            connection.release();
         }
-    );
+    } catch (error) {
+        console.error('Error creando cliente:', error);
+        res.status(500).json({ error: 'Error creando cliente' });
+    }
 });
 
 
-app.get('/clientes/:id', authenticateJWT, (req, res) => {
+app.get('/clientes/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
-    const query = `
-        SELECT c.*, COUNT(m.id) AS total_multas
-        FROM clientes c 
-        LEFT JOIN multas m ON c.id = m.cliente_id 
-        WHERE c.id = ? 
-        GROUP BY c.id`;
+    try {
+        const connection = await getConnection();
+        try {
+            const query = `
+                SELECT c.*, COUNT(m.id) AS total_multas
+                FROM clientes c 
+                LEFT JOIN multas m ON c.id = m.cliente_id 
+                WHERE c.id = ? 
+                GROUP BY c.id`;
 
-    db.query(query, [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo cliente:', err);
-            return res.status(500).json({ error: 'Error obteniendo cliente' });
+            const [rows] = await connection.execute(query, [clienteId]);
+
+            if (rows.length === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+
+            res.json(rows[0]);
+        } finally {
+            connection.release();
         }
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Cliente no encontrado' });
-        }
-
-        res.json(result[0]);
-    });
+    } catch (error) {
+        console.error('Error obteniendo cliente:', error);
+        res.status(500).json({ error: 'Error obteniendo cliente' });
+    }
 });
 
-app.put('/clientes/:id', authenticateJWT, (req, res) => {
+app.put('/clientes/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
@@ -177,52 +264,82 @@ app.put('/clientes/:id', authenticateJWT, (req, res) => {
         nuevoEstado = 'pendiente';
     }
 
-    const query = `
-        UPDATE clientes 
-        SET nombre = ?, ocupacion = ?, direccion = ?, telefono = ?, fecha_inicio = ?, fecha_termino = ?, monto_inicial = ?, monto_actual = ?, estado = ? 
-        WHERE id = ?`;
+    try {
+        const connection = await getConnection();
+        try {
+            const query = `
+                UPDATE clientes 
+                SET nombre = ?, ocupacion = ?, direccion = ?, telefono = ?, fecha_inicio = ?, fecha_termino = ?, monto_inicial = ?, monto_actual = ?, estado = ? 
+                WHERE id = ?`;
 
-    db.query(query, [nombre, ocupacion, direccion, telefono, fecha_inicio, fecha_termino, monto_inicial, monto_actual, nuevoEstado, clienteId], (err, result) => {
-        if (err) {
-            console.error('Error actualizando cliente:', err);
-            return res.status(500).json({ error: 'Error actualizando cliente' });
+            const [result] = await connection.execute(query, [
+                nombre, ocupacion, direccion, telefono, fecha_inicio, fecha_termino, monto_inicial, monto_actual, nuevoEstado, clienteId
+            ]);
+
+            if (result.affectedRows === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+
+            res.json({ message: 'Cliente actualizado correctamente' });
+        } finally {
+            connection.release();
         }
-
-        res.json({ message: 'Cliente actualizado correctamente' });
-    });
+    } catch (error) {
+        console.error('Error actualizando cliente:', error);
+        res.status(500).json({ error: 'Error actualizando cliente' });
+    }
 });
-app.delete('/clientes/:id', authenticateJWT, (req, res) => {
+
+app.delete('/clientes/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
-    db.query('DELETE FROM clientes WHERE id = ?', [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error eliminando cliente:', err);
-            return res.status(500).json({ error: 'Error eliminando cliente' });
-        }
+    try {
+        const connection = await getConnection();
 
-        res.json({ message: 'Cliente eliminado correctamente' });
-    });
+        try {
+            const [result] = await connection.execute('DELETE FROM clientes WHERE id = ?', [clienteId]);
+
+            if (result.affectedRows === 0) {
+                res.status(404).json({ message: 'Cliente no encontrado' });
+            } else {
+                res.json({ message: 'Cliente eliminado correctamente' });
+            }
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error eliminando cliente:', error);
+        res.status(500).json({ error: 'Error eliminando cliente' });
+    }
 });
 
 
 
-app.get('/clientes/:id/multas', authenticateJWT, (req, res) => {
+app.get('/clientes/:id/multas', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
-    db.query('SELECT id, fecha, monto, estado FROM multas WHERE cliente_id = ?', [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo multas:', err);
-            return res.status(500).json({ error: 'Error obteniendo multas' });
-        }
+    try {
+        const connection = await getConnection();
 
-        res.json(result);
-    });
+        try {
+            const [result] = await connection.execute('SELECT id, fecha, monto, estado FROM multas WHERE cliente_id = ?', [clienteId]);
+
+            console.log(`Obtenidas ${result.length} multas para el cliente con ID: ${clienteId}`);
+            res.json(result);
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo multas:', error);
+        res.status(500).json({ error: 'Error obteniendo multas' });
+    }
 });
-app.post('/clientes/:id/multas', authenticateJWT, (req, res) => {
+
+app.post('/clientes/:id/multas', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') {
         return res.sendStatus(403);
     }
@@ -236,86 +353,71 @@ app.post('/clientes/:id/multas', authenticateJWT, (req, res) => {
 
     const montoMultaFija = 20; // Multa fija de 20 pesos
 
-    db.query('SELECT monto_inicial, monto_actual, fecha_termino FROM clientes WHERE id = ?', [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo datos del cliente:', err);
-            return res.status(500).json({ error: 'Error obteniendo datos del cliente' });
-        }
+    try {
+        const connection = await getConnection();
 
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Cliente no encontrado' });
-        }
+        try {
+            // Obtener datos del cliente
+            const [clienteResult] = await connection.execute('SELECT monto_inicial, monto_actual, fecha_termino FROM clientes WHERE id = ?', [clienteId]);
 
-        const cliente = result[0];
-        const montoMulta = montoMultaFija;
-
-        db.query(
-            'INSERT INTO multas (cliente_id, fecha, monto, estado) VALUES (?, ?, ?, ?)',
-            [clienteId, fecha, montoMulta, 'pendiente'],
-            (err) => {
-                if (err) {
-                    console.error('Error creando multa:', err);
-                    return res.status(500).json({ error: 'Error creando multa' });
-                }
-
-                // Contar las multas diarias y semanales
-                const queryMultas = `
-                    SELECT 
-                        IFNULL(SUM(CASE WHEN DATE(fecha) = CURDATE() THEN 1 ELSE 0 END), 0) AS total_multas_hoy,
-                        IFNULL(SUM(CASE WHEN YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END), 0) AS total_multas_semanales
-                    FROM multas
-                    WHERE cliente_id = ?
-                `;
-
-                db.query(queryMultas, [clienteId], (err, result) => {
-                    if (err) {
-                        console.error('Error contando multas:', err);
-                        return res.status(500).json({ error: 'Error contando multas' });
-                    }
-
-                    const totalMultasHoy = result[0].total_multas_hoy;
-                    const totalMultasSemanales = result[0].total_multas_semanales;
-
-                    const nuevoMonto = parseFloat(cliente.monto_actual) + montoMulta;
-                    const nuevaFechaTermino = new Date(cliente.fecha_termino);
-
-                    if (totalMultasHoy % 3 === 0) {
-                        nuevaFechaTermino.setDate(nuevaFechaTermino.getDate() + 1);
-                    }
-
-                    db.query(
-                        'UPDATE clientes SET monto_actual = ?, fecha_termino = ?, total_multas_hoy = ?, total_multas_semanales = ? WHERE id = ?',
-                        [nuevoMonto, nuevaFechaTermino, totalMultasHoy, totalMultasSemanales, clienteId],
-                        (err) => {
-                            if (err) {
-                                console.error('Error actualizando cliente:', err);
-                                return res.status(500).json({ error: 'Error actualizando cliente' });
-                            }
-
-                            res.status(201).json({
-                                message: 'Multa creada y monto actualizado',
-                                nuevoMonto,
-                                nuevaFechaTermino,
-                                totalMultasHoy,
-                                totalMultasSemanales
-                            });
-                        }
-                    );
-                });
+            if (clienteResult.length === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
             }
-        );
-    });
+
+            const cliente = clienteResult[0];
+            const montoMulta = montoMultaFija;
+
+            // Crear multa
+            await connection.execute(
+                'INSERT INTO multas (cliente_id, fecha, monto, estado) VALUES (?, ?, ?, ?)',
+                [clienteId, fecha, montoMulta, 'pendiente']
+            );
+
+            // Contar las multas diarias y semanales
+            const [multasCountResult] = await connection.execute(`
+                SELECT 
+                    IFNULL(SUM(CASE WHEN DATE(fecha) = CURDATE() THEN 1 ELSE 0 END), 0) AS total_multas_hoy,
+                    IFNULL(SUM(CASE WHEN YEARWEEK(fecha, 1) = YEARWEEK(CURDATE(), 1) THEN 1 ELSE 0 END), 0) AS total_multas_semanales
+                FROM multas
+                WHERE cliente_id = ?
+            `, [clienteId]);
+
+            const totalMultasHoy = multasCountResult[0].total_multas_hoy;
+            const totalMultasSemanales = multasCountResult[0].total_multas_semanales;
+
+            const nuevoMonto = parseFloat(cliente.monto_actual) + montoMulta;
+            const nuevaFechaTermino = new Date(cliente.fecha_termino);
+
+            if (totalMultasHoy % 3 === 0) {
+                nuevaFechaTermino.setDate(nuevaFechaTermino.getDate() + 1);
+            }
+
+            // Actualizar cliente
+            await connection.execute(
+                'UPDATE clientes SET monto_actual = ?, fecha_termino = ?, total_multas_hoy = ?, total_multas_semanales = ? WHERE id = ?',
+                [nuevoMonto, nuevaFechaTermino, totalMultasHoy, totalMultasSemanales, clienteId]
+            );
+
+            res.status(201).json({
+                message: 'Multa creada y monto actualizado',
+                nuevoMonto,
+                nuevaFechaTermino,
+                totalMultasHoy,
+                totalMultasSemanales
+            });
+        } catch (error) {
+            console.error('Error procesando multa:', error);
+            res.status(500).json({ error: 'Error procesando multa' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-
-
-
-
-
-
-
-
-app.post('/clientes/:id/abonos', authenticateJWT, (req, res) => {
+app.post('/clientes/:id/abonos', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
@@ -325,20 +427,18 @@ app.post('/clientes/:id/abonos', authenticateJWT, (req, res) => {
         return res.status(400).json({ error: 'Monto y fecha son campos requeridos' });
     }
 
-    db.query(
-        'SELECT monto_actual, estado FROM clientes WHERE id = ?',
-        [clienteId],
-        (err, results) => {
-            if (err) {
-                console.error('Error al verificar el estado del cliente:', err);
-                return res.status(500).json({ error: 'Error al verificar el estado del cliente' });
-            }
+    try {
+        const connection = await getConnection();
 
-            if (results.length === 0) {
+        try {
+            // Verificar estado del cliente
+            const [clienteResult] = await connection.execute('SELECT monto_actual, estado FROM clientes WHERE id = ?', [clienteId]);
+
+            if (clienteResult.length === 0) {
                 return res.status(404).json({ error: 'Cliente no encontrado' });
             }
 
-            const cliente = results[0];
+            const cliente = clienteResult[0];
 
             if (cliente.estado === 'completado') {
                 return res.status(400).json({ error: 'No se pueden agregar más abonos, el cliente está completado' });
@@ -346,58 +446,63 @@ app.post('/clientes/:id/abonos', authenticateJWT, (req, res) => {
 
             const nuevoMontoActual = cliente.monto_actual - parseFloat(monto);
 
-
-            db.query(
+            // Crear abono
+            const [abonoResult] = await connection.execute(
                 'INSERT INTO abonos (cliente_id, monto, abono_diario, abono_semanal, fecha, estado) VALUES (?, ?, ?, ?, ?, ?)',
-                [clienteId, parseFloat(monto), parseFloat(monto), parseFloat(monto), fecha, 'pagado'],
-                (err, result) => {
-                    if (err) {
-                        console.error('Error creando abono:', err);
-                        return res.status(500).json({ error: 'Error creando abono' });
-                    }
-            
-                    db.query(
-                        'UPDATE clientes SET monto_actual = ?, estado = ? WHERE id = ?',
-                        [nuevoMontoActual, nuevoMontoActual <= 0 ? 'completado' : cliente.estado, clienteId],
-                        (updateErr) => {
-                            if (updateErr) {
-                                console.error('Error actualizando monto actual del cliente:', updateErr);
-                                return res.status(500).json({ error: 'Error actualizando monto actual del cliente' });
-                            }
-            
-                            res.status(201).json({
-                                message: nuevoMontoActual <= 0 ? 'Abono creado y cliente completado' : 'Abono creado',
-                                abonoId: result.insertId
-                            });
-                        }
-                    );
-                }
+                [clienteId, parseFloat(monto), parseFloat(monto), parseFloat(monto), fecha, 'pagado']
             );
+
+            // Actualizar cliente
+            await connection.execute(
+                'UPDATE clientes SET monto_actual = ?, estado = ? WHERE id = ?',
+                [nuevoMontoActual, nuevoMontoActual <= 0 ? 'completado' : cliente.estado, clienteId]
+            );
+
+            res.status(201).json({
+                message: nuevoMontoActual <= 0 ? 'Abono creado y cliente completado' : 'Abono creado',
+                abonoId: abonoResult.insertId
+            });
+        } catch (error) {
+            console.error('Error procesando abono:', error);
+            res.status(500).json({ error: 'Error procesando abono' });
+        } finally {
+            connection.release();
         }
-    );
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 
 
-app.get('/clientes/:id/abonos', authenticateJWT, (req, res) => {
+app.get('/clientes/:id/abonos', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
-    db.query('SELECT id, monto, fecha, estado FROM abonos WHERE cliente_id = ?', [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo abonos:', err);
-            return res.status(500).json({ error: 'Error obteniendo abonos' });
-        }
+    try {
+        const connection = await getConnection();
 
-        res.json(result);
-    });
+        try {
+            const [result] = await connection.execute('SELECT id, monto, fecha, estado FROM abonos WHERE cliente_id = ?', [clienteId]);
+
+            console.log(`Obtenidos ${result.length} abonos para el cliente con ID: ${clienteId}`);
+            res.json(result);
+        } catch (error) {
+            console.error('Error obteniendo abonos:', error);
+            res.status(500).json({ error: 'Error obteniendo abonos' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 
-
-
-app.get('/trabajadores', authenticateJWT, (req, res) => {
+app.get('/trabajadores', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const query = `
@@ -410,36 +515,18 @@ app.get('/trabajadores', authenticateJWT, (req, res) => {
         GROUP BY u.id, c.id
         ORDER BY u.nombre, c.nombre`;
 
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error obteniendo trabajadores:', err);
-            return res.status(500).json({ error: 'Error obteniendo trabajadores' });
-        }
+    try {
+        const connection = await getConnection();
 
-        const trabajadores = result.reduce((acc, row) => {
-            const trabajador = acc.find(t => t.id === row.id);
-            if (trabajador) {
-                trabajador.clientes.push({
-                    id: row.cliente_id,
-                    nombre: row.cliente_nombre,
-                    ocupacion: row.ocupacion,
-                    direccion: row.direccion,
-                    telefono: row.telefono,
-                    fecha_inicio: row.fecha_inicio,
-                    fecha_termino: row.fecha_termino,
-                    monto_inicial: row.monto_inicial,
-                    monto_actual: row.monto_actual,
-                    estado: row.estado,
-                    total_multas: row.total_multas,
-                    total_abonos: row.total_abonos
-                });
-            } else {
-                acc.push({
-                    id: row.id,
-                    nombre: row.nombre,
-                    email: row.email,
-                    role: row.role,
-                    clientes: row.cliente_id ? [{
+        try {
+            const [result] = await connection.execute(query);
+
+            console.log(`Obtenidos ${result.length} registros de trabajadores`);
+
+            const trabajadores = result.reduce((acc, row) => {
+                const trabajador = acc.find(t => t.id === row.id);
+                if (trabajador) {
+                    trabajador.clientes.push({
                         id: row.cliente_id,
                         nombre: row.cliente_nombre,
                         ocupacion: row.ocupacion,
@@ -452,16 +539,47 @@ app.get('/trabajadores', authenticateJWT, (req, res) => {
                         estado: row.estado,
                         total_multas: row.total_multas,
                         total_abonos: row.total_abonos
-                    }] : []
-                });
-            }
-            return acc;
-        }, []);
+                    });
+                } else {
+                    acc.push({
+                        id: row.id,
+                        nombre: row.nombre,
+                        email: row.email,
+                        role: row.role,
+                        clientes: row.cliente_id ? [{
+                            id: row.cliente_id,
+                            nombre: row.cliente_nombre,
+                            ocupacion: row.ocupacion,
+                            direccion: row.direccion,
+                            telefono: row.telefono,
+                            fecha_inicio: row.fecha_inicio,
+                            fecha_termino: row.fecha_termino,
+                            monto_inicial: row.monto_inicial,
+                            monto_actual: row.monto_actual,
+                            estado: row.estado,
+                            total_multas: row.total_multas,
+                            total_abonos: row.total_abonos
+                        }] : []
+                    });
+                }
+                return acc;
+            }, []);
 
-        res.json(trabajadores);
-    });
+            console.log(`Procesados ${trabajadores.length} trabajadores`);
+            res.json(trabajadores);
+        } catch (error) {
+            console.error('Error obteniendo datos de trabajadores:', error);
+            res.status(500).json({ error: 'Error obteniendo datos de trabajadores' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
-app.get('/trabajadores/:id/clientes', authenticateJWT, (req, res) => {
+
+app.get('/trabajadores/:id/clientes', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const trabajadorId = req.params.id;
@@ -473,16 +591,27 @@ app.get('/trabajadores/:id/clientes', authenticateJWT, (req, res) => {
         WHERE c.trabajador_id = ? 
         GROUP BY c.id`;
 
-    db.query(query, [trabajadorId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo clientes:', err);
-            return res.status(500).json({ error: 'Error obteniendo clientes' });
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(query, [trabajadorId]);
+
+            console.log(`Obtenidos ${result.length} clientes para el trabajador con ID: ${trabajadorId}`);
+            res.json(result);
+        } catch (error) {
+            console.error('Error obteniendo clientes:', error);
+            res.status(500).json({ error: 'Error obteniendo clientes' });
+        } finally {
+            connection.release();
         }
-        res.json(result);
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.post('/trabajadores', authenticateJWT, (req, res) => {
+app.post('/trabajadores', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const { nombre, email, password, role } = req.body;
@@ -491,16 +620,28 @@ app.post('/trabajadores', authenticateJWT, (req, res) => {
         return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
-    db.query('INSERT INTO usuarios (nombre, email, password, role) VALUES (?, ?, ?, ?)', [nombre, email, password, role], (err, result) => {
-        if (err) {
-            console.error('Error creando trabajador:', err);
-            return res.status(500).json({ error: 'Error creando trabajador' });
+    try {
+        const connection = await getConnection();
+
+        try {
+            // ADVERTENCIA: No se está encriptando la contraseña. Esto es muy peligroso desde el punto de vista de la seguridad.
+            const [result] = await connection.execute('INSERT INTO usuarios (nombre, email, password, role) VALUES (?, ?, ?, ?)', [nombre, email, password, role]);
+
+            console.log(`Trabajador creado con ID: ${result.insertId}`);
+            res.status(201).json({ message: 'Trabajador creado', id: result.insertId });
+        } catch (error) {
+            console.error('Error creando trabajador:', error);
+            res.status(500).json({ error: 'Error creando trabajador' });
+        } finally {
+            connection.release();
         }
-        res.status(201).json({ message: 'Trabajador creado', id: result.insertId });
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.put('/trabajadores/:id', authenticateJWT, (req, res) => {
+app.put('/trabajadores/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const trabajadorId = req.params.id;
@@ -510,59 +651,96 @@ app.put('/trabajadores/:id', authenticateJWT, (req, res) => {
         return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
-    db.query(
-        'UPDATE usuarios SET nombre = ?, email = ?, role = ? WHERE id = ?',
-        [nombre, email, role, trabajadorId],
-        (err, result) => {
-            if (err) {
-                console.error('Error actualizando trabajador:', err);
-                return res.status(500).json({ error: 'Error actualizando trabajador' });
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(
+                'UPDATE usuarios SET nombre = ?, email = ?, role = ? WHERE id = ?',
+                [nombre, email, role, trabajadorId]
+            );
+
+            if (result.affectedRows === 0) {
+                console.log(`No se encontró trabajador con ID: ${trabajadorId}`);
+                return res.status(404).json({ error: 'Trabajador no encontrado' });
             }
+
+            console.log(`Trabajador con ID ${trabajadorId} actualizado`);
             res.status(200).json({ message: 'Trabajador actualizado' });
+        } catch (error) {
+            console.error('Error actualizando trabajador:', error);
+            res.status(500).json({ error: 'Error actualizando trabajador' });
+        } finally {
+            connection.release();
         }
-    );
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.delete('/trabajadores/:id', authenticateJWT, (req, res) => {
+app.delete('/trabajadores/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const trabajadorId = req.params.id;
 
-    db.query('DELETE FROM usuarios WHERE id = ?', [trabajadorId], (err, result) => {
-        if (err) {
-            console.error('Error eliminando trabajador:', err);
-            return res.status(500).json({ error: 'Error eliminando trabajador' });
-        }
+    try {
+        const connection = await getConnection();
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Trabajador no encontrado' });
-        }
+        try {
+            const [result] = await connection.execute('DELETE FROM usuarios WHERE id = ?', [trabajadorId]);
 
-        res.status(200).json({ message: 'Trabajador eliminado' });
-    });
+            if (result.affectedRows === 0) {
+                console.log(`No se encontró trabajador con ID: ${trabajadorId}`);
+                return res.status(404).json({ error: 'Trabajador no encontrado' });
+            }
+
+            console.log(`Eliminado trabajador con ID: ${trabajadorId}`);
+            res.status(200).json({ message: 'Trabajador eliminado' });
+        } catch (error) {
+            console.error('Error eliminando trabajador:', error);
+            res.status(500).json({ error: 'Error eliminando trabajador' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 // Ruta para eliminar un cliente
-app.delete('/clientes/:id', authenticateJWT, (req, res) => {
+app.delete('/clientes/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
-    db.query('DELETE FROM clientes WHERE id = ?', [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error eliminando cliente:', err);
-            return res.status(500).json({ error: 'Error eliminando cliente' });
-        }
+    try {
+        const connection = await getConnection();
 
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: 'Cliente no encontrado' });
-        }
+        try {
+            const [result] = await connection.execute('DELETE FROM clientes WHERE id = ?', [clienteId]);
 
-        res.status(200).json({ message: 'Cliente eliminado correctamente' });
-    });
+            if (result.affectedRows === 0) {
+                console.log(`No se encontró cliente con ID: ${clienteId}`);
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+
+            console.log(`Eliminado cliente con ID: ${clienteId}`);
+            res.status(200).json({ message: 'Cliente eliminado correctamente' });
+        } catch (error) {
+            console.error('Error eliminando cliente:', error);
+            res.status(500).json({ error: 'Error eliminando cliente' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.get('/estadisticas/general', authenticateJWT, (req, res) => {
+app.get('/estadisticas/general', authenticateJWT, async (req, res) => {
     const query = `
         SELECT c.id, c.nombre, c.telefono, c.monto_inicial, c.fecha_inicio, c.fecha_termino, c.ocupacion, c.estado, c.direccion,
             DATEDIFF(c.fecha_termino, c.fecha_inicio) + 1 AS dias_prestamo,
@@ -575,16 +753,27 @@ app.get('/estadisticas/general', authenticateJWT, (req, res) => {
         GROUP BY c.id;
     `;
 
-    db.query(query, (err, result) => {
-        if (err) {
-            console.error('Error obteniendo estadísticas generales:', err);
-            return res.status(500).json({ error: 'Error obteniendo estadísticas generales' });
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(query);
+
+            console.log(`Obtenidas ${result.length} estadísticas generales`);
+            res.json(result);
+        } catch (error) {
+            console.error('Error obteniendo estadísticas generales:', error);
+            res.status(500).json({ error: 'Error obteniendo estadísticas generales' });
+        } finally {
+            connection.release();
         }
-        res.json(result);
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.get('/estadisticas/trabajadores', authenticateJWT, (req, res) => {
+app.get('/estadisticas/trabajadores', authenticateJWT, async (req, res) => {
     const query = `
    SELECT 
     u.id AS trabajador_id, 
@@ -600,80 +789,121 @@ GROUP BY u.id, u.nombre;
 
     `;
 
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error('Error obteniendo estadísticas de trabajadores:', err);
-            return res.status(500).json({ error: 'Error obteniendo estadísticas de trabajadores' });
-        }
+    try {
+        const connection = await getConnection();
 
-        res.json(results);
-    });
+        try {
+            const [results] = await connection.execute(query);
+
+            console.log(`Obtenidas ${results.length} estadísticas de trabajadores`);
+            res.json(results);
+        } catch (error) {
+            console.error('Error obteniendo estadísticas de trabajadores:', error);
+            res.status(500).json({ error: 'Error obteniendo estadísticas de trabajadores' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
 
 
 // Cron job que se ejecuta diariamente a las 5 a.m. hora de México
-cron.schedule('19 1 * * *', () => {
+cron.schedule('19 1 * * *', async () => {
     const resetAbonoDiarioQuery = 'UPDATE abonos SET abono_diario = 0 WHERE abono_diario != 0';
 
-    db.query(resetAbonoDiarioQuery, (err, result) => {
-        if (err) {
-            console.error('Error al reiniciar el campo abono_diario:', err);
-        } else {
-            console.log('Campo abono_diario reiniciado a 0 para todos los registros.');
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(resetAbonoDiarioQuery);
+
+            console.log(`Reiniciado campo abono_diario a 0. Registros afectados: ${result.affectedRows}`);
+        } catch (error) {
+            console.error('Error al reiniciar el campo abono_diario:', error);
+        } finally {
+            connection.release();
         }
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+    }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
 });
 
-cron.schedule('0 5 * * 1', () => {
-    const resetAbonoDiarioQuery = 'UPDATE abonos SET abono_semanal = 0 WHERE abono_semanal != 0';
+cron.schedule('0 5 * * 1', async () => {
+    const resetAbonoSemanalQuery = 'UPDATE abonos SET abono_semanal = 0 WHERE abono_semanal != 0';
 
-    db.query(resetAbonoDiarioQuery, (err, result) => {
-        if (err) {
-            console.error('Error al reiniciar el campo abono_diario:', err);
-        } else {
-            console.log('Campo abono_diario reiniciado a 0 para todos los registros.');
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(resetAbonoSemanalQuery);
+
+            console.log(`Reiniciado campo abono_semanal a 0. Registros afectados: ${result.affectedRows}`);
+        } catch (error) {
+            console.error('Error al reiniciar el campo abono_semanal:', error);
+        } finally {
+            connection.release();
         }
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+    }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
 });
 
 // Cron job que se ejecuta diariamente a las 5 a.m. hora de México
-cron.schedule('17 1 * * *', () => {
-    const resetAbonoDiarioQuery = 'UPDATE clientes SET total_multas_hoy = 0 WHERE total_multas_hoy != 0';
+cron.schedule('17 1 * * *', async () => {
+    const resetTotalMultasHoyQuery = 'UPDATE clientes SET total_multas_hoy = 0 WHERE total_multas_hoy != 0';
 
-    db.query(resetAbonoDiarioQuery, (err, result) => {
-        if (err) {
-            console.error('Error al reiniciar el campo abono_diario:', err);
-        } else {
-            console.log('Campo total_multas_hoy reiniciado a 0 para todos los registros.');
-        }
-    });
-}, {
-    timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
-});
-cron.schedule('3 12 * * *', () => {
-    const resetAbonoDiarioQuery = 'UPDATE clientes SET total_multas_semanales = 0 WHERE total_multas_semanales != 0';
+    try {
+        const connection = await getConnection();
 
-    db.query(resetAbonoDiarioQuery, (err, result) => {
-        if (err) {
-            console.error('Error al reiniciar el campo abono_diario:', err);
-        } else {
-            console.log('Campo total_multas_semanales reiniciado a 0 para todos los registros.');
+        try {
+            const [result] = await connection.execute(resetTotalMultasHoyQuery);
+
+            console.log(`Reiniciado campo total_multas_hoy a 0. Registros afectados: ${result.affectedRows}`);
+        } catch (error) {
+            console.error('Error al reiniciar el campo total_multas_hoy:', error);
+        } finally {
+            connection.release();
         }
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+    }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
 });
 
+cron.schedule('3 12 * * *', async () => {
+    const resetTotalMultasSemanalesQuery = 'UPDATE clientes SET total_multas_semanales = 0 WHERE total_multas_semanales != 0';
 
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(resetTotalMultasSemanalesQuery);
+
+            console.log(`Reiniciado campo total_multas_semanales a 0. Registros afectados: ${result.affectedRows}`);
+        } catch (error) {
+            console.error('Error al reiniciar el campo total_multas_semanales:', error);
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+    }
+}, {
+    timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
+});
 
 
 // Ruta para obtener resumen de un cliente en específico
-app.get('/estadisticas/cliente/:id', authenticateJWT, (req, res) => {
+app.get('/estadisticas/cliente/:id', authenticateJWT, async (req, res) => {
     const clienteId = req.params.id;
 
     const query = `
@@ -693,16 +923,31 @@ app.get('/estadisticas/cliente/:id', authenticateJWT, (req, res) => {
         GROUP BY c.id;
     `;
 
-    db.query(query, [clienteId], (err, result) => {
-        if (err) {
-            console.error('Error obteniendo estadísticas del cliente:', err);
-            return res.status(500).json({ error: 'Error obteniendo estadísticas del cliente' });
+    try {
+        const connection = await getConnection();
+
+        try {
+            const [result] = await connection.execute(query, [clienteId]);
+
+            if (result.length === 0) {
+                return res.status(404).json({ error: 'Cliente no encontrado' });
+            }
+
+            console.log(`Obtenidas estadísticas del cliente ${clienteId}`);
+            res.json(result[0]);
+        } catch (error) {
+            console.error('Error obteniendo estadísticas del cliente:', error);
+            res.status(500).json({ error: 'Error obteniendo estadísticas del cliente' });
+        } finally {
+            connection.release();
         }
-        res.json(result[0]);
-    });
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
-app.get('/estadisticas/trabajador/:id', authenticateJWT, (req, res) => {
+app.get('/estadisticas/trabajador/:id', authenticateJWT, async (req, res) => {
     const trabajadorId = req.params.id;
 
     const query = `
@@ -729,18 +974,38 @@ app.get('/estadisticas/trabajador/:id', authenticateJWT, (req, res) => {
         GROUP BY c.id;
     `;
 
-    db.query(query, [trabajadorId], (err, results) => {
-        if (err) {
-            console.error('Error al obtener estadísticas del trabajador:', err);
-            return res.status(500).json({ error: 'Error al obtener estadísticas del trabajador' });
-        }
+    try {
+        const connection = await getConnection();
 
-        res.json(results);
-    });
+        try {
+            const [results] = await connection.execute(query, [trabajadorId]);
+
+            if (results.length === 0) {
+                return res.status(404).json({ error: 'Trabajador no encontrado' });
+            }
+
+            console.log(`Obtenidas estadísticas del trabajador ${trabajadorId}`);
+            res.json(results);
+        } catch (error) {
+            console.error('Error al obtener estadísticas del trabajador:', error);
+            res.status(500).json({ error: 'Error al obtener estadísticas del trabajador' });
+        } finally {
+            connection.release();
+        }
+    } catch (error) {
+        console.error('Error obteniendo conexión:', error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
 
+// app.listen(PORT, () => {
+//     console.log(`Servidor corriendo en el puerto ${PORT}`);
+// });
 
-
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
+checkInitialDatabaseConnection().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Servidor corriendo en el puerto ${PORT}`);
+    });
+}).catch(error => {
+    console.error('No se pudo iniciar el servidor debido a un error de conexión:', error);
 });
