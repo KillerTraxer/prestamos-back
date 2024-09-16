@@ -839,7 +839,6 @@ const sendEmailNotification = (subject, body) => {
     });
 };
 
-
 // Cron job que se ejecuta diariamente a las 5 a.m. hora de México
 cron.schedule('19 1 * * *', async () => {
     const resetAbonoDiarioQuery = 'UPDATE abonos SET abono_diario = 0 WHERE abono_diario != 0';
@@ -983,49 +982,6 @@ cron.schedule('3 12 * * *', async () => {
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
 });
-
-// Cron job que se ejecuta cada 2 minutos
-cron.schedule('*/1 * * * *', async () => {
-    const checkConfigurationJob = async () => {
-        try {
-            // Verifica la conexión a la base de datos
-            const connection = await getConnection();
-            await connection.execute('SELECT 1');
-            console.log('Conexión a la base de datos válida');
-
-            // Verifica la configuración de nodemailer
-            const testEmail = await transporter.sendMail({
-                from: '"Prestamos"',
-                to: 'eduardogf312@gmail.com',
-                subject: 'Test Email',
-                text: 'This is a test email sent from your application.'
-            });
-
-            console.log('Correo de prueba enviado correctamente');
-
-            // Verifica la configuración de cron
-            console.log('Cron job de verificación ejecutándose correctamente');
-
-            // Envía un correo de éxito
-            sendEmailNotification(
-                'Verificación de configuración exitosa',
-                'El cron job de verificación se ejecutó correctamente.'
-            );
-
-        } catch (error) {
-            console.error('Error en la verificación de configuración:', error);
-            sendEmailNotification(
-                'Error en la verificación de configuración',
-                `Ocurrió un error durante la verificación de configuración: ${error.message}`
-            );
-        }
-    };
-
-    await checkConfigurationJob();
-}, {
-    timezone: "America/Mexico_City"
-});
-
 
 // Ruta para obtener resumen de un cliente en específico
 app.get('/estadisticas/cliente/:id', authenticateJWT, async (req, res) => {
