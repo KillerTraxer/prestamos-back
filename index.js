@@ -22,6 +22,18 @@ const dbPool = mysql.createPool({
     connectTimeout: 10000, // Timeout de conexión en milisegundos
 });
 
+const nodemailer = require('nodemailer');
+
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'traxer3122@gmail.com',
+        pass: 'NewKing4123'
+    }
+});
+
+transporter.sendMail = transporter.sendMail.bind(transporter);
+
 // db.connect(err => {
 //     if (err) {
 //         console.error('Error conectando a la base de datos:', err);
@@ -810,6 +822,20 @@ GROUP BY u.id, u.nombre;
     }
 });
 
+const sendEmailNotification = (subject, body) => {
+    transporter.sendMail({
+        from: '"Prestamos"',
+        to: 'eduardogf312@gmail.com',
+        subject: subject,
+        text: body
+    })
+    .then(info => {
+        console.log('Correo enviado: ' + info.response);
+    })
+    .catch(error => {
+        console.error('Error al enviar correo:', error);
+    });
+};
 
 
 // Cron job que se ejecuta diariamente a las 5 a.m. hora de México
@@ -823,13 +849,28 @@ cron.schedule('19 1 * * *', async () => {
             const [result] = await connection.execute(resetAbonoDiarioQuery);
 
             console.log(`Reiniciado campo abono_diario a 0. Registros afectados: ${result.affectedRows}`);
+
+            sendEmailNotification(
+                'Actualización diaria de abonos',
+                `Se ha reiniciado el campo abono_diario a 0. Registros afectados: ${result.affectedRows}`
+            );
         } catch (error) {
             console.error('Error al reiniciar el campo abono_diario:', error);
+
+            sendEmailNotification(
+                'Error en la actualización diaria de abonos',
+                `Error al intentar reiniciar el campo abono_diario: ${error.message}`
+            );
         } finally {
             connection.release();
         }
     } catch (error) {
         console.error('Error obteniendo conexión:', error);
+
+        sendEmailNotification(
+            'Error general en la conexión a la base de datos',
+            `Error al intentar obtener una conexión a la base de datos: ${error.message}`
+        );
     }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
@@ -845,8 +886,18 @@ cron.schedule('0 5 * * 1', async () => {
             const [result] = await connection.execute(resetAbonoSemanalQuery);
 
             console.log(`Reiniciado campo abono_semanal a 0. Registros afectados: ${result.affectedRows}`);
+
+            sendEmailNotification(
+                'Actualización semanal de abonos',
+                `Se ha reiniciado el campo abono_semanal a 0. Registros afectados: ${result.affectedRows}`
+            );
         } catch (error) {
             console.error('Error al reiniciar el campo abono_semanal:', error);
+
+            sendEmailNotification(
+                'Error en la actualización semanal de abonos',
+                `Error al intentar reiniciar el campo abono_semanal: ${error.message}`
+            );
         } finally {
             connection.release();
         }
@@ -868,13 +919,28 @@ cron.schedule('17 1 * * *', async () => {
             const [result] = await connection.execute(resetTotalMultasHoyQuery);
 
             console.log(`Reiniciado campo total_multas_hoy a 0. Registros afectados: ${result.affectedRows}`);
+
+            sendEmailNotification(
+                'Actualización diaria de multas',
+                `Se ha reiniciado el campo total_multas_hoy a 0. Registros afectados: ${result.affectedRows}`
+            );
         } catch (error) {
             console.error('Error al reiniciar el campo total_multas_hoy:', error);
+            
+            sendEmailNotification(
+                'Error en la actualización diaria de multas',
+                `Error al intentar reiniciar el campo total_multas_hoy: ${error.message}`
+            );
         } finally {
             connection.release();
         }
     } catch (error) {
         console.error('Error obteniendo conexión:', error);
+
+        sendEmailNotification(
+            'Error general en la conexión a la base de datos',
+            `Error al intentar obtener una conexión a la base de datos: ${error.message}`
+        );
     }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
@@ -890,13 +956,27 @@ cron.schedule('3 12 * * *', async () => {
             const [result] = await connection.execute(resetTotalMultasSemanalesQuery);
 
             console.log(`Reiniciado campo total_multas_semanales a 0. Registros afectados: ${result.affectedRows}`);
+
+            sendEmailNotification(
+                'Actualización semanales de multas',
+                `Se ha reiniciado el campo total_multas_hoy a 0. Registros afectados: ${result.affectedRows}`
+            );
         } catch (error) {
             console.error('Error al reiniciar el campo total_multas_semanales:', error);
+            sendEmailNotification(
+                'Error en la actualización semanales de multas',
+                `Error al intentar reiniciar el campo total_multas_semanales: ${error.message}`
+            );
         } finally {
             connection.release();
         }
     } catch (error) {
         console.error('Error obteniendo conexión:', error);
+
+        sendEmailNotification(
+            'Error general en la conexión a la base de datos',
+            `Error al intentar obtener una conexión a la base de datos: ${error.message}`
+        );
     }
 }, {
     timezone: "America/Mexico_City"  // Ajuste para la zona horaria de México
