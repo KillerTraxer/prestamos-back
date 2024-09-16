@@ -25,10 +25,12 @@ const dbPool = mysql.createPool({
 const nodemailer = require('nodemailer');
 
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: "smtp.ethereal.email",
+    port: 587,
+    secure: false,
     auth: {
-        user: 'traxer3122@gmail.com',
-        pass: 'NewKing4123'
+        user: 'alison.cassin70@ethereal.email',
+        pass: 'cGyv97sBCv3CjBeBDC'
     }
 });
 
@@ -824,7 +826,7 @@ GROUP BY u.id, u.nombre;
 
 const sendEmailNotification = (subject, body) => {
     transporter.sendMail({
-        from: '"Prestamos"',
+        from: '"Prestamos" <alison.cassin70@ethereal.email>',
         to: 'eduardogf312@gmail.com',
         subject: subject,
         text: body
@@ -983,7 +985,7 @@ cron.schedule('3 12 * * *', async () => {
 });
 
 // Cron job que se ejecuta cada 2 minutos
-cron.schedule('*/2 * * * *', async () => {
+cron.schedule('*/1 * * * *', async () => {
     const checkConfigurationJob = async () => {
         try {
             // Verifica la conexión a la base de datos
