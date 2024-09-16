@@ -36,14 +36,6 @@ let transporter = nodemailer.createTransport({
 
 transporter.sendMail = transporter.sendMail.bind(transporter);
 
-// db.connect(err => {
-//     if (err) {
-//         console.error('Error conectando a la base de datos:', err);
-//         throw err;
-//     }
-//     console.log('Conectado a la base de datos');
-// });
-
 // Event listener para eventos de conexión
 dbPool.on('connection', function (connection) {
     console.log('Nueva conexión a la base de datos');
@@ -60,7 +52,6 @@ async function checkInitialDatabaseConnection() {
     }
 }
 
-// Función para obtener una conexión del pool
 async function getConnection() {
     try {
         const connection = await dbPool.getConnection();
@@ -91,28 +82,6 @@ const authenticateJWT = (req, res, next) => {
     }
 };
 
-// app.post('/login', (req, res) => {
-//     const { email, password } = req.body;
-
-//     db.query('SELECT * FROM usuarios WHERE email = ? AND password = ?', [email, password], (err, result) => {
-//         if (err) {
-//             console.error('Error en la consulta de login:', err);
-//             throw err;
-//         }
-
-//         if (result.length > 0) {
-//             const user = result[0];
-//             console.log('Usuario autenticado:', user); // Agregar esta línea
-
-//             const token = jwt.sign({ id: user.id, role: user.role }, 'your_jwt_secret', { expiresIn: '1d' });
-//             console.log('Token generado:', token); // Agregar esta línea
-//             res.json({ token });
-//         } else {
-//             console.log('Credenciales incorrectas para:', email);
-//             res.status(401).json({ message: 'Credenciales incorrectas' });
-//         }
-//     });
-// });
 
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
@@ -141,9 +110,6 @@ app.post('/login', async (req, res) => {
         res.status(500).json({ message: 'Error en el servidor' });
     }
 });
-
-
-
 
 app.get('/clientes', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
