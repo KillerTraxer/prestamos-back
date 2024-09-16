@@ -63,7 +63,8 @@ const authenticateJWT = (req, res, next) => {
     if (authHeader) {
         const token = authHeader.split(' ')[1];
 
-        jwt.verify(token, 'your_jwt_secret', (err, user) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        // jwt.verify(token, 'your_jwt_secret', (err, user) => {
             if (err) {
                 console.error('Error verificando JWT:', err);
                 return res.sendStatus(403);
