@@ -7,6 +7,7 @@ const { auth } = require('./config/supabase');
 const { createBackup, restoreBackup } = require('./utils/backup');
 const multer = require('multer');
 const path = require('path');
+const passwordUtils = require('./utils/password');
 require('dotenv').config();
 
 const app = express();
@@ -20,23 +21,56 @@ const authenticateJWT = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
-        return res.status(401).json({ error: 'No token provided' });
+        return res.status(401).json({ 
+            error: 'No token provided',
+            message: 'Se requiere un token de autenticación'
+        });
     }
 
     const token = authHeader.split(' ')[1];
 
     try {
-        const user = await auth.getUser(token);
+        // Verificar el token con Supabase Auth
+        const { data: { user }, error: authError } = await auth.supabaseAdmin.auth.getUser(token);
         
-        if (!user) {
-            return res.status(401).json({ error: 'Invalid token' });
+        if (authError) {
+            console.error('Error de autenticación:', authError);
+            return res.status(401).json({ 
+                error: 'Token inválido',
+                message: 'El token de autenticación no es válido o ha expirado'
+            });
         }
 
-        // Obtener el rol del usuario desde la base de datos
-        const userData = await userQueries.findByEmail(user.email);
-        
+        if (!user) {
+            return res.status(401).json({ 
+                error: 'Usuario no encontrado',
+                message: 'No se pudo encontrar el usuario asociado al token'
+            });
+        }
+
+        // Obtener el rol del usuario desde la base de datos usando el cliente admin
+        const { data: userData, error: dbError } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('id, email, role')
+            .eq('email', user.email)
+            .single();
+
+        if (dbError) {
+            console.error('Error obteniendo datos del usuario:', dbError);
+            if (dbError.code === 'PGRST116') {
+                return res.status(401).json({ 
+                    error: 'Usuario no encontrado',
+                    message: 'El usuario no existe en la base de datos'
+                });
+            }
+            throw dbError;
+        }
+
         if (!userData) {
-            return res.status(401).json({ error: 'User not found' });
+            return res.status(401).json({ 
+                error: 'Usuario no encontrado',
+                message: 'El usuario no existe en la base de datos'
+            });
         }
 
         req.user = {
@@ -48,7 +82,10 @@ const authenticateJWT = async (req, res, next) => {
         next();
     } catch (error) {
         console.error('Error en autenticación:', error);
-        return res.status(401).json({ error: 'Invalid token' });
+        return res.status(401).json({ 
+            error: 'Error de autenticación',
+            message: 'Ocurrió un error al verificar la autenticación'
+        });
     }
 };
 
@@ -84,17 +121,71 @@ app.post('/auth/signup', async (req, res) => {
     const { email, password, nombre, role } = req.body;
 
     try {
+        console.log('Iniciando proceso de registro para:', email);
+
+        // Verificar si el usuario existe en la base de datos usando el cliente admin
+        const { data: existingDbUser, error: dbError } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('id, email')
+            .eq('email', email)
+            .single();
+
+        if (dbError && dbError.code !== 'PGRST116') {
+            console.error('Error verificando usuario en base de datos:', dbError);
+            throw dbError;
+        }
+
+        if (existingDbUser) {
+            console.log('Email ya registrado en la base de datos:', email);
+            return res.status(400).json({ 
+                error: 'Usuario ya registrado',
+                details: 'Ya existe un usuario registrado con este email'
+            });
+        }
+
+        // Verificar si el usuario existe en Supabase Auth
+        const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers();
+        
+        if (authError) {
+            console.error('Error verificando usuarios en Auth:', authError);
+            throw authError;
+        }
+
+        const existingAuthUser = authUsers?.users?.find(user => user.email === email);
+        if (existingAuthUser) {
+            console.log('Email ya registrado en Auth:', email);
+            return res.status(400).json({ 
+                error: 'Usuario ya registrado',
+                details: 'Ya existe un usuario registrado con este email'
+            });
+        }
+
         // Crear usuario en Supabase Auth
-        const { user } = await auth.signUp(email, password, { nombre, role });
+        console.log('Creando usuario en Auth...');
+        const { user, error: signUpError } = await auth.signUp(email, password, { nombre, role });
+
+        if (signUpError) {
+            console.error('Error en signUp:', signUpError);
+            return res.status(400).json({ 
+                error: 'Error al crear usuario',
+                details: signUpError.message
+            });
+        }
+
+        // Hashear la contraseña antes de guardarla en la base de datos
+        const hashedPassword = await passwordUtils.hashPassword(password);
 
         // Crear usuario en la base de datos
+        console.log('Creando usuario en base de datos...');
         const userData = await userQueries.create({
             email,
             nombre,
             role,
+            password: hashedPassword,
             auth_id: user.id
         });
 
+        console.log('Usuario creado exitosamente:', userData.id);
         res.status(201).json({
             message: 'Usuario creado exitosamente',
             user: {
@@ -105,6 +196,7 @@ app.post('/auth/signup', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error en registro:', error);
         handleError(error, res);
     }
 });
@@ -113,11 +205,27 @@ app.post('/auth/login', async (req, res) => {
     const { email, password } = req.body;
 
     try {
+        // Primero intentar el login con Supabase Auth
         const { session } = await auth.signIn(email, password);
+        
+        // Obtener los datos del usuario de nuestra base de datos
         const userData = await userQueries.findByEmail(email);
+        
+        if (!userData) {
+            return res.status(401).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Verificar la contraseña hasheada
+        const isValidPassword = await passwordUtils.verifyPassword(password, userData.password);
+        
+        if (!isValidPassword) {
+            return res.status(401).json({ error: 'Contraseña incorrecta' });
+        }
 
         res.json({
             token: session.access_token,
+            refresh_token: session.refresh_token,
+            expires_at: session.expires_at,
             user: {
                 id: userData.id,
                 email: userData.email,
@@ -133,7 +241,7 @@ app.post('/auth/login', async (req, res) => {
 app.post('/auth/logout', authenticateJWT, async (req, res) => {
     try {
         await auth.signOut();
-        res.json({ message: 'Logged out successfully' });
+        res.json({ message: 'Sesión cerrada exitosamente' });
     } catch (error) {
         handleError(error, res);
     }
@@ -150,14 +258,76 @@ app.post('/auth/reset-password', async (req, res) => {
     }
 });
 
-app.post('/auth/update-password', authenticateJWT, async (req, res) => {
-    const { newPassword } = req.body;
+app.post('/auth/update-password', async (req, res) => {
+    const { newPassword, resetToken } = req.body;
+
+    if (!newPassword) {
+        return res.status(400).json({ 
+            error: 'Contraseña requerida',
+            message: 'La nueva contraseña es requerida'
+        });
+    }
 
     try {
-        await auth.updatePassword(newPassword);
-        res.json({ message: 'Password updated successfully' });
+        // Si se proporciona un token de reset, usarlo para actualizar la contraseña
+        if (resetToken) {
+            const { error } = await auth.updatePassword(newPassword, resetToken);
+            if (error) throw error;
+            
+            return res.json({ 
+                message: 'Contraseña actualizada exitosamente',
+                details: 'La contraseña ha sido actualizada usando el token de recuperación'
+            });
+        }
+
+        // Si no hay token de reset, verificar la sesión actual
+        const authHeader = req.headers.authorization;
+        if (!authHeader) {
+            return res.status(401).json({ 
+                error: 'No autorizado',
+                message: 'Se requiere una sesión activa o un token de recuperación'
+            });
+        }
+
+        const token = authHeader.split(' ')[1];
+        const { data: { user }, error: authError } = await auth.supabaseAdmin.auth.getUser(token);
+        
+        if (authError || !user) {
+            return res.status(401).json({ 
+                error: 'Sesión inválida',
+                message: 'La sesión actual no es válida'
+            });
+        }
+
+        // Actualizar la contraseña usando la sesión actual
+        const { error } = await auth.updatePassword(newPassword);
+        if (error) throw error;
+
+        res.json({ 
+            message: 'Contraseña actualizada exitosamente',
+            details: 'La contraseña ha sido actualizada usando la sesión actual'
+        });
     } catch (error) {
-        handleError(error, res);
+        console.error('Error actualizando contraseña:', error);
+        
+        if (error.message?.includes('Invalid token')) {
+            return res.status(400).json({ 
+                error: 'Token inválido',
+                message: 'El token de recuperación no es válido o ha expirado'
+            });
+        }
+
+        if (error.message?.includes('Password should be at least')) {
+            return res.status(400).json({ 
+                error: 'Contraseña inválida',
+                message: 'La contraseña debe tener al menos 6 caracteres'
+            });
+        }
+
+        res.status(500).json({ 
+            error: 'Error actualizando contraseña',
+            message: 'Ocurrió un error al intentar actualizar la contraseña'
+        });
     }
 });
 
@@ -538,74 +708,23 @@ app.get('/clientes/:id/abonos', authenticateJWT, async (req, res) => {
     }
 });
 
+//?FUNCTION: GET ALL WORKERS
 app.get('/trabajadores', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
-    const query = `
-        SELECT u.id, u.nombre, u.email, u.role, c.id AS cliente_id, c.nombre AS cliente_nombre, c.ocupacion, c.direccion, c.telefono, c.fecha_inicio, c.fecha_termino, c.monto_inicial, c.monto_actual, c.estado, COUNT(m.id) AS total_multas, COUNT(a.id) AS total_abonos
-        FROM usuarios u
-        LEFT JOIN clientes c ON u.id = c.trabajador_id
-        LEFT JOIN multas m ON c.id = m.cliente_id
-        LEFT JOIN abonos a ON c.id = a.cliente_id
-        WHERE u.role = 'trabajador'
-        GROUP BY u.id, c.id
-        ORDER BY u.nombre, c.nombre`;
-
     try {
         const trabajadores = await userQueries.findAllWorkers();
-
-        console.log(`Obtenidos ${trabajadores.length} registros de trabajadores`);
-
-        const processedTrabajadores = trabajadores.reduce((acc, trabajador) => {
-            const cliente = acc.find(t => t.id === trabajador.id);
-            if (cliente) {
-                cliente.clientes.push({
-                    id: cliente.id,
-                    nombre: cliente.nombre,
-                    ocupacion: cliente.ocupacion,
-                    direccion: cliente.direccion,
-                    telefono: cliente.telefono,
-                    fecha_inicio: cliente.fecha_inicio,
-                    fecha_termino: cliente.fecha_termino,
-                    monto_inicial: cliente.monto_inicial,
-                    monto_actual: cliente.monto_actual,
-                    estado: cliente.estado,
-                    total_multas: cliente.total_multas,
-                    total_abonos: cliente.total_abonos
-                });
-            } else {
-                acc.push({
-                    id: trabajador.id,
-                    nombre: trabajador.nombre,
-                    email: trabajador.email,
-                    role: trabajador.role,
-                    clientes: trabajador.cliente_id ? [{
-                        id: trabajador.cliente_id,
-                        nombre: trabajador.cliente_nombre,
-                        ocupacion: trabajador.ocupacion,
-                        direccion: trabajador.direccion,
-                        telefono: trabajador.telefono,
-                        fecha_inicio: trabajador.fecha_inicio,
-                        fecha_termino: trabajador.fecha_termino,
-                        monto_inicial: trabajador.monto_inicial,
-                        monto_actual: trabajador.monto_actual,
-                        estado: trabajador.estado,
-                        total_multas: trabajador.total_multas,
-                        total_abonos: trabajador.total_abonos
-                    }] : []
-                });
-            }
-            return acc;
-        }, []);
-
-        console.log(`Procesados ${processedTrabajadores.length} trabajadores`);
-        res.json(processedTrabajadores);
+        res.json(trabajadores);
     } catch (error) {
         console.error('Error obteniendo datos de trabajadores:', error);
-        res.status(500).json({ error: 'Error obteniendo datos de trabajadores' });
+        res.status(500).json({ 
+            error: 'Error obteniendo datos de trabajadores',
+            message: 'Ocurrió un error al intentar obtener la lista de trabajadores'
+        });
     }
 });
 
+//?FUNCTION: GET INFORMATION FOR A SPECIFIC WORKER
 app.get('/trabajadores/:id/clientes', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
@@ -629,6 +748,7 @@ app.get('/trabajadores/:id/clientes', authenticateJWT, async (req, res) => {
     }
 });
 
+//?FUNCTION: CREATE A NEW WORKER
 app.post('/trabajadores', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
@@ -647,6 +767,7 @@ app.post('/trabajadores', authenticateJWT, async (req, res) => {
     }
 });
 
+//?FUNCTION: UPDATE WORKER
 app.put('/trabajadores/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
@@ -654,37 +775,89 @@ app.put('/trabajadores/:id', authenticateJWT, async (req, res) => {
     const { nombre, email, role } = req.body;
 
     if (!nombre || !email || !role) {
-        return res.status(400).json({ error: 'Todos los campos son requeridos' });
+        return res.status(400).json({ 
+            error: 'Campos requeridos',
+            message: 'Todos los campos (nombre, email, role) son requeridos'
+        });
     }
 
     try {
         const trabajador = await userQueries.updateWorker(trabajadorId, nombre, email, role);
-        res.status(200).json({ message: 'Trabajador actualizado' });
+        res.status(200).json({ 
+            message: 'Trabajador actualizado exitosamente',
+            trabajador: {
+                id: trabajador.id,
+                nombre: trabajador.nombre,
+                email: trabajador.email,
+                role: trabajador.role
+            }
+        });
     } catch (error) {
         console.error('Error actualizando trabajador:', error);
-        res.status(500).json({ error: 'Error actualizando trabajador' });
+        
+        if (error.message === 'Trabajador no encontrado') {
+            return res.status(404).json({ 
+                error: 'Trabajador no encontrado',
+                message: 'No existe un trabajador con el ID proporcionado'
+            });
+        }
+        
+        if (error.message === 'El email ya está registrado por otro usuario') {
+            return res.status(400).json({ 
+                error: 'Email duplicado',
+                message: 'El email ya está registrado por otro usuario'
+            });
+        }
+
+        if (error.message.includes('Error actualizando el email en la autenticación') ||
+            error.message.includes('No se pudo actualizar la información de autenticación')) {
+            return res.status(500).json({ 
+                error: 'Error de autenticación',
+                message: 'No se pudo actualizar la información en el sistema de autenticación'
+            });
+        }
+
+        res.status(500).json({ 
+            error: 'Error actualizando trabajador',
+            message: 'Ocurrió un error al intentar actualizar el trabajador'
+        });
     }
 });
 
+//? FUNCTION: DELETE WORKER
 app.delete('/trabajadores/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     const trabajadorId = req.params.id;
 
     try {
-        const trabajador = await userQueries.findById(trabajadorId);
-
-        if (!trabajador) {
-            console.log(`No se encontró trabajador con ID: ${trabajadorId}`);
-            return res.status(404).json({ error: 'Trabajador no encontrado' });
-        }
-
         await userQueries.delete(trabajadorId);
-        console.log(`Eliminado trabajador con ID: ${trabajadorId}`);
-        res.status(200).json({ message: 'Trabajador eliminado' });
+        res.status(200).json({ 
+            message: 'Trabajador eliminado exitosamente',
+            id: trabajadorId
+        });
     } catch (error) {
         console.error('Error eliminando trabajador:', error);
-        res.status(500).json({ error: 'Error eliminando trabajador' });
+        
+        if (error.message === 'Trabajador no encontrado') {
+            return res.status(404).json({ 
+                error: 'Trabajador no encontrado',
+                message: 'No existe un trabajador con el ID proporcionado'
+            });
+        }
+
+        // Si hay un error de referencia (por ejemplo, si el trabajador tiene clientes asociados)
+        if (error.code === '23503') {
+            return res.status(400).json({ 
+                error: 'No se puede eliminar el trabajador',
+                message: 'El trabajador tiene clientes asociados. Elimine o transfiera los clientes primero.'
+            });
+        }
+
+        res.status(500).json({ 
+            error: 'Error eliminando trabajador',
+            message: 'Ocurrió un error al intentar eliminar el trabajador'
+        });
     }
 });
 
