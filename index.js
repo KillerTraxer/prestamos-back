@@ -907,6 +907,11 @@ cron.schedule('0 3 * * 0', async () => {
     timezone: "America/Mexico_City"
 });
 
+// Health check route for UptimeRobot
+app.get('/', (req, res) => {
+  res.status(200).json({ status: 'OK', message: 'Server is running' });
+});
+
 checkInitialDatabaseConnection().then(() => {
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en el puerto ${PORT}`);
