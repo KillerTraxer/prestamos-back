@@ -197,8 +197,8 @@ const auth = {
                 // Actualizar contraseña usando token de reset
                 console.log('Actualizando contraseña usando token de reset');
                 try {
-                    result = await supabaseAdmin.auth.verifyOtp({
-                        token_hash: resetToken,
+                    result = await supabaseClient.auth.verifyOtp({
+                        token: resetToken,
                         type: 'recovery',
                         password: newPassword
                     });
