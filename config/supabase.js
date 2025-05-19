@@ -130,14 +130,16 @@ const auth = {
                 throw new Error('No existe una cuenta registrada con este email');
             }
 
-            // Construir la URL de redirección
+            // Construir la URL de redirección con el email como parámetro
             const redirectUrl = process.env.FRONTEND_URL?.trim();
             if (!redirectUrl) {
                 console.error('FRONTEND_URL no está configurada en las variables de entorno');
                 throw new Error('Error de configuración: FRONTEND_URL no está definida');
             }
 
-            const resetPasswordUrl = `${redirectUrl}/`;
+            // Codificar el email para la URL
+            const encodedEmail = encodeURIComponent(email);
+            const resetPasswordUrl = `${redirectUrl}/?email=${encodedEmail}`;
             console.log('URL de redirección configurada:', resetPasswordUrl);
 
             // Enviar email de reset usando el cliente público
@@ -182,7 +184,7 @@ const auth = {
         }
     },
 
-    async updatePassword(newPassword, resetToken = null) {
+    async updatePassword(newPassword, resetToken = null, email = null) {
         try {
             console.log('Iniciando actualización de contraseña');
 
@@ -196,8 +198,12 @@ const auth = {
             if (resetToken) {
                 // Actualizar contraseña usando token de reset
                 console.log('Actualizando contraseña usando token de reset');
+                if (!email) {
+                    throw new Error('Se requiere el email para actualizar la contraseña con token de reset');
+                }
                 try {
                     result = await supabaseClient.auth.verifyOtp({
+                        email,
                         token: resetToken,
                         type: 'recovery',
                         password: newPassword

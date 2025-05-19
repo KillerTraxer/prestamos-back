@@ -259,7 +259,7 @@ app.post('/auth/reset-password', async (req, res) => {
 });
 
 app.post('/auth/update-password', async (req, res) => {
-    const { newPassword, resetToken } = req.body;
+    const { newPassword, resetToken, email } = req.body;
 
     if (!newPassword) {
         return res.status(400).json({ 
@@ -271,7 +271,13 @@ app.post('/auth/update-password', async (req, res) => {
     try {
         // Si se proporciona un token de reset, usarlo para actualizar la contraseña
         if (resetToken) {
-            const { error } = await auth.updatePassword(newPassword, resetToken);
+            if (!email) {
+                return res.status(400).json({
+                    error: 'Email requerido',
+                    message: 'Se requiere el email para actualizar la contraseña con token de reset'
+                });
+            }
+            const { error } = await auth.updatePassword(newPassword, resetToken, email);
             if (error) throw error;
             
             return res.json({ 
