@@ -1091,6 +1091,15 @@ app.get('/', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Server is running' });
 });
 
+app.get('/ping', (req, res) => {
+    res.set('Cache-Control', 'no-store'); // evita respuestas 304
+    res.status(200).json({
+        status: 'OK',
+        message: 'Server is running',
+        timestamp: new Date().toISOString()
+    });
+});
+
 checkInitialDatabaseConnection().then(() => {
     app.listen(PORT, () => {
         console.log(`Servidor corriendo en el puerto ${PORT}`);
