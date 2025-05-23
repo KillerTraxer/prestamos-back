@@ -212,14 +212,32 @@ app.post('/auth/login', async (req, res) => {
         const userData = await userQueries.findByEmail(email);
         
         if (!userData) {
-            return res.status(401).json({ error: 'Usuario no encontrado' });
+            return res.status(401).json({ 
+                error: 'Credenciales inválidas',
+                code: 'AUTH_INVALID_CREDENTIALS',
+                details: {
+                    type: 'auth',
+                    action: 'sign_in',
+                    reason: 'invalid_credentials'
+                },
+                message: 'Credenciales inválidas'
+            });
         }
 
         // Verificar la contraseña hasheada
         const isValidPassword = await passwordUtils.verifyPassword(password, userData.password);
         
         if (!isValidPassword) {
-            return res.status(401).json({ error: 'Contraseña incorrecta' });
+            return res.status(401).json({ 
+                error: 'Credenciales inválidas',
+                code: 'AUTH_INVALID_CREDENTIALS',
+                details: {
+                    type: 'auth',
+                    action: 'sign_in',
+                    reason: 'invalid_credentials'
+                },
+                message: 'Credenciales inválidas'
+            });
         }
 
         res.json({
@@ -234,7 +252,33 @@ app.post('/auth/login', async (req, res) => {
             }
         });
     } catch (error) {
-        handleError(error, res);
+        // Manejar específicamente los diferentes códigos de error
+        switch (error.code) {
+            case 'AUTH_INVALID_CREDENTIALS':
+                return res.status(401).json({
+                    error: 'Credenciales inválidas',
+                    code: error.code,
+                    details: error.details,
+                    message: 'Credenciales inválidas'
+                });
+            case 'AUTH_INVALID_EMAIL':
+                return res.status(400).json({
+                    error: 'Email inválido',
+                    code: error.code,
+                    details: error.details,
+                    message: 'El formato del email no es válido'
+                });
+            case 'AUTH_SIGNIN_ERROR':
+                return res.status(500).json({
+                    error: 'Error de autenticación',
+                    code: error.code,
+                    details: error.details,
+                    message: 'Error al iniciar sesión'
+                });
+            default:
+                // Para otros errores, mantener el manejo general
+                handleError(error, res);
+        }
     }
 });
 
@@ -254,7 +298,33 @@ app.post('/auth/reset-password', async (req, res) => {
         await auth.resetPassword(email);
         res.json({ message: 'Password reset email sent' });
     } catch (error) {
-        handleError(error, res);
+        // Manejar específicamente los diferentes códigos de error
+        switch (error.code) {
+            case 'AUTH_EMAIL_NOT_FOUND':
+                return res.status(400).json({ 
+                    error: 'Email no encontrado',
+                    code: error.code,
+                    details: error.details,
+                    message: error.message
+                });
+            case 'AUTH_INVALID_EMAIL':
+                return res.status(400).json({ 
+                    error: 'Email inválido',
+                    code: error.code,
+                    details: error.details,
+                    message: error.message
+                });
+            case 'AUTH_INVALID_REDIRECT':
+                return res.status(500).json({ 
+                    error: 'Error de configuración',
+                    code: error.code,
+                    details: error.details,
+                    message: error.message
+                });
+            default:
+                // Para otros errores, mantener el manejo general
+                handleError(error, res);
+        }
     }
 });
 
@@ -385,6 +455,7 @@ const upload = multer({
     }
 });
 
+//!CREAR CLIENTES Y PRESTAMOS
 app.post('/clientes', authenticateJWT, upload.fields([
     { name: 'comprobante_domicilio', maxCount: 1 },
     { name: 'ine', maxCount: 1 }

@@ -80,14 +80,50 @@ const auth = {
 
             if (error) {
                 console.error('Error en signIn:', error);
-                throw error;
+                
+                // Crear un error personalizado con mensaje genérico
+                const customError = new Error();
+                
+                // Para cualquier error de credenciales, usar un mensaje genérico
+                if (error.code === 'invalid_credentials' || error.code === 'user_not_found') {
+                    customError.message = 'Credenciales inválidas';
+                    customError.code = 'AUTH_INVALID_CREDENTIALS';
+                    customError.details = {
+                        type: 'auth',
+                        action: 'sign_in',
+                        reason: 'invalid_credentials'
+                    };
+                } else if (error.code === 'invalid_email') {
+                    customError.message = 'El formato del email no es válido';
+                    customError.code = 'AUTH_INVALID_EMAIL';
+                    customError.details = {
+                        type: 'auth',
+                        action: 'sign_in',
+                        reason: 'invalid_email_format'
+                    };
+                } else {
+                    customError.message = 'Error al iniciar sesión';
+                    customError.code = 'AUTH_SIGNIN_ERROR';
+                    customError.details = {
+                        type: 'auth',
+                        action: 'sign_in',
+                        reason: 'unknown_error',
+                        originalError: error.message
+                    };
+                }
+                
+                throw customError;
             }
             return data;
         } catch (error) {
             console.error('Error detallado en signIn:', {
                 message: error.message,
-                code: error.code,
-                details: error.details
+                code: error.code || 'AUTH_UNKNOWN_ERROR',
+                details: error.details || {
+                    type: 'auth',
+                    action: 'sign_in',
+                    reason: 'unknown'
+                }
             });
             throw error;
         }
@@ -127,7 +163,14 @@ const auth = {
             }
 
             if (!existingUser) {
-                throw new Error('No existe una cuenta registrada con este email');
+                const error = new Error('No existe una cuenta registrada con este email');
+                error.code = 'AUTH_EMAIL_NOT_FOUND';
+                error.details = {
+                    type: 'auth',
+                    action: 'reset_password',
+                    reason: 'email_not_registered'
+                };
+                throw error;
             }
 
             // Construir la URL de redirección con el email como parámetro
@@ -163,24 +206,50 @@ const auth = {
         } catch (error) {
             console.error('Error detallado en resetPassword:', {
                 message: error.message,
-                code: error.code,
-                details: error.details,
+                code: error.code || 'AUTH_UNKNOWN_ERROR',
+                details: error.details || {
+                    type: 'auth',
+                    action: 'reset_password',
+                    reason: 'unknown'
+                },
                 frontendUrl: process.env.FRONTEND_URL
             });
 
             if (error.message === 'No existe una cuenta registrada con este email') {
-                throw error;
+                throw error; // Ya tiene el código y detalles personalizados
             }
 
             if (error.message?.includes('Invalid email')) {
-                throw new Error('El formato del email no es válido');
+                const customError = new Error('El formato del email no es válido');
+                customError.code = 'AUTH_INVALID_EMAIL';
+                customError.details = {
+                    type: 'auth',
+                    action: 'reset_password',
+                    reason: 'invalid_email_format'
+                };
+                throw customError;
             }
 
             if (error.message?.includes('redirect URL')) {
-                throw new Error('La URL de redirección no está configurada correctamente en Supabase');
+                const customError = new Error('La URL de redirección no está configurada correctamente en Supabase');
+                customError.code = 'AUTH_INVALID_REDIRECT';
+                customError.details = {
+                    type: 'auth',
+                    action: 'reset_password',
+                    reason: 'invalid_redirect_url'
+                };
+                throw customError;
             }
 
-            throw new Error('Error al procesar la solicitud de reset de contraseña');
+            // Error genérico para otros casos
+            const genericError = new Error('Error al procesar la solicitud de reset de contraseña');
+            genericError.code = 'AUTH_RESET_ERROR';
+            genericError.details = {
+                type: 'auth',
+                action: 'reset_password',
+                reason: 'unknown_error'
+            };
+            throw genericError;
         }
     },
 
