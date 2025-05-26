@@ -9,7 +9,6 @@ const clientRoutes = require('./src/routes/clients');
 const workerRoutes = require('./src/routes/workers');
 const statsRoutes = require('./src/routes/stats');
 const backupRoutes = require('./src/routes/backup');
-const loanRoutes = require('./src/routes/loans');
 
 // Inicializar express
 const app = express();
@@ -34,7 +33,6 @@ app.use('/clients', authenticateJWT, clientRoutes);
 app.use('/workers', authenticateJWT, workerRoutes);
 app.use('/stats', authenticateJWT, statsRoutes);
 app.use('/backup', authenticateJWT, backupRoutes);
-app.use('/loans', authenticateJWT, loanRoutes);
 
 // Iniciar el servidor
 app.listen(PORT, () => {

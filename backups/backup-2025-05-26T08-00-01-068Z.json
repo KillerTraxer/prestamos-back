@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-05-26T08:00:01.068Z",
+  "metadata": {
+    "totalUsers": 1,
+    "totalClients": 0,
+    "totalPayments": 0,
+    "totalFines": 0
+  },
+  "data": {
+    "users": [
+      {
+        "id": 14,
+        "email": "admin@gmail.com",
+        "nombre": "Admin1",
+        "role": "admin",
+        "auth_id": "fc088de7-39ea-45b0-a58f-6639551bd4eb",
+        "password": "$2b$10$ZLjzwg2YcBHpdbd3zhYr..loLG1c0TvDXKqufFczqPuK.Udkao/Ia",
+        "status": "active"
+      }
+    ],
+    "clients": [],
+    "payments": [],
+    "fines": []
+  }
+}

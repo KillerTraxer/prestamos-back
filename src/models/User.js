@@ -1,0 +1,114 @@
+const { auth } = require('../config/supabase');
+
+class User {
+    constructor(data) {
+        this.id = data.id;
+        this.email = data.email;
+        this.nombre = data.nombre;
+        this.role = data.role;
+        this.auth_id = data.auth_id;
+        this.password = data.password;
+        this.status = data.status;
+    }
+
+    isActive() {
+        return this.status === 'active';
+    }
+
+    static async findAll() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('*');
+        if (error) throw error;
+        return data.map(user => new User(user));
+    }
+
+    static async findAllWorkers() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('*')
+            .eq('role', 'trabajador');
+        if (error) throw error;
+        return data.map(user => new User(user));
+    }
+
+    static async findById(id) {
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('*')
+            .eq('id', id)
+            .single();
+        if (error) throw error;
+        return data ? new User(data) : null;
+    }
+
+    static async findByEmail(email) {
+        console.log('Buscando usuario por email:', email);
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error) {
+            console.error('Error buscando usuario:', error);
+            throw error;
+        }
+
+        console.log('Resultado de búsqueda:', data ? 'Usuario encontrado' : 'Usuario no encontrado');
+        return data ? new User(data) : null;
+    }
+
+    static async create(userData) {
+        console.log('Creando nuevo usuario:', userData.email);
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .insert([userData])
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Error creando usuario:', error);
+            throw error;
+        }
+
+        console.log('Usuario creado exitosamente');
+        return new User(data);
+    }
+
+    async update(updates) {
+        const { data, error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .update(updates)
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, data);
+        return this;
+    }
+
+    async delete() {
+        const { error } = await auth.supabaseAdmin
+            .from('usuarios')
+            .delete()
+            .eq('id', this.id);
+        if (error) throw error;
+        return true;
+    }
+
+    // Métodos específicos para trabajadores
+    async getClients() {
+        if (this.role !== 'trabajador') {
+            throw new Error('Solo los trabajadores pueden acceder a la lista de clientes');
+        }
+        const { data, error } = await auth.supabaseAdmin
+            .from('clientes')
+            .select('*')
+            .eq('trabajador_id', this.id);
+        if (error) throw error;
+        return data;
+    }
+}
+
+module.exports = User; 
