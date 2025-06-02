@@ -51,7 +51,10 @@ class Client {
             `)
             .eq('id', id)
             .single();
-        if (error) throw error;
+        
+        if (error) {
+            throw error;
+        }
         return new Client(data);
     }
 

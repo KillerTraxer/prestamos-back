@@ -5,7 +5,7 @@ const Trabajador = require('../models/Trabajador');
 const authenticateJWT = async (req, res, next) => {
     console.log('Iniciando proceso de autenticación...');
     const authHeader = req.headers.authorization;
-    const refreshToken = req.headers['x-refresh-token'];
+    const refreshTokenHeader = req.headers['x-refresh-token'];
 
     if (!authHeader) {
         return res.status(401).json({
@@ -22,21 +22,22 @@ const authenticateJWT = async (req, res, next) => {
 
         // Si hay error de autenticación (token expirado o inválido)
         if (authError) {
-            console.log('Token inválido o expirado, verificando refresh token...');
+            console.log('Token inválido o expirado, intentando renovar con refresh token...');
             
-            // Si no hay refresh token, retornar error
-            if (!refreshToken) {
+            // Verificar si tenemos refresh token en las headers
+            if (!refreshTokenHeader) {
+                console.log('No se proporcionó refresh token en headers');
                 return res.status(401).json({
                     error: 'Token expired',
-                    message: 'El token ha expirado y no se proporcionó refresh token',
-                    requiresRefresh: true
+                    message: 'El token ha expirado. Por favor, inicie sesión nuevamente.',
+                    requiresLogin: true
                 });
             }
 
             try {
                 console.log('Intentando renovar sesión con refresh token...');
                 const { data: refreshData, error: refreshError } = await auth.supabaseAdmin.auth.refreshSession({
-                    refresh_token: refreshToken
+                    refresh_token: refreshTokenHeader
                 });
 
                 if (refreshError || !refreshData?.session) {
@@ -62,21 +63,42 @@ const authenticateJWT = async (req, res, next) => {
                     });
                 }
 
-                // Devolver los nuevos tokens
+                // Construir datos del usuario según su tipo
+                const userData = {
+                    id: dbUser.id,
+                    email: dbUser.email,
+                    nombre: dbUser.nombre,
+                    role: dbUser.role || 'trabajador',
+                    status: dbUser.status
+                };
+
+                // Agregar datos específicos según el tipo de usuario
+                if (dbUser.role === 'trabajador' || !dbUser.role) {
+                    userData.phone = dbUser.phone;
+                    // Obtener conteo de clientes si es necesario
+                    try {
+                        const Client = require('../models/Client');
+                        const clientes = await Client.findByWorkerId(dbUser.id);
+                        userData.clients_count = clientes.length;
+                    } catch (clientError) {
+                        console.error('Error obteniendo clientes:', clientError);
+                        userData.clients_count = 0;
+                    }
+                } else if (dbUser.role === 'admin') {
+                    // Para admins, obtener conteos si es necesario
+                    userData.workers_count = 0;
+                    userData.clients_count = 0;
+                }
+
+                // Devolver los nuevos tokens con status 401 para mantener compatibilidad
                 return res.status(401).json({
-                    error: 'Token renovado',
-                    message: 'Se ha renovado tu sesión. Usa los nuevos tokens para continuar.',
+                    message: 'Token renovado exitosamente',
                     newTokens: {
                         access_token: refreshData.session.access_token,
-                        refresh_token: refreshData.session.refresh_token
+                        refresh_token: refreshData.session.refresh_token,
+                        expires_at: refreshData.session.expires_at
                     },
-                    user: {
-                        id: dbUser.id,
-                        email: dbUser.email,
-                        nombre: dbUser.nombre,
-                        role: dbUser.role || 'trabajador',
-                        status: dbUser.status
-                    }
+                    user: userData
                 });
             } catch (refreshError) {
                 console.error('Error en el proceso de renovación:', refreshError);

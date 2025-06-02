@@ -170,12 +170,38 @@ router.post('/login', async (req, res) => {
 // Ruta de logout
 router.post('/logout', authenticateJWT, async (req, res) => {
     try {
-        await auth.signOut();
-        res.json({ message: 'Sesión cerrada exitosamente' });
+        console.log('Iniciando proceso de logout para usuario:', req.user?.email);
+        
+        // Obtener el token del header de autorización
+        const authHeader = req.headers.authorization;
+        if (authHeader) {
+            const token = authHeader.split(' ')[1];
+            
+            try {
+                // Intentar invalidar la sesión específica usando el token
+                const { error: signOutError } = await auth.supabaseAdmin.auth.signOut(token);
+                if (signOutError) {
+                    console.warn('Error al invalidar sesión específica:', signOutError);
+                    // Continuar con el logout aunque falle la invalidación de Supabase
+                }
+            } catch (signOutError) {
+                console.warn('Error al intentar invalidar la sesión:', signOutError);
+                // Continuar con el logout aunque falle
+            }
+        }
+
+        console.log('Logout completado exitosamente');
+        res.json({ 
+            message: 'Sesión cerrada exitosamente',
+            timestamp: new Date().toISOString()
+        });
     } catch (error) {
-        res.status(500).json({
-            error: 'Error en el logout',
-            message: error.message
+        console.error('Error en logout:', error);
+        // Incluso si hay error, devolver éxito para permitir logout en el frontend
+        res.json({ 
+            message: 'Sesión cerrada (con advertencias)',
+            warning: 'Hubo un problema al invalidar la sesión en el servidor',
+            timestamp: new Date().toISOString()
         });
     }
 });

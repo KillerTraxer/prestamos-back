@@ -375,4 +375,37 @@ router.put('/adeudos/:adeudoId/pagar', authenticateJWT, async (req, res) => {
     }
 });
 
+// Liquidar préstamo
+router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    const prestamoId = req.params.id;
+
+    try {
+        const prestamo = await Loan.findById(prestamoId);
+        if (!prestamo) {
+            return res.status(404).json({ error: 'Préstamo no encontrado' });
+        }
+
+        // Verificar que el préstamo no esté ya completado
+        if (prestamo.estado === 'completado') {
+            return res.status(400).json({ error: 'El préstamo ya está completado' });
+        }
+
+        // Actualizar el estado del préstamo a completado
+        const updatedPrestamo = await prestamo.update({ estado: 'completado' });
+
+        res.json({
+            message: 'Préstamo liquidado exitosamente',
+            prestamo: updatedPrestamo
+        });
+    } catch (error) {
+        console.error('Error liquidando préstamo:', error);
+        res.status(500).json({ 
+            error: 'Error liquidando préstamo',
+            message: error.message 
+        });
+    }
+});
+
 module.exports = router; 

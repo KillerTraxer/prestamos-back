@@ -178,6 +178,14 @@ router.put('/:id', authenticateJWT, async (req, res) => {
             return res.status(404).json({ error: 'Cliente no encontrado' });
         }
 
+        console.log('Client trabajador_id:', cliente.trabajador_id, 'Current user ID:', req.user.id);
+        
+        // Verificar que el trabajador puede editar este cliente
+        if (req.user.role === 'trabajador' && cliente.trabajador_id !== req.user.id) {
+            console.log('Permission denied: Client belongs to different worker');
+            return res.status(403).json({ error: 'No tienes permisos para editar este cliente' });
+        }
+
         const updates = {
             nombre,
             direccion,
