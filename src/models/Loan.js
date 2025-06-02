@@ -11,6 +11,7 @@ class Loan {
         this.fecha_fin = data.fecha_fin;
         this.estado = data.estado;
         this.observaciones = data.observaciones;
+        this.pago_diario = data.pago_diario;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
     }

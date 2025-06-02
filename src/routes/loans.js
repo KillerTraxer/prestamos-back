@@ -5,6 +5,7 @@ const Loan = require('../models/Loan');
 const Payment = require('../models/Payment');
 const Fine = require('../models/Fine');
 const Client = require('../models/Client');
+const Adeudo = require('../models/Adeudo');
 
 // Obtener todos los préstamos
 router.get('/', authenticateJWT, async (req, res) => {
@@ -30,11 +31,12 @@ router.post('/', authenticateJWT, async (req, res) => {
         interes,
         fecha_inicio,
         fecha_fin,
-        observaciones
+        observaciones,
+        pago_diario
     } = req.body;
 
     if (!cliente_id || !trabajador_id || !monto || !interes || !fecha_inicio || !fecha_fin) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             error: 'Faltan campos requeridos',
             details: 'cliente_id, trabajador_id, monto, interes, fecha_inicio y fecha_fin son obligatorios'
         });
@@ -55,20 +57,22 @@ router.post('/', authenticateJWT, async (req, res) => {
             fecha_inicio,
             fecha_fin,
             estado: 'activo',
-            observaciones: observaciones || ''
+            observaciones: observaciones || '',
+            pago_diario: pago_diario || 0
         };
 
         const newPrestamo = await Loan.create(prestamoData);
-        
+
         res.status(201).json({
             message: 'Préstamo creado exitosamente',
             prestamo: newPrestamo
         });
     } catch (error) {
         console.error('Error creando préstamo:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Error creando préstamo',
-            message: error.message 
+            message: error.message,
+            details: error.details || 'No hay detalles adicionales disponibles'
         });
     }
 });
@@ -111,7 +115,7 @@ router.put('/:id', authenticateJWT, async (req, res) => {
         };
 
         const updatedPrestamo = await prestamo.update(updates);
-        res.json({ 
+        res.json({
             message: 'Préstamo actualizado correctamente',
             prestamo: updatedPrestamo
         });
@@ -128,7 +132,22 @@ router.get('/:id/multas', authenticateJWT, async (req, res) => {
     const prestamoId = req.params.id;
 
     try {
-        const multas = await Fine.findByLoanId(prestamoId);
+        const multas = await Fine.findByLoanId(prestamoId, { estado: 'pendiente' });
+        res.json(multas);
+    } catch (error) {
+        console.error('Error obteniendo multas:', error);
+        res.status(500).json({ error: 'Error obteniendo multas' });
+    }
+});
+
+//Obtener multas de un cliente
+router.get('/cliente/:id/multas', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    const clienteId = req.params.id;
+
+    try {
+        const multas = await Fine.findByClientId(clienteId);
         res.json(multas);
     } catch (error) {
         console.error('Error obteniendo multas:', error);
@@ -141,7 +160,7 @@ router.post('/:id/multas', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const prestamoId = req.params.id;
-    const { fecha, monto } = req.body;
+    const { fecha, monto, cliente_id } = req.body;
 
     if (!fecha || !monto) {
         return res.status(400).json({ error: 'Fecha y monto son campos requeridos' });
@@ -156,10 +175,47 @@ router.post('/:id/multas', authenticateJWT, async (req, res) => {
         const multaData = {
             prestamo_id: prestamoId,
             fecha,
-            monto
+            monto,
+            cliente_id,
+            estado: 'pendiente'
         };
 
         const multa = await Fine.create(multaData);
+
+        // Contar multas existentes para este préstamo
+        const multasPendientes = await Fine.findByLoanId(prestamoId, { estado: 'pendiente' });
+        const totalMultas = multasPendientes.length;
+
+        const adeudosPendientes = await Adeudo.findByLoanId(prestamoId, { estado: 'pendiente' });
+        const totalAdeudos = adeudosPendientes.length;
+
+        const adeudosNecesarios = Math.floor(totalMultas / 3);
+
+        for (let i = totalAdeudos; i < adeudosNecesarios; i++) {
+            await Adeudo.create({
+                prestamo_id: prestamoId,
+                cliente_id: cliente_id,
+                monto: prestamo.pago_diario,  // monto diario del préstamo
+                fecha: null,
+                estado: 'pendiente'
+            });
+        }
+
+        // // Si el número de multas es múltiplo de 3, crear un adeudo
+        // if (numeroMultas % 3 === 0) {
+        //     // Obtener el préstamo para saber el monto
+        //     const prestamo = await Loan.findById(prestamoId);
+
+        //     // Crear el adeudo
+        //     await Adeudo.create({
+        //         // cliente_id: prestamo.cliente_id,
+        //         prestamo_id: prestamoId,
+        //         monto: prestamo.pago_diario, // Usar el monto del pago del préstamo
+        //         fecha: null,
+        //         estado: 'pendiente'
+        //     });
+        // }
+
         res.status(201).json({
             message: 'Multa creada exitosamente',
             multa
@@ -167,6 +223,34 @@ router.post('/:id/multas', authenticateJWT, async (req, res) => {
     } catch (error) {
         console.error('Error creando multa:', error);
         res.status(500).json({ error: 'Error creando multa' });
+    }
+});
+
+//Crear pago de multa
+router.put('/multas/:multaId/pagar', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { fine_id } = req.body;
+
+    try {
+        const multa = await Fine.findById(fine_id);
+        if (!multa) {
+            return res.status(404).json({ error: 'Multa no encontrada' });
+        }
+
+        const pagoData = {
+            estado: 'pagado'
+        };
+
+        const pago = await multa.update(pagoData);
+
+        res.status(201).json({
+            message: 'Pago de multa creado exitosamente',
+            pago
+        });
+    } catch (error) {
+        console.error('Error creando pago de multa:', error);
+        res.status(500).json({ error: 'Error creando pago de multa' });
     }
 });
 
@@ -205,14 +289,14 @@ router.post('/:id/abonos', authenticateJWT, async (req, res) => {
         const abonoData = {
             prestamo_id: prestamoId,
             monto,
-            fecha
+            fecha,
         };
 
         const abono = await Payment.create(abonoData);
-        
+
         // Verificar si con este abono se completa el préstamo
         const totalAbonos = await Payment.getTotalByLoanId(prestamoId);
-        if (totalAbonos >= prestamo.monto + (prestamo.monto * prestamo.interes / 100)) {
+        if (totalAbonos >= prestamo.monto + (prestamo.monto * prestamo.interes)) {
             await prestamo.update({ estado: 'completado' });
         }
 
@@ -223,6 +307,71 @@ router.post('/:id/abonos', authenticateJWT, async (req, res) => {
     } catch (error) {
         console.error('Error creando abono:', error);
         res.status(500).json({ error: 'Error creando abono' });
+    }
+});
+
+// Obtener adeudos por préstamo
+router.get('/:id/adeudos', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        const adeudos = await Adeudo.findByLoanId(req.params.id);
+        res.json(adeudos);
+    } catch (error) {
+        console.error('Error obteniendo adeudos:', error);
+        res.status(500).json({
+            error: 'Error obteniendo adeudos',
+            message: error.message
+        });
+    }
+});
+
+// Obtener adeudos pendientes por cliente
+router.get('/cliente/:id/adeudos', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        const adeudos = await Adeudo.findByClientId(req.params.id);
+        res.json(adeudos);
+    } catch (error) {
+        console.error('Error obteniendo adeudos pendientes:', error);
+        res.status(500).json({
+            error: 'Error obteniendo adeudos pendientes',
+            message: error.message
+        });
+    }
+});
+
+// Marcar adeudo como pagado
+router.put('/adeudos/:adeudoId/pagar', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { fecha, debt_id } = req.body;
+
+    if (!fecha) {
+        return res.status(400).json({
+            error: 'Fecha requerida',
+            message: 'Se requiere la fecha de pago'
+        });
+    }
+
+    try {
+        const adeudo = new Adeudo({ id: debt_id });
+        const adeudoActualizado = await adeudo.update({
+            fecha,
+            estado: 'pagado'
+        });
+
+        res.json({
+            message: 'Adeudo actualizado exitosamente',
+            adeudo: adeudoActualizado
+        });
+    } catch (error) {
+        console.error('Error actualizando adeudo:', error);
+        res.status(500).json({
+            error: 'Error actualizando adeudo',
+            message: error.message
+        });
     }
 });
 

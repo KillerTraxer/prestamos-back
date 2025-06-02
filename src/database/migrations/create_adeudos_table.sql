@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS adeudos (
+    id SERIAL PRIMARY KEY,
+    cliente_id INTEGER NOT NULL REFERENCES clientes(id),
+    prestamo_id INTEGER NOT NULL REFERENCES prestamos(id),
+    monto DECIMAL(10,2) NOT NULL,
+    fecha TIMESTAMP,
+    estado VARCHAR(20) NOT NULL DEFAULT 'pendiente',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+); 

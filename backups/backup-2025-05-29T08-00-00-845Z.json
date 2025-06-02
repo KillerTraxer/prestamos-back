@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-05-29T08:00:00.845Z",
+  "metadata": {
+    "totalUsers": 2,
+    "totalClients": 2,
+    "totalPayments": 3,
+    "totalFines": 6
+  },
+  "data": {
+    "users": [
+      {
+        "id": 14,
+        "email": "admin@gmail.com",
+        "nombre": "Admin1",
+        "role": "admin",
+        "auth_id": "fc088de7-39ea-45b0-a58f-6639551bd4eb",
+        "password": "$2b$10$ZLjzwg2YcBHpdbd3zhYr..loLG1c0TvDXKqufFczqPuK.Udkao/Ia",
+        "status": "active",
+        "created_at": "2025-05-25T22:33:24.583851+00:00"
+      },
+      {
+        "id": 16,
+        "email": "admin2@gmail.com",
+        "nombre": "Admin2",
+        "role": "admin",
+        "auth_id": "2ad33786-b41d-4f67-b9fa-066ac046c4d0",
+        "password": "Admin123",
+        "status": "active",
+        "created_at": "2025-05-28T20:58:16.985672+00:00"
+      }
+    ],
+    "clients": [
+      {
+        "id": 9,
+        "nombre": "Edus",
+        "telefono": "9494",
+        "direccion": "Xd B",
+        "ocupacion": "Jsjs",
+        "trabajador_id": 2,
+        "created_at": "2025-05-28T08:19:17.895271+00:00",
+        "updated_at": null
+      },
+      {
+        "id": 10,
+        "nombre": "Mario",
+        "telefono": "618234",
+        "direccion": "Cual",
+        "ocupacion": "Dic",
+        "trabajador_id": 2,
+        "created_at": "2025-05-28T09:10:20.174077+00:00",
+        "updated_at": null
+      }
+    ],
+    "payments": [
+      {
+        "id": 3,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-05-29",
+        "created_at": "2025-05-28T09:28:53.789598+00:00"
+      },
+      {
+        "id": 2,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-05-29",
+        "created_at": "2025-05-28T09:28:35.844851+00:00"
+      },
+      {
+        "id": 4,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-05-30",
+        "created_at": "2025-05-29T01:21:44.607847+00:00"
+      }
+    ],
+    "fines": [
+      {
+        "id": 4,
+        "prestamo_id": 2,
+        "fecha": "2025-05-29",
+        "monto": 20,
+        "created_at": "2025-05-28T09:49:46.40311+00:00"
+      },
+      {
+        "id": 6,
+        "prestamo_id": 2,
+        "fecha": "2025-05-29",
+        "monto": 20,
+        "created_at": "2025-05-29T01:31:59.948039+00:00"
+      },
+      {
+        "id": 7,
+        "prestamo_id": 2,
+        "fecha": "2025-05-28",
+        "monto": 20,
+        "created_at": "2025-05-29T01:36:53.767332+00:00"
+      },
+      {
+        "id": 5,
+        "prestamo_id": 3,
+        "fecha": "2025-05-28",
+        "monto": 100,
+        "created_at": "2025-05-28T09:50:18.917886+00:00"
+      },
+      {
+        "id": 9,
+        "prestamo_id": 3,
+        "fecha": "2025-05-30",
+        "monto": 100,
+        "created_at": "2025-05-29T07:38:07.855393+00:00"
+      },
+      {
+        "id": 13,
+        "prestamo_id": 3,
+        "fecha": "2025-05-29",
+        "monto": 100,
+        "created_at": "2025-05-29T07:45:16.982695+00:00"
+      }
+    ]
+  }
+}

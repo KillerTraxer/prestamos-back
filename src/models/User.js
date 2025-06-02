@@ -9,6 +9,8 @@ class User {
         this.auth_id = data.auth_id;
         this.password = data.password;
         this.status = data.status;
+        this.created_at = data.created_at;
+        this.updated_at = data.updated_at;
     }
 
     isActive() {
@@ -43,19 +45,49 @@ class User {
     }
 
     static async findByEmail(email) {
-        console.log('Buscando usuario por email:', email);
+        console.log('User.findByEmail: Buscando usuario admin por email:', email);
+
+        try {
+            const { data, error } = await auth.supabaseAdmin
+                .from('usuarios')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    console.log('User.findByEmail: No se encontró usuario admin con el email:', email);
+                    return null;
+                }
+                console.error('User.findByEmail: Error en la búsqueda:', error);
+                throw error;
+            }
+
+            if (!data) {
+                console.log('No se encontró usuario admin con el email (data null):', email);
+                return null;
+            }
+
+            console.log('Usuario admin encontrado');
+            return new User(data);
+        } catch (error) {
+            console.error('User.findByEmail: Error inesperado:', error);
+            throw error;
+        }
+    }
+
+    static async findByAuthId(authId) {
         const { data, error } = await auth.supabaseAdmin
             .from('usuarios')
             .select('*')
-            .eq('email', email)
+            .eq('auth_id', authId)
             .single();
 
         if (error) {
-            console.error('Error buscando usuario:', error);
+            if (error.code === 'PGRST116') return null;
             throw error;
         }
 
-        console.log('Resultado de búsqueda:', data ? 'Usuario encontrado' : 'Usuario no encontrado');
         return data ? new User(data) : null;
     }
 

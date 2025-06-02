@@ -6,6 +6,8 @@ class Fine {
         this.prestamo_id = data.prestamo_id;
         this.fecha = data.fecha;
         this.monto = data.monto;
+        this.estado = data.estado;
+        this.cliente_id = data.cliente_id;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
     }
@@ -28,12 +30,28 @@ class Fine {
         return data ? new Fine(data) : null;
     }
 
-    static async findByLoanId(prestamoId) {
+    static async findByLoanId(prestamoId, filters = {}) {
+        let query = auth.supabaseAdmin
+            .from('multas')
+            .select('*')
+            .eq('prestamo_id', prestamoId);
+
+        // Si vino filtro por estado, lo aplicamos
+        if (filters.estado) {
+            query = query.eq('estado', filters.estado);
+        }
+
+        const { data, error } = await query.order('fecha', { ascending: true });
+
+        if (error) throw error;
+        return data.map(fine => new Fine(fine));
+    }
+
+    static async findByClientId(clienteId) {
         const { data, error } = await auth.supabaseAdmin
             .from('multas')
             .select('*')
-            .eq('prestamo_id', prestamoId)
-            .order('fecha', { ascending: true });
+            .eq('cliente_id', clienteId);
         if (error) throw error;
         return data.map(fine => new Fine(fine));
     }

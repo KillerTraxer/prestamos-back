@@ -10,9 +10,13 @@ const { auth } = require('../config/supabase');
 router.get('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
+    console.log(req.user);
+
     try {
-        // Obtener todos los trabajadores
-        const trabajadores = await Trabajador.findAll();
+        // Obtener solo los trabajadores asociados al admin que hace la petición
+        const trabajadores = await Trabajador.findAll({
+            usuario_id: req.user.id
+        });
 
         // Para cada trabajador, obtener el conteo de sus clientes
         const trabajadoresConConteo = await Promise.all(
@@ -28,7 +32,7 @@ router.get('/', authenticateJWT, async (req, res) => {
         res.json(trabajadoresConConteo);
     } catch (error) {
         console.error('Error obteniendo datos de trabajadores:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Error obteniendo datos de trabajadores',
             message: error.message
         });
@@ -63,26 +67,20 @@ router.post('/', authenticateJWT, async (req, res) => {
     const { nombre, email, password, phone, status } = req.body;
 
     if (!nombre || !email || !password || !phone) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             error: 'Campos requeridos faltantes',
             details: 'nombre, email, password y phone son obligatorios'
         });
     }
 
     try {
-        // Verificar si el usuario ya existe en la base de datos
-        const existingUser = await Trabajador.findByEmail(email);
-        if (existingUser) {
-            return res.status(400).json({ error: 'El email ya está registrado' });
-        }
-
-        // Verificar si el usuario existe en Supabase Auth
-        const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers();
+        // Verificar si ya existe en Auth
+        const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers({ filter: `email=eq.${email}` });
         if (authError) throw authError;
 
-        const existingAuthUser = authUsers?.users?.find(user => user.email === email);
+        const existingAuthUser = authUsers.users.find(u => u.email === email);
         if (existingAuthUser) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 error: 'Usuario ya registrado',
                 details: 'Ya existe un usuario con este email en el sistema de autenticación'
             });
@@ -90,24 +88,15 @@ router.post('/', authenticateJWT, async (req, res) => {
 
         // Crear usuario en Supabase Auth
         console.log('Creando usuario en Auth...');
-        const { data: authData, error: signUpError } = await auth.signUp(email, password, { 
+        const { data: authData, error: signUpError } = await auth.signUp(email, password, {
             nombre: nombre,
             role: 'trabajador'
         });
 
-        if (signUpError) {
-            console.error('Error en signUp:', signUpError);
-            return res.status(400).json({ 
-                error: 'Error al crear usuario',
-                details: signUpError.message
-            });
-        }
-
-        if (!authData || !authData.user) {
-            console.error('Error: No se recibieron datos del usuario después del signUp');
-            return res.status(500).json({
-                error: 'Error al crear usuario',
-                details: 'No se pudo crear el usuario en el sistema de autenticación'
+        if (signUpError || !authData?.user) {
+            return res.status(400).json({
+                error: 'Error en Supabase Auth',
+                message: signUpError?.message || 'No se pudo crear el usuario en Supabase Auth'
             });
         }
 
@@ -122,8 +111,8 @@ router.post('/', authenticateJWT, async (req, res) => {
             auth_id: authData.user.id
         });
 
-        res.status(201).json({ 
-            message: 'Trabajador creado', 
+        res.status(201).json({
+            message: 'Trabajador creado',
             trabajador: {
                 id: trabajador.id,
                 nombre: trabajador.nombre,
@@ -136,9 +125,9 @@ router.post('/', authenticateJWT, async (req, res) => {
         });
     } catch (error) {
         console.error('Error creando trabajador:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Error creando trabajador',
-            message: error.message 
+            message: error.message
         });
     }
 });
@@ -151,7 +140,7 @@ router.put('/:id', authenticateJWT, async (req, res) => {
     const { nombre, email, status, phone } = req.body;
 
     if (!nombre || !email) {
-        return res.status(400).json({ 
+        return res.status(400).json({
             error: 'Campos requeridos',
             message: 'Los campos nombre y email son requeridos'
         });
@@ -160,7 +149,7 @@ router.put('/:id', authenticateJWT, async (req, res) => {
     try {
         const trabajador = await Trabajador.findById(trabajadorId);
         if (!trabajador) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 error: 'Trabajador no encontrado',
                 message: 'No existe un trabajador con el ID proporcionado'
             });
@@ -169,21 +158,21 @@ router.put('/:id', authenticateJWT, async (req, res) => {
         if (email !== trabajador.email) {
             const existingUser = await Trabajador.findByEmail(email);
             if (existingUser) {
-                return res.status(400).json({ 
+                return res.status(400).json({
                     error: 'Email duplicado',
                     message: 'El email ya está registrado por otro usuario'
                 });
             }
         }
 
-        const updatedTrabajador = await trabajador.update({ 
-            nombre, 
-            email, 
+        const updatedTrabajador = await trabajador.update({
+            nombre,
+            email,
             status: status || trabajador.status,
             phone: phone || trabajador.phone
         });
-        
-        res.json({ 
+
+        res.json({
             message: 'Trabajador actualizado exitosamente',
             trabajador: {
                 id: updatedTrabajador.id,
@@ -195,7 +184,7 @@ router.put('/:id', authenticateJWT, async (req, res) => {
         });
     } catch (error) {
         console.error('Error actualizando trabajador:', error);
-        res.status(500).json({ 
+        res.status(500).json({
             error: 'Error actualizando trabajador',
             message: error.message
         });
@@ -211,7 +200,7 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
     try {
         const trabajador = await Trabajador.findById(trabajadorId);
         if (!trabajador) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 error: 'Trabajador no encontrado',
                 message: 'No existe un trabajador con el ID proporcionado'
             });
@@ -219,23 +208,32 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
 
         const clientes = await Client.findByWorkerId(trabajadorId);
         if (clientes.length > 0) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 error: 'No se puede eliminar el trabajador',
                 message: 'El trabajador tiene clientes asociados. Elimine o transfiera los clientes primero.'
             });
         }
 
         await trabajador.delete();
-        res.json({ 
-            message: 'Trabajador eliminado exitosamente',
+        res.json({
+            message: 'Trabajador y cuenta de autenticación eliminados exitosamente',
             id: trabajadorId
         });
     } catch (error) {
         console.error('Error eliminando trabajador:', error);
-        res.status(500).json({ 
-            error: 'Error eliminando trabajador',
-            message: error.message
-        });
+
+        // Provide more specific error messages based on the error type
+        if (error.message && error.message.includes('auth')) {
+            res.status(500).json({
+                error: 'Error eliminando cuenta de autenticación',
+                message: error.message
+            });
+        } else {
+            res.status(500).json({
+                error: 'Error eliminando trabajador',
+                message: error.message
+            });
+        }
     }
 });
 

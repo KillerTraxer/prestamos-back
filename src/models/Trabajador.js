@@ -20,14 +20,14 @@ class Trabajador {
 
     static async findByEmail(email) {
         console.log('Buscando trabajador por email:', email);
-        
+
         try {
             const { data, error } = await auth.supabaseAdmin
                 .from('trabajadores')
                 .select('*')
                 .eq('email', email)
                 .single();
-            
+
             if (error) {
                 if (error.code === 'PGRST116') {
                     console.log('No se encontró trabajador con el email:', email);
@@ -37,12 +37,32 @@ class Trabajador {
                 throw error;
             }
 
-            console.log('Trabajador encontrado:', data ? 'Sí' : 'No');
-            return data ? new Trabajador(data) : null;
+            if (!data) {
+                console.log('No se encontró trabajador con el email (data null):', email);
+                return null;
+            }
+
+            console.log('Trabajador encontrado');
+            return new Trabajador(data);
         } catch (error) {
             console.error('Error inesperado buscando trabajador:', error);
             throw error;
         }
+    }
+
+    static async findByAuthId(authId) {
+        const { data, error } = await auth.supabaseAdmin
+            .from('trabajadores')
+            .select('*')
+            .eq('auth_id', authId)
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null;
+            throw error;
+        }
+
+        return data ? new Trabajador(data) : null;
     }
 
     static async findById(id) {
@@ -51,7 +71,7 @@ class Trabajador {
             .select('*')
             .eq('id', id)
             .single();
-        
+
         if (error) {
             if (error.code === 'PGRST116') return null;
             throw error;
@@ -101,12 +121,37 @@ class Trabajador {
     }
 
     async delete() {
-        const { error } = await auth.supabaseAdmin
+        // First get the auth_id before deleting the record
+        const { data: worker, error: findError } = await auth.supabaseAdmin
+            .from('trabajadores')
+            .select('auth_id')
+            .eq('id', this.id)
+            .single();
+
+        if (findError) throw findError;
+
+        // Delete the worker from the database
+        const { error: deleteError } = await auth.supabaseAdmin
             .from('trabajadores')
             .delete()
             .eq('id', this.id);
 
-        if (error) throw error;
+        if (deleteError) throw deleteError;
+
+        // If the worker has an auth_id, delete their auth account
+        if (worker && worker.auth_id) {
+            try {
+                const { error: authError } = await auth.supabaseAdmin.auth.admin.deleteUser(worker.auth_id);
+                if (authError) {
+                    console.error('Error deleting auth user:', authError);
+                    throw authError;
+                }
+            } catch (error) {
+                console.error('Error deleting auth user:', error);
+                throw error;
+            }
+        }
+
         return true;
     }
 
@@ -121,17 +166,23 @@ class Trabajador {
         return passwordUtils.verifyPassword(password, data.password);
     }
 
-    static async findAll() {
-        const { data, error } = await auth.supabaseAdmin
+    static async findAll(filters = {}) {
+        let query = auth.supabaseAdmin
             .from('trabajadores')
             .select(`
-                *,
-                clients_count:clientes(count)
-            `)
-            .order('nombre');
+          *,
+          clients_count:clientes(count)
+        `);
+
+        // Si vino filtro por usuario_id, lo aplicas
+        if (filters.usuario_id) {
+            query = query.eq('usuario_id', filters.usuario_id);
+        }
+
+        const { data, error } = await query.order('nombre');
 
         if (error) throw error;
-        
+
         // Transformar el resultado para que clients_count sea un número
         const trabajadoresConConteo = data.map(trabajador => ({
             ...new Trabajador(trabajador),

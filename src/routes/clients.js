@@ -47,17 +47,14 @@ router.get('/', authenticateJWT, async (req, res) => {
 });
 
 // Crear nuevo cliente
-router.post('/', authenticateJWT, upload.fields([
-    { name: 'comprobante_domicilio', maxCount: 1 },
-    { name: 'ine', maxCount: 1 }
-]), async (req, res) => {
+router.post('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const {
         nombre,
         direccion,
         telefono,
-        telefono_familiar,
+        // telefono_familiar,
         ocupacion,
         trabajador_id
     } = req.body;
@@ -99,7 +96,7 @@ router.post('/', authenticateJWT, upload.fields([
             nombre,
             direccion,
             telefono,
-            telefono_familiar,
+            // telefono_familiar,
             ocupacion,
             trabajador_id,
             // comprobante_domicilio_url: comprobanteData.path,
