@@ -65,6 +65,7 @@ router.post('/', authenticateJWT, async (req, res) => {
 
         res.status(201).json({
             message: 'Préstamo creado exitosamente',
+            id: newPrestamo.id,
             prestamo: newPrestamo
         });
     } catch (error) {
