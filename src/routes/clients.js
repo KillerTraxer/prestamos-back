@@ -38,7 +38,14 @@ router.get('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
-        const clientes = await Client.findByWorkerId(req.user.id);
+        let clientes;
+        // Si es admin y hay un collectorId, obtener clientes de ese trabajador
+        if (req.user.role === 'admin' && req.query.collectorId) {
+            clientes = await Client.findByWorkerId(req.query.collectorId);
+        } else {
+            // Si no es admin o no hay collectorId, obtener clientes del trabajador actual
+            clientes = await Client.findByWorkerId(req.user.id);
+        }
         res.json(clientes);
     } catch (error) {
         console.error('Error obteniendo clientes:', error);

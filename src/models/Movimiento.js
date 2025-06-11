@@ -11,6 +11,36 @@ class Movimiento {
         this.created_at = data.created_at;
     }
 
+    // Configuración de signos para cada tipo de movimiento
+    static getTipoMovimientoConfig() {
+        return {
+            'entrega_cliente': { signo: '-', descripcion: 'El sistema entrega dinero al cliente (inicio de préstamo)' },
+            'abono_cliente': { signo: '+', descripcion: 'Cliente abona → entra dinero al sistema' },
+            'pago_multa': { signo: '+', descripcion: 'Cliente paga una multa → dinero entra' },
+            'pago_acumulado': { signo: '+', descripcion: 'Cliente paga multa acumulada → dinero entra' },
+            'renovacion_prestamo': { signo: '-', descripcion: 'Se entrega nuevo préstamo → salida de dinero' },
+            'liquidacion_prestamo': { signo: '+', descripcion: 'Cliente liquida todo → entra el resto del dinero' },
+            'entrega_trabajador': { signo: '-', descripcion: 'Admin entrega efectivo al cobrador → sale dinero' },
+            'gasto_operativo': { signo: '-', descripcion: 'Cobrador gasta en gasolina, comida, etc. → egreso' }
+        };
+    }
+
+    // Método para aplicar el signo correcto al monto según el tipo de movimiento
+    static aplicarSignoCorrector(tipoMovimiento, monto) {
+        const config = this.getTipoMovimientoConfig();
+        const tipoConfig = config[tipoMovimiento];
+        
+        if (!tipoConfig) {
+            throw new Error(`Tipo de movimiento no configurado: ${tipoMovimiento}`);
+        }
+        
+        // Convertir a número absoluto primero para evitar doble negativos
+        const montoAbsoluto = Math.abs(parseFloat(monto));
+        
+        // Aplicar el signo correcto
+        return tipoConfig.signo === '-' ? -montoAbsoluto : montoAbsoluto;
+    }
+
     static async findAll() {
         const { data, error } = await auth.supabaseAdmin
             .from('movimientos')
@@ -72,18 +102,11 @@ class Movimiento {
     }
 
     static async create(movimientoData) {
-        // Validar tipo de movimiento
-        const tiposValidos = [
-            'entrega_cliente',
-            'abono_cliente', 
-            'pago_multa',
-            'pago_acumulado',
-            'renovacion_prestamo',
-            'liquidacion_prestamo'
-        ];
+        const tiposValidosConfig = this.getTipoMovimientoConfig();
+        const tiposValidos = Object.keys(tiposValidosConfig);
 
         if (!tiposValidos.includes(movimientoData.tipo_movimiento)) {
-            throw new Error(`Tipo de movimiento inválido: ${movimientoData.tipo_movimiento}`);
+            throw new Error(`Tipo de movimiento inválido: ${movimientoData.tipo_movimiento}. Tipos válidos: ${tiposValidos.join(', ')}`);
         }
 
         // Validar que el usuario_id existe en usuarios o trabajadores
@@ -92,9 +115,21 @@ class Movimiento {
             throw new Error(`Usuario no encontrado: ${movimientoData.usuario_id}`);
         }
 
+        // Aplicar el signo correcto al monto según el tipo de movimiento
+        const montoConSigno = this.aplicarSignoCorrector(movimientoData.tipo_movimiento, movimientoData.monto);
+        
+        console.log(`Creando movimiento: ${movimientoData.tipo_movimiento}`);
+        console.log(`Monto original: ${movimientoData.monto}`);
+        console.log(`Monto con signo correcto: ${montoConSigno}`);
+
+        const movimientoParaInsertar = {
+            ...movimientoData,
+            monto: montoConSigno
+        };
+
         const { data, error } = await auth.supabaseAdmin
             .from('movimientos')
-            .insert([movimientoData])
+            .insert([movimientoParaInsertar])
             .select()
             .single();
         if (error) throw error;
@@ -134,6 +169,17 @@ class Movimiento {
     }
 
     async update(updates) {
+        // Si se está actualizando el tipo de movimiento o el monto, aplicar el signo correcto
+        if (updates.tipo_movimiento || updates.monto) {
+            const tipoMovimiento = updates.tipo_movimiento || this.tipo_movimiento;
+            const monto = updates.monto || this.monto;
+            
+            updates.monto = Movimiento.aplicarSignoCorrector(tipoMovimiento, monto);
+            
+            console.log(`Actualizando movimiento: ${tipoMovimiento}`);
+            console.log(`Monto actualizado con signo correcto: ${updates.monto}`);
+        }
+
         const { data, error } = await auth.supabaseAdmin
             .from('movimientos')
             .update(updates)
@@ -167,6 +213,8 @@ class Movimiento {
 
         const { data, error } = await query;
         if (error) throw error;
+        
+        // Los montos ya tienen el signo correcto, solo sumar
         return data.reduce((total, movimiento) => total + parseFloat(movimiento.monto), 0);
     }
 
@@ -182,6 +230,8 @@ class Movimiento {
 
         const { data, error } = await query;
         if (error) throw error;
+        
+        // Los montos ya tienen el signo correcto, solo sumar
         return data.reduce((total, movimiento) => total + parseFloat(movimiento.monto), 0);
     }
 
@@ -212,10 +262,79 @@ class Movimiento {
                 };
             }
             summary[movimiento.tipo_movimiento].count++;
+            // Los montos ya tienen el signo correcto
             summary[movimiento.tipo_movimiento].total += parseFloat(movimiento.monto);
         });
 
         return summary;
+    }
+
+    // Método para obtener el balance total (considerando todos los signos)
+    static async getBalanceTotal(fechaInicio = null, fechaFin = null) {
+        let query = auth.supabaseAdmin
+            .from('movimientos')
+            .select('monto');
+
+        if (fechaInicio && fechaFin) {
+            query = query.gte('fecha', fechaInicio).lte('fecha', fechaFin);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        
+        // Sumar todos los montos (que ya tienen el signo correcto)
+        return data.reduce((balance, movimiento) => balance + parseFloat(movimiento.monto), 0);
+    }
+
+    // Método para obtener ingresos y egresos por separado
+    static async getIngresosEgresos(fechaInicio = null, fechaFin = null) {
+        let query = auth.supabaseAdmin
+            .from('movimientos')
+            .select('monto, tipo_movimiento');
+
+        if (fechaInicio && fechaFin) {
+            query = query.gte('fecha', fechaInicio).lte('fecha', fechaFin);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        
+        const result = {
+            ingresos: 0,
+            egresos: 0,
+            balance: 0
+        };
+
+        data.forEach(movimiento => {
+            const monto = parseFloat(movimiento.monto);
+            if (monto > 0) {
+                result.ingresos += monto;
+            } else if (monto < 0) {
+                result.egresos += Math.abs(monto); // Mostrar egresos como positivos para claridad
+            }
+        });
+
+        result.balance = result.ingresos - result.egresos;
+        
+        return result;
+    }
+
+    // Método para validar que un tipo de movimiento existe
+    static esTipoMovimientoValido(tipoMovimiento) {
+        const tiposValidos = Object.keys(this.getTipoMovimientoConfig());
+        return tiposValidos.includes(tipoMovimiento);
+    }
+
+    // Método para obtener la descripción de un tipo de movimiento
+    static getDescripcionTipoMovimiento(tipoMovimiento) {
+        const config = this.getTipoMovimientoConfig();
+        return config[tipoMovimiento]?.descripcion || 'Tipo de movimiento desconocido';
+    }
+
+    // Método para obtener el signo de un tipo de movimiento
+    static getSignoTipoMovimiento(tipoMovimiento) {
+        const config = this.getTipoMovimientoConfig();
+        return config[tipoMovimiento]?.signo || '+';
     }
 }
 

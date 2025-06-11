@@ -77,18 +77,40 @@ class User {
     }
 
     static async findByAuthId(authId) {
-        const { data, error } = await auth.supabaseAdmin
-            .from('usuarios')
-            .select('*')
-            .eq('auth_id', authId)
-            .single();
+        console.log('User.findByAuthId: Buscando usuario admin por auth_id:', authId);
+        
+        try {
+            const { data, error } = await auth.supabaseAdmin
+                .from('usuarios')
+                .select('*')
+                .eq('auth_id', authId)
+                .single();
 
-        if (error) {
-            if (error.code === 'PGRST116') return null;
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    console.log('User.findByAuthId: No se encontró usuario admin con auth_id:', authId);
+                    return null;
+                }
+                console.error('User.findByAuthId: Error en la búsqueda:', error);
+                throw error;
+            }
+
+            if (!data) {
+                console.log('User.findByAuthId: No data returned for auth_id:', authId);
+                return null;
+            }
+
+            console.log('User.findByAuthId: Usuario admin encontrado:', {
+                id: data.id,
+                email: data.email,
+                nombre: data.nombre,
+                status: data.status
+            });
+            return new User(data);
+        } catch (error) {
+            console.error('User.findByAuthId: Error inesperado:', error);
             throw error;
         }
-
-        return data ? new User(data) : null;
     }
 
     static async create(userData) {

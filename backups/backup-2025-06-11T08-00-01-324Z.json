@@ -1,0 +1,503 @@
+{
+  "timestamp": "2025-06-11T08:00:01.324Z",
+  "metadata": {
+    "totalUsers": 2,
+    "totalClients": 4,
+    "totalPayments": 40,
+    "totalFines": 16
+  },
+  "data": {
+    "users": [
+      {
+        "id": 14,
+        "email": "admin@gmail.com",
+        "nombre": "Admin1",
+        "role": "admin",
+        "auth_id": "fc088de7-39ea-45b0-a58f-6639551bd4eb",
+        "password": "$2b$10$ZLjzwg2YcBHpdbd3zhYr..loLG1c0TvDXKqufFczqPuK.Udkao/Ia",
+        "status": "active",
+        "created_at": "2025-05-25T22:33:24.583851+00:00"
+      },
+      {
+        "id": 16,
+        "email": "admin2@gmail.com",
+        "nombre": "Admin2",
+        "role": "admin",
+        "auth_id": "2ad33786-b41d-4f67-b9fa-066ac046c4d0",
+        "password": "Admin123",
+        "status": "active",
+        "created_at": "2025-05-28T20:58:16.985672+00:00"
+      }
+    ],
+    "clients": [
+      {
+        "id": 10,
+        "nombre": "Mario",
+        "telefono": "618234",
+        "direccion": "Cual",
+        "ocupacion": "Dic",
+        "trabajador_id": 2,
+        "created_at": "2025-05-28T09:10:20.174077+00:00",
+        "updated_at": null
+      },
+      {
+        "id": 11,
+        "nombre": "elded",
+        "telefono": "6184523696",
+        "direccion": "Durango",
+        "ocupacion": "Streamer",
+        "trabajador_id": 2,
+        "created_at": "2025-06-01T08:49:21.511916+00:00",
+        "updated_at": null
+      },
+      {
+        "id": 9,
+        "nombre": "Edus",
+        "telefono": "6182354555",
+        "direccion": "Las nubes 2",
+        "ocupacion": "Jsjs",
+        "trabajador_id": 2,
+        "created_at": "2025-05-28T08:19:17.895271+00:00",
+        "updated_at": null
+      },
+      {
+        "id": 15,
+        "nombre": "Jsjs",
+        "telefono": "5454554545",
+        "direccion": "Jsjs",
+        "ocupacion": "Jsjs",
+        "trabajador_id": 2,
+        "created_at": "2025-06-05T09:31:13.877678+00:00",
+        "updated_at": null
+      }
+    ],
+    "payments": [
+      {
+        "id": 3,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-05-29",
+        "created_at": "2025-05-28T09:28:53.789598+00:00"
+      },
+      {
+        "id": 2,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-05-29",
+        "created_at": "2025-05-28T09:28:35.844851+00:00"
+      },
+      {
+        "id": 4,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-05-30",
+        "created_at": "2025-05-29T01:21:44.607847+00:00"
+      },
+      {
+        "id": 5,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-05-31",
+        "created_at": "2025-05-29T09:32:11.448421+00:00"
+      },
+      {
+        "id": 6,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-01",
+        "created_at": "2025-05-29T09:32:15.253926+00:00"
+      },
+      {
+        "id": 7,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-02",
+        "created_at": "2025-05-29T09:32:18.049442+00:00"
+      },
+      {
+        "id": 8,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-03",
+        "created_at": "2025-05-29T09:32:21.141373+00:00"
+      },
+      {
+        "id": 9,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-04",
+        "created_at": "2025-05-29T09:32:24.175007+00:00"
+      },
+      {
+        "id": 10,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-05",
+        "created_at": "2025-05-29T09:32:27.592906+00:00"
+      },
+      {
+        "id": 11,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-06",
+        "created_at": "2025-05-29T09:46:38.125564+00:00"
+      },
+      {
+        "id": 12,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-05-30",
+        "created_at": "2025-05-31T23:56:05.704743+00:00"
+      },
+      {
+        "id": 14,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-07",
+        "created_at": "2025-06-01T08:47:56.272084+00:00"
+      },
+      {
+        "id": 15,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-08",
+        "created_at": "2025-06-01T08:47:59.532421+00:00"
+      },
+      {
+        "id": 16,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-09",
+        "created_at": "2025-06-01T08:48:02.518847+00:00"
+      },
+      {
+        "id": 17,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-10",
+        "created_at": "2025-06-01T08:48:05.239306+00:00"
+      },
+      {
+        "id": 18,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-11",
+        "created_at": "2025-06-01T08:48:08.619077+00:00"
+      },
+      {
+        "id": 19,
+        "prestamo_id": 2,
+        "monto": 92,
+        "fecha": "2025-06-12",
+        "created_at": "2025-06-01T08:48:13.290504+00:00"
+      },
+      {
+        "id": 20,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-06-01",
+        "created_at": "2025-06-01T08:50:26.418503+00:00"
+      },
+      {
+        "id": 21,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-05-31",
+        "created_at": "2025-06-01T08:50:30.238732+00:00"
+      },
+      {
+        "id": 22,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-06-02",
+        "created_at": "2025-06-01T08:51:03.615558+00:00"
+      },
+      {
+        "id": 23,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-06-03",
+        "created_at": "2025-06-01T08:51:06.990961+00:00"
+      },
+      {
+        "id": 24,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-06-04",
+        "created_at": "2025-06-01T08:51:09.720294+00:00"
+      },
+      {
+        "id": 25,
+        "prestamo_id": 3,
+        "monto": 325,
+        "fecha": "2025-06-05",
+        "created_at": "2025-06-01T08:51:13.106671+00:00"
+      },
+      {
+        "id": 26,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-03",
+        "created_at": "2025-06-02T21:33:11.036566+00:00"
+      },
+      {
+        "id": 27,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-04",
+        "created_at": "2025-06-05T08:26:17.91203+00:00"
+      },
+      {
+        "id": 28,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-05",
+        "created_at": "2025-06-05T08:41:30.505377+00:00"
+      },
+      {
+        "id": 29,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-06",
+        "created_at": "2025-06-05T08:42:26.839802+00:00"
+      },
+      {
+        "id": 30,
+        "prestamo_id": 13,
+        "monto": 322,
+        "fecha": "2025-06-06",
+        "created_at": "2025-06-05T09:48:32.272445+00:00"
+      },
+      {
+        "id": 31,
+        "prestamo_id": 13,
+        "monto": 322,
+        "fecha": "2025-06-07",
+        "created_at": "2025-06-05T09:49:09.343622+00:00"
+      },
+      {
+        "id": 32,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-05",
+        "created_at": "2025-06-05T10:01:11.312682+00:00"
+      },
+      {
+        "id": 33,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-07",
+        "created_at": "2025-06-07T04:09:58.06372+00:00"
+      },
+      {
+        "id": 34,
+        "prestamo_id": 8,
+        "monto": 552,
+        "fecha": "2025-06-08",
+        "created_at": "2025-06-07T04:50:24.322871+00:00"
+      },
+      {
+        "id": 35,
+        "prestamo_id": 13,
+        "monto": 322,
+        "fecha": "2025-06-08",
+        "created_at": "2025-06-07T04:50:56.227231+00:00"
+      },
+      {
+        "id": 36,
+        "prestamo_id": 13,
+        "monto": 322,
+        "fecha": "2025-06-09",
+        "created_at": "2025-06-07T04:56:16.926867+00:00"
+      },
+      {
+        "id": 37,
+        "prestamo_id": 13,
+        "monto": 322,
+        "fecha": "2025-06-10",
+        "created_at": "2025-06-07T05:02:59.235345+00:00"
+      },
+      {
+        "id": 40,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-02",
+        "created_at": "2025-06-10T09:06:20.446421+00:00"
+      },
+      {
+        "id": 42,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-03",
+        "created_at": "2025-06-10T09:12:56.754184+00:00"
+      },
+      {
+        "id": 43,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-10",
+        "created_at": "2025-06-10T09:16:16.480337+00:00"
+      },
+      {
+        "id": 44,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-04",
+        "created_at": "2025-06-10T09:16:30.0716+00:00"
+      },
+      {
+        "id": 45,
+        "prestamo_id": 4,
+        "monto": 230,
+        "fecha": "2025-06-06",
+        "created_at": "2025-06-11T07:46:02.687766+00:00"
+      }
+    ],
+    "fines": [
+      {
+        "id": 14,
+        "prestamo_id": 3,
+        "fecha": "2025-05-27",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-05-29T08:28:02.569017+00:00"
+      },
+      {
+        "id": 15,
+        "prestamo_id": 3,
+        "fecha": "2025-05-28",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-05-29T09:10:46.549031+00:00"
+      },
+      {
+        "id": 18,
+        "prestamo_id": 3,
+        "fecha": "2025-05-29",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-05-29T09:15:48.671422+00:00"
+      },
+      {
+        "id": 19,
+        "prestamo_id": 3,
+        "fecha": "2025-05-29",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-05-29T09:25:19.626359+00:00"
+      },
+      {
+        "id": 20,
+        "prestamo_id": 3,
+        "fecha": "2025-05-29",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-05-29T09:26:50.910356+00:00"
+      },
+      {
+        "id": 55,
+        "prestamo_id": 3,
+        "fecha": "2025-05-31",
+        "monto": 100,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-06-01T08:35:29.166206+00:00"
+      },
+      {
+        "id": 59,
+        "prestamo_id": 8,
+        "fecha": "2025-06-04",
+        "monto": 40,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-06-05T06:00:05.544355+00:00"
+      },
+      {
+        "id": 60,
+        "prestamo_id": 8,
+        "fecha": "2025-06-05",
+        "monto": 42,
+        "estado": "pagado",
+        "cliente_id": 10,
+        "created_at": "2025-06-05T08:23:34.452432+00:00"
+      },
+      {
+        "id": 61,
+        "prestamo_id": 4,
+        "fecha": "2025-06-05",
+        "monto": 50,
+        "estado": "pagado",
+        "cliente_id": 11,
+        "created_at": "2025-06-05T08:43:41.401511+00:00"
+      },
+      {
+        "id": 63,
+        "prestamo_id": 4,
+        "fecha": "2025-06-07",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 11,
+        "created_at": "2025-06-08T06:00:03.18174+00:00"
+      },
+      {
+        "id": 64,
+        "prestamo_id": 4,
+        "fecha": "2025-06-08",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 11,
+        "created_at": "2025-06-09T06:00:04.597559+00:00"
+      },
+      {
+        "id": 65,
+        "prestamo_id": 4,
+        "fecha": "2025-06-09",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 11,
+        "created_at": "2025-06-10T06:00:04.351195+00:00"
+      },
+      {
+        "id": 56,
+        "prestamo_id": 4,
+        "fecha": "2025-06-02",
+        "monto": 40,
+        "estado": "pagado",
+        "cliente_id": 11,
+        "created_at": "2025-06-03T06:00:02.586679+00:00"
+      },
+      {
+        "id": 57,
+        "prestamo_id": 4,
+        "fecha": "2025-06-03",
+        "monto": 40,
+        "estado": "pagado",
+        "cliente_id": 11,
+        "created_at": "2025-06-04T06:00:03.073507+00:00"
+      },
+      {
+        "id": 58,
+        "prestamo_id": 4,
+        "fecha": "2025-06-04",
+        "monto": 40,
+        "estado": "pagado",
+        "cliente_id": 11,
+        "created_at": "2025-06-05T06:00:05.415614+00:00"
+      },
+      {
+        "id": 62,
+        "prestamo_id": 4,
+        "fecha": "2025-06-06",
+        "monto": 40,
+        "estado": "pagado",
+        "cliente_id": 11,
+        "created_at": "2025-06-07T06:00:03.014108+00:00"
+      }
+    ]
+  }
+}

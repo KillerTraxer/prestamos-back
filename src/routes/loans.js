@@ -12,7 +12,14 @@ router.get('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
-        const prestamos = await Loan.findByWorkerId(req.user.id);
+        let prestamos;
+        // Si es admin y hay un collectorId, obtener préstamos de ese trabajador
+        if (req.user.role === 'admin' && req.query.collectorId) {
+            prestamos = await Loan.findByWorkerId(req.query.collectorId);
+        } else {
+            // Si no es admin o no hay collectorId, obtener préstamos del trabajador actual
+            prestamos = await Loan.findByWorkerId(req.user.id);
+        }
         res.json(prestamos);
     } catch (error) {
         console.error('Error obteniendo préstamos:', error);
@@ -296,8 +303,17 @@ router.post('/:id/abonos', authenticateJWT, async (req, res) => {
         const abono = await Payment.create(abonoData);
 
         // Verificar si con este abono se completa el préstamo
-        const totalAbonos = await Payment.getTotalByLoanId(prestamoId);
-        if (totalAbonos >= prestamo.monto + (prestamo.monto * prestamo.interes)) {
+        // Contar el número de pagos realizados
+        const pagosRealizados = await Payment.findByLoanId(prestamoId);
+        const numeroPagos = pagosRealizados.length;
+        
+        // Calcular la duración del préstamo en días
+        const fechaInicio = new Date(prestamo.fecha_inicio);
+        const fechaFin = new Date(prestamo.fecha_fin);
+        const duracionDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24)) + 1;
+        
+        // El préstamo se completa cuando se han hecho todos los pagos requeridos
+        if (numeroPagos >= duracionDias) {
             await prestamo.update({ estado: 'completado' });
         }
 
@@ -381,6 +397,7 @@ router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const prestamoId = req.params.id;
+    const { monto } = req.body; // Monto personalizado opcional
 
     try {
         const prestamo = await Loan.findById(prestamoId);
@@ -388,17 +405,35 @@ router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
             return res.status(404).json({ error: 'Préstamo no encontrado' });
         }
 
-        // Verificar que el préstamo no esté ya completado
-        if (prestamo.estado === 'completado') {
-            return res.status(400).json({ error: 'El préstamo ya está completado' });
+        // Verificar que el préstamo no esté ya completado o liquidado
+        if (prestamo.estado === 'completado' || prestamo.estado === 'liquidado') {
+            return res.status(400).json({ error: 'El préstamo ya está finalizado' });
         }
 
-        // Actualizar el estado del préstamo a completado
-        const updatedPrestamo = await prestamo.update({ estado: 'completado' });
+        // Calcular el monto de liquidación si no se proporciona uno personalizado
+        let montoLiquidacion = monto;
+        if (!monto) {
+            // Calcular cuántos pagos faltan por realizar
+            const pagosRealizados = await Payment.findByLoanId(prestamoId);
+            const numeroPagos = pagosRealizados.length;
+            
+            // Calcular la duración del préstamo en días
+            const fechaInicio = new Date(prestamo.fecha_inicio);
+            const fechaFin = new Date(prestamo.fecha_fin);
+            const duracionDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24)) + 1;
+            
+            // Calcular pagos pendientes y el monto de liquidación
+            const pagosPendientes = Math.max(0, duracionDias - numeroPagos);
+            montoLiquidacion = pagosPendientes * prestamo.pago_diario;
+        }
+
+        // Actualizar el estado del préstamo a liquidado
+        const updatedPrestamo = await prestamo.update({ estado: 'liquidado' });
 
         res.json({
             message: 'Préstamo liquidado exitosamente',
-            prestamo: updatedPrestamo
+            prestamo: updatedPrestamo,
+            monto_liquidacion: parseFloat(montoLiquidacion)
         });
     } catch (error) {
         console.error('Error liquidando préstamo:', error);

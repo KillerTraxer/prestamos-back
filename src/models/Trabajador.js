@@ -51,18 +51,40 @@ class Trabajador {
     }
 
     static async findByAuthId(authId) {
-        const { data, error } = await auth.supabaseAdmin
-            .from('trabajadores')
-            .select('*')
-            .eq('auth_id', authId)
-            .single();
+        console.log('Trabajador.findByAuthId: Buscando trabajador por auth_id:', authId);
+        
+        try {
+            const { data, error } = await auth.supabaseAdmin
+                .from('trabajadores')
+                .select('*')
+                .eq('auth_id', authId)
+                .single();
 
-        if (error) {
-            if (error.code === 'PGRST116') return null;
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    console.log('Trabajador.findByAuthId: No se encontró trabajador con auth_id:', authId);
+                    return null;
+                }
+                console.error('Trabajador.findByAuthId: Error en la búsqueda:', error);
+                throw error;
+            }
+
+            if (!data) {
+                console.log('Trabajador.findByAuthId: No data returned for auth_id:', authId);
+                return null;
+            }
+
+            console.log('Trabajador.findByAuthId: Trabajador encontrado:', {
+                id: data.id,
+                email: data.email,
+                nombre: data.nombre,
+                status: data.status
+            });
+            return new Trabajador(data);
+        } catch (error) {
+            console.error('Trabajador.findByAuthId: Error inesperado:', error);
             throw error;
         }
-
-        return data ? new Trabajador(data) : null;
     }
 
     static async findById(id) {

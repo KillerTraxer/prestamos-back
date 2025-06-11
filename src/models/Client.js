@@ -5,22 +5,12 @@ class Client {
     constructor(data) {
         this.id = data.id;
         this.nombre = data.nombre;
-        this.email = data.email;
         this.telefono = data.telefono;
         this.direccion = data.direccion;
         this.ocupacion = data.ocupacion;
-        this.monto_inicial = data.monto_inicial;
-        this.monto_actual = data.monto_actual;
-        this.fecha_inicio = data.fecha_inicio;
-        this.fecha_termino = data.fecha_termino;
-        this.estado = data.estado;
         this.trabajador_id = data.trabajador_id;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
-        this.total_multas_hoy = data.total_multas_hoy;
-        this.total_multas_semanales = data.total_multas_semanales;
-        this.comprobante_domicilio_url = data.comprobante_domicilio_url;
-        this.ine_url = data.ine_url;
     }
 
     static async findAll() {

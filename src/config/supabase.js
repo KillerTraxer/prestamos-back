@@ -26,7 +26,25 @@ const auth = {
     signIn: async (email, password) => {
         return supabase.auth.signInWithPassword({ email, password });
     },
-    signOut: async () => {
+    signOut: async (token = null) => {
+        if (token) {
+            // Intentar invalidar una sesión específica usando el token
+            try {
+                // Primero intentar obtener el usuario del token para invalidar su sesión
+                const { data: { user }, error: getUserError } = await supabaseAdmin.auth.getUser(token);
+                if (!getUserError && user) {
+                    // Invalidar todas las sesiones del usuario
+                    const { error: signOutError } = await supabaseAdmin.auth.signOut(user.id, 'global');
+                    if (signOutError) {
+                        console.warn('Error al invalidar sesión específica:', signOutError);
+                    }
+                }
+            } catch (error) {
+                console.warn('Error procesando signOut específico:', error);
+            }
+        }
+        
+        // Hacer signOut general como respaldo
         return supabase.auth.signOut();
     },
     resetPassword: async (email) => {

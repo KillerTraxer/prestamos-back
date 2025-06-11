@@ -296,4 +296,75 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
     }
 });
 
+// Obtener información de tipos de movimientos disponibles
+router.get('/tipos', authenticateJWT, async (req, res) => {
+    try {
+        const tiposConfig = Movimiento.getTipoMovimientoConfig();
+        const tiposInfo = Object.keys(tiposConfig).map(tipo => ({
+            tipo_movimiento: tipo,
+            signo: tiposConfig[tipo].signo,
+            descripcion: tiposConfig[tipo].descripcion,
+            es_ingreso: tiposConfig[tipo].signo === '+',
+            es_egreso: tiposConfig[tipo].signo === '-'
+        }));
+
+        res.json({
+            tipos_movimientos: tiposInfo,
+            total_tipos: tiposInfo.length,
+            tipos_ingreso: tiposInfo.filter(t => t.es_ingreso).length,
+            tipos_egreso: tiposInfo.filter(t => t.es_egreso).length
+        });
+    } catch (error) {
+        console.error('Error obteniendo tipos de movimientos:', error);
+        res.status(500).json({
+            error: 'Error obteniendo tipos de movimientos',
+            message: error.message
+        });
+    }
+});
+
+// Obtener balance total del sistema
+router.get('/balance', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { fechaInicio, fechaFin } = req.query;
+
+    try {
+        const balance = await Movimiento.getBalanceTotal(fechaInicio, fechaFin);
+        res.json({
+            balance_total: balance,
+            periodo: fechaInicio && fechaFin ? `${fechaInicio} a ${fechaFin}` : 'Todos los tiempos',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error obteniendo balance total:', error);
+        res.status(500).json({
+            error: 'Error obteniendo balance total',
+            message: error.message
+        });
+    }
+});
+
+// Obtener ingresos y egresos separados
+router.get('/ingresos-egresos', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { fechaInicio, fechaFin } = req.query;
+
+    try {
+        const datos = await Movimiento.getIngresosEgresos(fechaInicio, fechaFin);
+        res.json({
+            ...datos,
+            periodo: fechaInicio && fechaFin ? `${fechaInicio} a ${fechaFin}` : 'Todos los tiempos',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error obteniendo ingresos y egresos:', error);
+        res.status(500).json({
+            error: 'Error obteniendo ingresos y egresos',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router; 
