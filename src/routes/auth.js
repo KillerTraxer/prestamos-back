@@ -74,7 +74,10 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.status(400).json({ error: 'Datos incompletos' });
+        return res.status(400).json({
+            error: 'Datos incompletos',
+            message: 'El email y contraseña son requeridos'
+        });
     }
 
     try {
@@ -110,14 +113,32 @@ router.post('/login', async (req, res) => {
         const authId = loginData.user.id;
         console.log('Usuario autenticado en Supabase con auth_id:', authId);
 
-        let user = await User.findByAuthId(authId);
-        let isTrabajador = false;
+        // Función auxiliar para buscar usuario con reintento
+        const findUserWithRetry = async (retries = 3, delay = 500) => {
+            for (let i = 0; i < retries; i++) {
+                if (i > 0) {
+                    console.log(`Reintento ${i + 1}/${retries} después de ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
 
-        if (!user) {
-            console.log('No se encontró usuario admin, buscando trabajador...');
-            user = await Trabajador.findByAuthId(authId);
-            isTrabajador = true;
-        }
+                let user = await User.findByAuthId(authId);
+                let isTrabajador = false;
+
+                if (!user) {
+                    console.log('No se encontró usuario admin, buscando trabajador...');
+                    user = await Trabajador.findByAuthId(authId);
+                    isTrabajador = true;
+                }
+
+                if (user) {
+                    return { user, isTrabajador };
+                }
+            }
+            return { user: null, isTrabajador: false };
+        };
+
+        // Intentar encontrar el usuario con reintentos
+        const { user, isTrabajador } = await findUserWithRetry();
 
         console.log('Resultado de búsqueda de usuario:', {
             found: !!user,

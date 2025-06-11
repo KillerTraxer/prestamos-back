@@ -87,21 +87,34 @@ class SessionManager {
         try {
             console.log(`Limpiando sesión problemática [${context}] para auth_id: ${authId}`);
             
-            // Solo intentar invalidar si el usuario existe en Auth
+            // Esperar un momento antes de comenzar la limpieza
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Intentar invalidar sesiones de diferentes maneras
+            const methods = ['global', 'others', 'current'];
+            for (const method of methods) {
+                try {
+                    const { error } = await auth.supabaseAdmin.auth.admin.signOut(authId, method);
+                    if (!error) {
+                        console.log(`Sesiones invalidadas exitosamente usando método '${method}'`);
+                    }
+                    // Pequeña pausa entre intentos
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                } catch (error) {
+                    console.warn(`Error en método ${method}:`, error);
+                }
+            }
+
+            // Verificar el estado final
             const userExists = await this.userExistsInAuth(authId);
-            if (!userExists) {
-                console.log(`Usuario no existe en Auth, omitiendo invalidación de sesión para: ${authId}`);
-                return;
-            }
-            
-            const success = await this.invalidateUserSessions(authId, `problematic-${context}`);
-            if (success) {
-                console.log(`Sesión problemática limpiada exitosamente [${context}]`);
+            if (userExists) {
+                console.log(`Usuario aún existe en Auth después de limpieza [${context}]`);
             } else {
-                console.warn(`No se pudo limpiar completamente la sesión problemática [${context}]`);
+                console.log(`Usuario ya no existe en Auth después de limpieza [${context}]`);
             }
+
         } catch (error) {
-            console.warn(`Error limpiando sesión problemática [${context}]:`, error);
+            console.warn(`Error en limpieza problemática [${context}]:`, error);
         }
     }
 
@@ -176,14 +189,29 @@ class SessionManager {
         try {
             console.log(`Limpieza suave de sesión [${context}] para auth_id: ${authId}`);
             
+            // Agregar un pequeño delay para permitir que otras operaciones terminen
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
             // Solo verificar que existe pero NO invalidar agresivamente
             const userExists = await this.userExistsInAuth(authId);
             if (userExists) {
                 console.log(`Usuario existe en Auth, el problema puede ser temporal [${context}]`);
-                // No hacer nada agresivo, dejar que el refresh token maneje la situación
+                // Esperar un poco más antes de continuar
+                await new Promise(resolve => setTimeout(resolve, 200));
             } else {
                 console.log(`Usuario no existe en Auth [${context}]`);
             }
+
+            // Intentar invalidar la sesión de manera más suave
+            try {
+                const { error: signOutError } = await auth.supabaseAdmin.auth.admin.signOut(authId, 'others');
+                if (!signOutError) {
+                    console.log(`Sesiones secundarias invalidadas exitosamente [${context}]`);
+                }
+            } catch (signOutError) {
+                console.warn(`Error en invalidación suave [${context}]:`, signOutError);
+            }
+
         } catch (error) {
             console.warn(`Error en limpieza suave [${context}]:`, error);
         }
