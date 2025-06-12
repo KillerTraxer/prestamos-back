@@ -296,6 +296,59 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
     }
 });
 
+// Entregar dinero a trabajador (solo admins)
+router.post('/entregar-trabajador', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { trabajador_id, monto, descripcion } = req.body;
+
+    console.log('Entregando dinero a trabajador:', req.body);
+
+    if (!trabajador_id || !monto) {
+        return res.status(400).json({
+            error: 'Campos requeridos faltantes',
+            details: 'trabajador_id y monto son obligatorios'
+        });
+    }
+
+    try {
+        // Verificar que el trabajador existe
+        const Trabajador = require('../models/Trabajador');
+        const trabajador = await Trabajador.findById(trabajador_id);
+        
+        if (!trabajador) {
+            return res.status(404).json({
+                error: 'Trabajador no encontrado'
+            });
+        }
+
+        // Crear el movimiento de entrega a trabajador
+        const movimiento = await Movimiento.create({
+            tipo_movimiento: 'entrega_trabajador',
+            monto: parseFloat(monto),
+            fecha: new Date().toISOString().split('T')[0],
+            usuario_id: req.user.id, // El admin que hace la entrega
+            referencia_id: trabajador_id, // ID del trabajador que recibe
+        });
+
+        res.status(201).json({
+            message: 'Dinero entregado exitosamente',
+            movimiento,
+            trabajador: {
+                id: trabajador.id,
+                nombre: trabajador.nombre,
+                email: trabajador.email
+            }
+        });
+    } catch (error) {
+        console.error('Error entregando dinero a trabajador:', error);
+        res.status(500).json({
+            error: 'Error entregando dinero a trabajador',
+            message: error.message
+        });
+    }
+});
+
 // Obtener información de tipos de movimientos disponibles
 router.get('/tipos', authenticateJWT, async (req, res) => {
     try {
