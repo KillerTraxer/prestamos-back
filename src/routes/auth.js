@@ -658,4 +658,49 @@ router.post('/debug-refresh', async (req, res) => {
     }
 });
 
+// Ruta para obtener los datos actualizados del usuario
+router.get('/profile/updated-stats', authenticateJWT, async (req, res) => {
+    try {
+        console.log('Obteniendo estadísticas actualizadas para usuario:', req.user?.email);
+        
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        
+        let updatedStats = {
+            workers_count: 0,
+            clients_count: 0
+        };
+        
+        if (userRole === 'trabajador') {
+            // Para trabajadores, obtener solo el conteo de clientes
+            const clientes = await Client.findByWorkerId(userId);
+            updatedStats.clients_count = clientes.length;
+            // Los trabajadores no tienen workers_count
+            delete updatedStats.workers_count;
+        } else if (userRole === 'admin') {
+            // Para admins, obtener el conteo de trabajadores y clientes totales
+            const trabajadores = await Trabajador.findAll({
+                usuario_id: userId
+            });
+            updatedStats.workers_count = trabajadores.length;
+            // Sumar todos los clients_count de los trabajadores
+            updatedStats.clients_count = trabajadores.reduce((total, trabajador) => total + (trabajador.clients_count || 0), 0);
+        }
+        
+        console.log('Estadísticas actualizadas:', updatedStats);
+        
+        res.json({
+            message: 'Estadísticas actualizadas exitosamente',
+            stats: updatedStats
+        });
+        
+    } catch (error) {
+        console.error('Error obteniendo estadísticas actualizadas:', error);
+        res.status(500).json({
+            error: 'Error obteniendo estadísticas',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router; 
