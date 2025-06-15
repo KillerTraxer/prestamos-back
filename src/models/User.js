@@ -151,6 +151,30 @@ class User {
         return true;
     }
 
+    // Método para actualizar contraseña
+    static async updatePassword(userId, hashedPassword) {
+        console.log('User.updatePassword: Actualizando contraseña para usuario:', userId);
+        try {
+            const { data, error } = await auth.supabaseAdmin
+                .from('usuarios')
+                .update({ password: hashedPassword, updated_at: new Date().toISOString() })
+                .eq('id', userId)
+                .select()
+                .single();
+            
+            if (error) {
+                console.error('User.updatePassword: Error actualizando contraseña:', error);
+                throw error;
+            }
+            
+            console.log('User.updatePassword: Contraseña actualizada exitosamente');
+            return new User(data);
+        } catch (error) {
+            console.error('User.updatePassword: Error inesperado:', error);
+            throw error;
+        }
+    }
+
     // Métodos específicos para trabajadores
     async getClients() {
         if (this.role !== 'trabajador') {

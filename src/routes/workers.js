@@ -3,8 +3,10 @@ const router = express.Router();
 const { authenticateJWT } = require('../middleware/auth');
 const Trabajador = require('../models/Trabajador');
 const Client = require('../models/Client');
+const Movimiento = require('../models/Movimiento');
 const passwordUtils = require('../utils/password');
 const { auth } = require('../config/supabase');
+const moment = require('moment-timezone');
 
 // Obtener todos los trabajadores
 router.get('/', authenticateJWT, async (req, res) => {
@@ -35,6 +37,124 @@ router.get('/', authenticateJWT, async (req, res) => {
         res.status(500).json({
             error: 'Error obteniendo datos de trabajadores',
             message: error.message
+        });
+    }
+});
+
+// Obtener recolecciones diarias de todos los trabajadores
+router.get('/daily-collections', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        // Obtener fecha de hoy en timezone de México y convertir a UTC
+        const ahora = moment().tz('America/Mexico_City');
+        const inicioHoyLocal = ahora.clone().startOf('day');
+        const finHoyLocal = ahora.clone().endOf('day');
+        
+        // Convertir a UTC para consultas en base de datos
+        const inicioHoyUTC = inicioHoyLocal.clone().utc().format('YYYY-MM-DD HH:mm:ss');
+        const finHoyUTC = finHoyLocal.clone().utc().format('YYYY-MM-DD HH:mm:ss');
+        
+        console.log('📅 Conversión de fechas para daily collections:', {
+            inicioHoyLocal: inicioHoyLocal.format('YYYY-MM-DD HH:mm:ss'),
+            finHoyLocal: finHoyLocal.format('YYYY-MM-DD HH:mm:ss'),
+            inicioHoyUTC,
+            finHoyUTC
+        });
+        
+        // Obtener movimientos de recolección del día para trabajadores del admin (usando fechas UTC)
+        const movimientos = await Movimiento.getCollectionsByAdminAndDateRange(req.user.id, inicioHoyUTC, finHoyUTC);
+        
+        // Agrupar por trabajador y sumar las recolecciones
+        const recoleccionesPorTrabajador = {};
+        
+        movimientos.forEach(movimiento => {
+            const trabajadorId = movimiento.usuario_id;
+            if (!recoleccionesPorTrabajador[trabajadorId]) {
+                recoleccionesPorTrabajador[trabajadorId] = 0;
+            }
+            recoleccionesPorTrabajador[trabajadorId] += parseFloat(movimiento.monto);
+        });
+
+        res.json({ recolecciones: recoleccionesPorTrabajador });
+    } catch (error) {
+        console.error('Error obteniendo recolecciones diarias:', error);
+        res.status(500).json({
+            error: 'Error obteniendo recolecciones diarias',
+            message: error.message
+        });
+    }
+});
+
+// Obtener recolecciones mensuales de todos los trabajadores
+router.get('/monthly-collections', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        // Obtener fecha de inicio y fin del mes actual en timezone de México y convertir a UTC
+        const ahora = moment().tz('America/Mexico_City');
+        const inicioMesLocal = ahora.clone().startOf('month');
+        const finMesLocal = ahora.clone().endOf('month');
+        
+        // Convertir a UTC para consultas en base de datos
+        const inicioMesUTC = inicioMesLocal.clone().utc().format('YYYY-MM-DD HH:mm:ss');
+        const finMesUTC = finMesLocal.clone().utc().format('YYYY-MM-DD HH:mm:ss');
+        
+        console.log('📅 Conversión de fechas para monthly collections:', {
+            inicioMesLocal: inicioMesLocal.format('YYYY-MM-DD HH:mm:ss'),
+            finMesLocal: finMesLocal.format('YYYY-MM-DD HH:mm:ss'),
+            inicioMesUTC,
+            finMesUTC
+        });
+        
+        // Obtener movimientos de recolección del mes para trabajadores del admin (usando fechas UTC)
+        const movimientos = await Movimiento.getCollectionsByAdminAndDateRange(req.user.id, inicioMesUTC, finMesUTC);
+        
+        // Agrupar por trabajador y sumar las recolecciones
+        const recoleccionesPorTrabajador = {};
+        
+        movimientos.forEach(movimiento => {
+            const trabajadorId = movimiento.usuario_id;
+            if (!recoleccionesPorTrabajador[trabajadorId]) {
+                recoleccionesPorTrabajador[trabajadorId] = 0;
+            }
+            recoleccionesPorTrabajador[trabajadorId] += parseFloat(movimiento.monto);
+        });
+
+        res.json({ recolecciones: recoleccionesPorTrabajador });
+    } catch (error) {
+        console.error('Error obteniendo recolecciones mensuales:', error);
+        res.status(500).json({
+            error: 'Error obteniendo recolecciones mensuales',
+            message: error.message
+        });
+    }
+});
+
+// Obtener balance de dinero de un trabajador
+router.get('/:id/balance', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    const trabajadorId = req.params.id;
+
+    try {
+        const trabajador = await Trabajador.findById(trabajadorId);
+        if (!trabajador) {
+            return res.status(404).json({ error: 'Trabajador no encontrado' });
+        }
+
+        // Verificar que el trabajador pertenece al admin que hace la petición
+        if (trabajador.usuario_id !== req.user.id) {
+            return res.status(403).json({ error: 'No tienes permiso para ver este trabajador' });
+        }
+
+        const balance = await Movimiento.getWorkerBalance(trabajadorId, req.user.id);
+        res.json({ balance });
+    } catch (error) {
+        console.error('Error obteniendo balance del trabajador:', error);
+        res.status(500).json({ 
+            error: 'Error obteniendo balance del trabajador',
+            message: error.message 
         });
     }
 });

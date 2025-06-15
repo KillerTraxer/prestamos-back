@@ -703,4 +703,237 @@ router.get('/profile/updated-stats', authenticateJWT, async (req, res) => {
     }
 });
 
+// Ruta para verificar contraseña actual
+router.post('/verify-password', authenticateJWT, async (req, res) => {
+    const { currentPassword } = req.body;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    console.log('Verificación de contraseña iniciada para usuario:', {
+        userId,
+        userRole,
+        hasCurrentPassword: !!currentPassword
+    });
+
+    // Validar que se proporcione la contraseña
+    if (!currentPassword) {
+        return res.status(400).json({
+            error: 'Datos incompletos',
+            message: 'La contraseña actual es requerida'
+        });
+    }
+
+    try {
+        console.log('Buscando usuario en base de datos...');
+        // Buscar el usuario según su rol usando el ID de la base de datos
+        let user;
+        if (userRole === 'trabajador') {
+            console.log('Buscando trabajador con ID:', userId);
+            user = await Trabajador.findById(userId);
+            console.log('Trabajador encontrado:', user ? 'SÍ' : 'NO');
+        } else {
+            console.log('Buscando usuario admin con ID:', userId);
+            user = await User.findById(userId);
+            console.log('Usuario admin encontrado:', user ? 'SÍ' : 'NO');
+        }
+
+        if (!user) {
+            console.log('ERROR: Usuario no encontrado en base de datos');
+            return res.status(404).json({
+                error: 'Usuario no encontrado',
+                message: 'No se encontró el usuario en la base de datos'
+            });
+        }
+
+        console.log('Usuario encontrado, verificando contraseña actual...');
+        
+        // Verificar que la contraseña actual sea correcta
+        console.log('Verificando contraseña actual...');
+        console.log('Password hash en BD:', user.password ? 'EXISTE' : 'NO EXISTE');
+        
+        const isCurrentPasswordValid = await passwordUtils.verifyPassword(currentPassword, user.password);
+        console.log('Contraseña actual válida:', isCurrentPasswordValid);
+        
+        if (!isCurrentPasswordValid) {
+            console.log('ERROR: Contraseña actual incorrecta');
+            return res.status(400).json({
+                error: 'Contraseña incorrecta',
+                message: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        console.log('Contraseña verificada exitosamente');
+
+        // Respuesta exitosa
+        res.status(200).json({
+            message: 'Contraseña verificada exitosamente',
+            verified: true
+        });
+
+    } catch (error) {
+        console.error('Error verificando contraseña:', error);
+        console.error('Stack trace:', error.stack);
+        res.status(500).json({
+            error: 'Error interno del servidor',
+            message: 'Ocurrió un error al verificar la contraseña. Inténtalo más tarde.'
+        });
+    }
+});
+
+// Ruta para cambiar contraseña
+router.put('/change-password', authenticateJWT, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    console.log('Cambio de contraseña iniciado para usuario:', {
+        userId,
+        userRole,
+        hasCurrentPassword: !!currentPassword,
+        hasNewPassword: !!newPassword
+    });
+
+    // Validar que se proporcionen ambas contraseñas
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+            error: 'Datos incompletos',
+            message: 'La contraseña actual y la nueva contraseña son requeridas'
+        });
+    }
+
+    try {
+        console.log('Buscando usuario en base de datos...');
+        // Buscar el usuario según su rol usando el ID de la base de datos
+        let user;
+        if (userRole === 'trabajador') {
+            console.log('Buscando trabajador con ID:', userId);
+            user = await Trabajador.findById(userId);
+            console.log('Trabajador encontrado:', user ? 'SÍ' : 'NO');
+        } else {
+            console.log('Buscando usuario admin con ID:', userId);
+            user = await User.findById(userId);
+            console.log('Usuario admin encontrado:', user ? 'SÍ' : 'NO');
+        }
+
+        if (!user) {
+            console.log('ERROR: Usuario no encontrado en base de datos');
+            return res.status(404).json({
+                error: 'Usuario no encontrado',
+                message: 'No se encontró el usuario en la base de datos'
+            });
+        }
+
+        console.log('Usuario encontrado, verificando contraseña actual...');
+
+        // Verificar que la contraseña actual sea correcta
+        console.log('Verificando contraseña actual...');
+        console.log('Password hash en BD:', user.password ? 'EXISTE' : 'NO EXISTE');
+        
+        const isCurrentPasswordValid = await passwordUtils.verifyPassword(currentPassword, user.password);
+        console.log('Contraseña actual válida:', isCurrentPasswordValid);
+        
+        if (!isCurrentPasswordValid) {
+            console.log('ERROR: Contraseña actual incorrecta');
+            return res.status(400).json({
+                error: 'Contraseña incorrecta',
+                message: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        console.log('Contraseña actual verificada, validando nueva contraseña...');
+
+        // Validar la nueva contraseña
+        console.log('Validando nueva contraseña...');
+        const passwordValidation = passwordUtils.validatePassword(newPassword);
+        console.log('Nueva contraseña válida:', passwordValidation.isValid);
+        
+        if (!passwordValidation.isValid) {
+            console.log('ERROR: Nueva contraseña no válida:', passwordValidation.errors);
+            const errorMessages = Object.values(passwordValidation.errors).filter(error => error !== null);
+            return res.status(400).json({
+                error: 'Contraseña no válida',
+                message: 'La nueva contraseña no cumple con los requisitos de seguridad',
+                details: errorMessages
+            });
+        }
+
+        console.log('Nueva contraseña validada, verificando que sea diferente...');
+
+        // Verificar que la nueva contraseña no sea igual a la actual
+        console.log('Verificando que la nueva contraseña sea diferente...');
+        const isSamePassword = await passwordUtils.verifyPassword(newPassword, user.password);
+        console.log('Nueva contraseña es igual a la actual:', isSamePassword);
+        
+        if (isSamePassword) {
+            console.log('ERROR: Nueva contraseña es igual a la actual');
+            return res.status(400).json({
+                error: 'Contraseña duplicada',
+                message: 'La nueva contraseña debe ser diferente a la actual'
+            });
+        }
+
+        console.log('Nueva contraseña es diferente, hasheando...');
+
+        // Hashear la nueva contraseña
+        console.log('Hasheando nueva contraseña...');
+        const hashedNewPassword = await passwordUtils.hashPassword(newPassword);
+        console.log('Nueva contraseña hasheada exitosamente');
+
+        // Actualizar la contraseña en Supabase
+        console.log('Actualizando contraseña en Supabase...');
+        console.log('Auth ID para Supabase:', req.user.auth_id);
+        
+        const { error: supabaseError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+            req.user.auth_id,
+            { password: newPassword }
+        );
+
+        if (supabaseError) {
+            console.error('Error actualizando contraseña en Supabase:', supabaseError);
+            return res.status(500).json({
+                error: 'Error del servicio de autenticación',
+                message: 'No se pudo actualizar la contraseña en el sistema de autenticación'
+            });
+        }
+
+        console.log('Contraseña actualizada en Supabase exitosamente');
+
+        // Actualizar la contraseña en la base de datos local
+        console.log('Actualizando contraseña en base de datos local...');
+        console.log('User ID para BD:', user.id);
+        console.log('User Role:', userRole);
+        
+        if (userRole === 'trabajador') {
+            console.log('Actualizando contraseña en tabla trabajadores...');
+            await Trabajador.updatePassword(user.id, hashedNewPassword);
+        } else {
+            console.log('Actualizando contraseña en tabla usuarios...');
+            await User.updatePassword(user.id, hashedNewPassword);
+        }
+
+        console.log('Contraseña actualizada en base de datos exitosamente');
+
+        console.log('Contraseña actualizada exitosamente para usuario:', {
+            userId: user.id,
+            userRole,
+            email: user.email
+        });
+
+        // Respuesta exitosa
+        console.log('Enviando respuesta exitosa...');
+        res.status(200).json({
+            message: 'Contraseña actualizada exitosamente',
+            success: true
+        });
+
+    } catch (error) {
+        console.error('Error cambiando contraseña:', error);
+        console.error('Stack trace:', error.stack);
+        res.status(500).json({
+            error: 'Error interno del servidor',
+            message: 'Ocurrió un error al cambiar la contraseña. Inténtalo más tarde.'
+        });
+    }
+});
+
 module.exports = router; 

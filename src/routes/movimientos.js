@@ -376,6 +376,33 @@ router.get('/tipos', authenticateJWT, async (req, res) => {
     }
 });
 
+// Obtener resumen financiero del admin
+router.get('/finanzas/resumen', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') return res.sendStatus(403);
+
+    const { fechaInicio, fechaFin } = req.query;
+
+    try {
+        const resumen = await Movimiento.getFinancialSummaryByAdmin(
+            req.user.id, 
+            fechaInicio || null, 
+            fechaFin || null
+        );
+        
+        res.json({
+            message: 'Resumen financiero obtenido exitosamente',
+            data: resumen,
+            periodo: fechaInicio && fechaFin ? `${fechaInicio} a ${fechaFin}` : 'Todos los tiempos'
+        });
+    } catch (error) {
+        console.error('Error obteniendo resumen financiero:', error);
+        res.status(500).json({
+            error: 'Error obteniendo resumen financiero',
+            message: error.message
+        });
+    }
+});
+
 // Obtener balance total del sistema
 router.get('/balance', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
@@ -415,6 +442,37 @@ router.get('/ingresos-egresos', authenticateJWT, async (req, res) => {
         console.error('Error obteniendo ingresos y egresos:', error);
         res.status(500).json({
             error: 'Error obteniendo ingresos y egresos',
+            message: error.message
+        });
+    }
+});
+
+// Obtener recolecciones de un trabajador específico
+router.get('/recolecciones/usuario/:id', authenticateJWT, async (req, res) => {
+    // Los trabajadores solo pueden ver sus propias recolecciones, los admins pueden ver todas
+    if (req.user.role === 'trabajador' && req.user.id !== parseInt(req.params.id)) {
+        return res.sendStatus(403);
+    }
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') {
+        return res.sendStatus(403);
+    }
+
+    const { fechaInicio, fechaFin } = req.query;
+
+    try {
+        // Para trabajadores, forzar el ID a su propio ID por seguridad
+        const targetUserId = req.user.role === 'trabajador' ? req.user.id : parseInt(req.params.id);
+        
+        const recolecciones = await Movimiento.getWorkerCollections(targetUserId, fechaInicio, fechaFin);
+        res.json({ 
+            usuario_id: targetUserId,
+            ...recolecciones,
+            periodo: fechaInicio && fechaFin ? `${fechaInicio} a ${fechaFin}` : 'Todos los tiempos'
+        });
+    } catch (error) {
+        console.error('Error obteniendo recolecciones por usuario:', error);
+        res.status(500).json({
+            error: 'Error obteniendo recolecciones por usuario',
             message: error.message
         });
     }

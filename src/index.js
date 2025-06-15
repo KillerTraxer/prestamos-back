@@ -15,6 +15,7 @@ const fineRoutes = require('./routes/fines');
 const adeudoRoutes = require('./routes/adeudos');
 const movimientoRoutes = require('./routes/movimientos');
 const expenseRoutes = require('./routes/expenses');
+const userRoutes = require('./routes/users');
 
 // Importar configuración de trabajos cron
 const { initCronJobs } = require('./jobs/cron');
@@ -62,6 +63,7 @@ app.use('/multas', fineRoutes);
 app.use('/adeudos', adeudoRoutes);
 app.use('/movimientos', movimientoRoutes);
 app.use('/gastos', expenseRoutes);
+app.use('/users', userRoutes);
 
 // Health check routes
 app.get('/', (req, res) => {

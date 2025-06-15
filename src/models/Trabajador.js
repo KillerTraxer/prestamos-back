@@ -10,6 +10,7 @@ class Trabajador {
         this.status = data.status;
         this.phone = data.phone;
         this.auth_id = data.auth_id;
+        this.password = data.password;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
     }
@@ -186,6 +187,30 @@ class Trabajador {
 
         if (error) throw error;
         return passwordUtils.verifyPassword(password, data.password);
+    }
+
+    // Método para actualizar contraseña
+    static async updatePassword(trabajadorId, hashedPassword) {
+        console.log('Trabajador.updatePassword: Actualizando contraseña para trabajador:', trabajadorId);
+        try {
+            const { data, error } = await auth.supabaseAdmin
+                .from('trabajadores')
+                .update({ password: hashedPassword, updated_at: new Date().toISOString() })
+                .eq('id', trabajadorId)
+                .select()
+                .single();
+            
+            if (error) {
+                console.error('Trabajador.updatePassword: Error actualizando contraseña:', error);
+                throw error;
+            }
+            
+            console.log('Trabajador.updatePassword: Contraseña actualizada exitosamente');
+            return new Trabajador(data);
+        } catch (error) {
+            console.error('Trabajador.updatePassword: Error inesperado:', error);
+            throw error;
+        }
     }
 
     static async findAll(filters = {}) {

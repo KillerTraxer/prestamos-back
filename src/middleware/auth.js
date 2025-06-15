@@ -140,7 +140,8 @@ const authenticateJWT = async (req, res, next) => {
                     email: dbUser.email,
                     nombre: dbUser.nombre,
                     role: dbUser.role || 'trabajador',
-                    status: dbUser.status
+                    status: dbUser.status,
+                    auth_id: refreshedUser.id // Agregamos el auth_id del usuario renovado
                 };
 
                 // Agregar datos específicos según el tipo de usuario
@@ -243,7 +244,8 @@ const authenticateJWT = async (req, res, next) => {
             email: dbUser.email,
             nombre: dbUser.nombre,
             role: dbUser.role || 'trabajador',
-            status: dbUser.status
+            status: dbUser.status,
+            auth_id: user.id // Agregamos el auth_id del usuario de Supabase
         };
 
         return next();
