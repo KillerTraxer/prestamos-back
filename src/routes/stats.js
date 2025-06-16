@@ -18,6 +18,14 @@ router.get('/admin', authenticateJWT, async (req, res) => {
     const adminId = req.user.id;
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cacheKey = `admin_stats:${adminId}:${periodo}`;
+        const cachedStats = authCache.getChartData(adminId, 'admin', 'admin_stats', periodo);
+        if (cachedStats) {
+            console.log('📊 Estadísticas admin obtenidas desde cache para período:', periodo);
+            return res.json(cachedStats);
+        }
         // Definir rangos de fechas según el período en zona horaria de México
         let fechaInicioLocal, fechaFinLocal, fechaInicioUTC, fechaFinUTC;
         const ahora = moment().tz('America/Mexico_City');
@@ -87,6 +95,10 @@ router.get('/admin', authenticateJWT, async (req, res) => {
             fecha_fin: fechaFin
         };
 
+        // Guardar en cache
+        authCache.setChartData(adminId, 'admin', 'admin_stats', periodo, estadisticas);
+        console.log('📊 Estadísticas admin guardadas en cache para período:', periodo);
+
         res.json(estadisticas);
     } catch (error) {
         console.error('Error obteniendo estadísticas del admin:', error);
@@ -102,6 +114,13 @@ router.get('/trabajador', authenticateJWT, async (req, res) => {
     const trabajadorId = req.user.id;
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedStats = authCache.getChartData(trabajadorId, 'trabajador', 'worker_stats', periodo);
+        if (cachedStats) {
+            console.log('📊 Estadísticas trabajador obtenidas desde cache para período:', periodo);
+            return res.json(cachedStats);
+        }
         // Definir rangos de fechas según el período en zona horaria de México
         let fechaInicioLocal, fechaFinLocal, fechaInicioUTC, fechaFinUTC;
         const ahora = moment().tz('America/Mexico_City');
@@ -205,6 +224,10 @@ router.get('/trabajador', authenticateJWT, async (req, res) => {
             fecha_fin: fechaFin
         };
 
+        // Guardar en cache
+        authCache.setChartData(trabajadorId, 'trabajador', 'worker_stats', periodo, estadisticas);
+        console.log('📊 Estadísticas trabajador guardadas en cache para período:', periodo);
+
         res.json(estadisticas);
     } catch (error) {
         console.error('Error obteniendo estadísticas del trabajador:', error);
@@ -220,6 +243,13 @@ router.get('/trabajadores-rendimiento', authenticateJWT, async (req, res) => {
     const adminId = req.user.id;
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedStats = authCache.getChartData(adminId, 'admin', 'workers_performance', periodo);
+        if (cachedStats) {
+            console.log('📊 Rendimiento trabajadores obtenido desde cache para período:', periodo);
+            return res.json(cachedStats);
+        }
         // Definir rangos de fechas según el período en zona horaria de México
         let fechaInicioLocal, fechaFinLocal, fechaInicioUTC, fechaFinUTC;
         const ahora = moment().tz('America/Mexico_City');
@@ -290,6 +320,10 @@ router.get('/trabajadores-rendimiento', authenticateJWT, async (req, res) => {
             })
         );
 
+        // Guardar en cache
+        authCache.setChartData(adminId, 'admin', 'workers_performance', periodo, rendimientoTrabajadores);
+        console.log('📊 Rendimiento trabajadores guardado en cache para período:', periodo);
+
         res.json(rendimientoTrabajadores);
     } catch (error) {
         console.error('Error obteniendo rendimiento de trabajadores:', error);
@@ -304,6 +338,13 @@ router.get('/clientes-detalle', authenticateJWT, async (req, res) => {
     const adminId = req.user.id;
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedStats = authCache.getChartData(adminId, 'admin', 'clients_detail', 'static');
+        if (cachedStats) {
+            console.log('📊 Detalle de clientes obtenido desde cache');
+            return res.json(cachedStats);
+        }
         // Obtener trabajadores del admin
         const trabajadores = await Trabajador.findAll({ usuario_id: adminId });
         const trabajadorIds = trabajadores.map(t => t.id);
@@ -406,6 +447,10 @@ router.get('/clientes-detalle', authenticateJWT, async (req, res) => {
                 };
             })
         );
+
+        // Guardar en cache
+        authCache.setChartData(adminId, 'admin', 'clients_detail', 'static', clientesDetalle);
+        console.log('📊 Detalle de clientes guardado en cache');
 
         res.json(clientesDetalle);
     } catch (error) {
@@ -526,6 +571,13 @@ router.get('/trabajador-clientes-detalle', authenticateJWT, async (req, res) => 
 // Función auxiliar para obtener recolecciones por día
 async function obtenerRecoleccionesPorDia(adminId, fechaInicio, fechaFin, periodo) {
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedData = authCache.getChartData(adminId, 'admin', 'recolecciones', periodo);
+        if (cachedData) {
+            console.log('📈 Datos de gráfica obtenidos desde cache');
+            return cachedData;
+        }
         const movimientos = await Movimiento.getFinancialMovementsByAdmin(adminId, fechaInicio, fechaFin);
         
         console.log(`Generando gráfica para período: ${periodo}, rango: ${fechaInicio} - ${fechaFin}`);
@@ -544,24 +596,36 @@ async function obtenerRecoleccionesPorDia(adminId, fechaInicio, fechaFin, period
             case 'Diario':
                 // Para diario, mostrar el día actual dividido en 8 períodos de 3 horas cada uno
                 const inicioDelDia = moment().tz('America/Mexico_City').startOf('day');
-                const finDelDia = moment().tz('America/Mexico_City').endOf('day');
                 
-                // Crear 8 períodos de 3 horas cada uno (00:00-03:00, 03:00-06:00, etc.)
+                // Optimización: agrupar por horas en una sola pasada
+                const recoleccionesPorHora = {};
+                
+                // Inicializar todos los rangos con 0
                 for (let i = 0; i < 8; i++) {
-                    const inicioRango = inicioDelDia.clone().add(i * 3, 'hours');
-                    const finRango = inicioRango.clone().add(3, 'hours');
-                    const label = inicioRango.format('HH:mm');
+                    const hora = i * 3;
+                    recoleccionesPorHora[hora] = 0;
+                }
+                
+                // Procesar todos los movimientos de una vez
+                recolecciones.forEach(mov => {
+                    const fechaMovMexico = moment.utc(mov.created_at).tz('America/Mexico_City');
+                    if (fechaMovMexico.isSame(inicioDelDia, 'day')) {
+                        const horaMovimiento = fechaMovMexico.hour();
+                        // Determinar en qué rango de 3 horas cae
+                        const rangoIndex = Math.floor(horaMovimiento / 3) * 3;
+                        if (recoleccionesPorHora.hasOwnProperty(rangoIndex)) {
+                            recoleccionesPorHora[rangoIndex] += Math.abs(parseFloat(mov.monto));
+                        }
+                    }
+                });
+                
+                // Generar datos de gráfica
+                for (let i = 0; i < 8; i++) {
+                    const hora = i * 3;
+                    const label = String(hora).padStart(2, '0') + ':00';
+                    const total = recoleccionesPorHora[hora];
                     
-                    // Buscar recolecciones en este rango de 3 horas
-                    const recoleccionesRango = recolecciones.filter(mov => {
-                        // Convertir la fecha UTC del movimiento a timezone de México
-                        const fechaMovMexico = moment.utc(mov.created_at).tz('America/Mexico_City');
-                        return fechaMovMexico.isBetween(inicioRango, finRango, null, '[)');
-                    });
-                    
-                    const total = recoleccionesRango.reduce((sum, mov) => sum + Math.abs(parseFloat(mov.monto)), 0);
-                    
-                    console.log(`Rango ${label}: ${recoleccionesRango.length} movimientos, total: ${total}`);
+                    console.log(`Rango ${label}: ${Math.round(total)} total`);
                     
                     datosGrafica.push({
                         label,
@@ -643,6 +707,10 @@ async function obtenerRecoleccionesPorDia(adminId, fechaInicio, fechaFin, period
         }
         
         console.log('Datos de gráfica generados:', datosGrafica);
+        
+        // Guardar en cache
+        authCache.setChartData(adminId, 'admin', 'recolecciones', periodo, datosGrafica);
+        
         return datosGrafica;
         
     } catch (error) {
@@ -692,6 +760,13 @@ function calcularEstadoPrestamo(cliente) {
 // Función auxiliar para obtener recolecciones por día del trabajador
 async function obtenerRecoleccionesPorDiaTrabajador(trabajadorId, fechaInicio, fechaFin, periodo) {
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedData = authCache.getChartData(trabajadorId, 'trabajador', 'recolecciones', periodo);
+        if (cachedData) {
+            console.log('📈 Datos de gráfica del trabajador obtenidos desde cache');
+            return cachedData;
+        }
         // Obtener movimientos del trabajador directamente
         const movimientos = await Movimiento.getMovimientosByUserAndDateRange(trabajadorId, fechaInicio, fechaFin);
         
@@ -711,24 +786,36 @@ async function obtenerRecoleccionesPorDiaTrabajador(trabajadorId, fechaInicio, f
             case 'Diario':
                 // Para diario, mostrar el día actual dividido en 8 períodos de 3 horas cada uno
                 const inicioDelDia = moment().tz('America/Mexico_City').startOf('day');
-                const finDelDia = moment().tz('America/Mexico_City').endOf('day');
                 
-                // Crear 8 períodos de 3 horas cada uno (00:00-03:00, 03:00-06:00, etc.)
+                // Optimización: agrupar por horas en una sola pasada
+                const recoleccionesPorHora = {};
+                
+                // Inicializar todos los rangos con 0
                 for (let i = 0; i < 8; i++) {
-                    const inicioRango = inicioDelDia.clone().add(i * 3, 'hours');
-                    const finRango = inicioRango.clone().add(3, 'hours');
-                    const label = inicioRango.format('HH:mm');
+                    const hora = i * 3;
+                    recoleccionesPorHora[hora] = 0;
+                }
+                
+                // Procesar todos los movimientos de una vez
+                recolecciones.forEach(mov => {
+                    const fechaMovMexico = moment.utc(mov.created_at).tz('America/Mexico_City');
+                    if (fechaMovMexico.isSame(inicioDelDia, 'day')) {
+                        const horaMovimiento = fechaMovMexico.hour();
+                        // Determinar en qué rango de 3 horas cae
+                        const rangoIndex = Math.floor(horaMovimiento / 3) * 3;
+                        if (recoleccionesPorHora.hasOwnProperty(rangoIndex)) {
+                            recoleccionesPorHora[rangoIndex] += Math.abs(parseFloat(mov.monto));
+                        }
+                    }
+                });
+                
+                // Generar datos de gráfica
+                for (let i = 0; i < 8; i++) {
+                    const hora = i * 3;
+                    const label = String(hora).padStart(2, '0') + ':00';
+                    const total = recoleccionesPorHora[hora];
                     
-                    // Buscar recolecciones en este rango de 3 horas
-                    const recoleccionesRango = recolecciones.filter(mov => {
-                        // Convertir la fecha UTC del movimiento a timezone de México
-                        const fechaMovMexico = moment.utc(mov.created_at).tz('America/Mexico_City');
-                        return fechaMovMexico.isBetween(inicioRango, finRango, null, '[)');
-                    });
-                    
-                    const total = recoleccionesRango.reduce((sum, mov) => sum + Math.abs(parseFloat(mov.monto)), 0);
-                    
-                    console.log(`Rango ${label}: ${recoleccionesRango.length} movimientos, total: ${total}`);
+                    console.log(`Rango ${label}: ${Math.round(total)} total`);
                     
                     datosGrafica.push({
                         label,
@@ -810,6 +897,10 @@ async function obtenerRecoleccionesPorDiaTrabajador(trabajadorId, fechaInicio, f
         }
         
         console.log('Datos de gráfica generados para trabajador:', datosGrafica);
+        
+        // Guardar en cache
+        authCache.setChartData(trabajadorId, 'trabajador', 'recolecciones', periodo, datosGrafica);
+        
         return datosGrafica;
         
     } catch (error) {

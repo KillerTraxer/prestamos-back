@@ -22,6 +22,13 @@ class AuthCache {
             checkperiod: 15,
             useClones: false 
         });
+        
+        // Cache con TTL de 5 minutos para gráficas complejas
+        this.chartCache = new NodeCache({ 
+            stdTTL: 300, // 5 minutos
+            checkperiod: 30,
+            useClones: false 
+        });
 
         // Rate limiter simple
         this.requestCounts = new NodeCache({ 
@@ -60,6 +67,17 @@ class AuthCache {
         return this.statsCache.set(`stats:${userId}:${role}`, stats);
     }
 
+    // Cache para gráficas complejas
+    getChartData(userId, role, chartType, period) {
+        const key = `chart:${userId}:${role}:${chartType}:${period}`;
+        return this.chartCache.get(key);
+    }
+
+    setChartData(userId, role, chartType, period, data) {
+        const key = `chart:${userId}:${role}:${chartType}:${period}`;
+        return this.chartCache.set(key, data);
+    }
+
     // Rate limiting simple
     checkRateLimit(identifier, maxRequests = 10) {
         const current = this.requestCounts.get(identifier) || 0;
@@ -80,6 +98,13 @@ class AuthCache {
                 this.statsCache.del(key);
             }
         });
+        // También limpiar gráficas
+        const chartKeys = this.chartCache.keys();
+        chartKeys.forEach(key => {
+            if (key.includes(authId)) {
+                this.chartCache.del(key);
+            }
+        });
     }
 
     // Limpiar todo el cache
@@ -87,6 +112,7 @@ class AuthCache {
         this.userCache.flushAll();
         this.tokenCache.flushAll();
         this.statsCache.flushAll();
+        this.chartCache.flushAll();
         this.requestCounts.flushAll();
     }
 
@@ -104,6 +130,10 @@ class AuthCache {
             stats: {
                 keys: this.statsCache.keys().length,
                 stats: this.statsCache.getStats()
+            },
+            charts: {
+                keys: this.chartCache.keys().length,
+                stats: this.chartCache.getStats()
             },
             rateLimits: {
                 keys: this.requestCounts.keys().length,

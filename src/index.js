@@ -21,7 +21,7 @@ const cacheDebugRoutes = require('./routes/cache-debug');
 // Importar configuración de trabajos cron
 const { initCronJobs } = require('./jobs/cron');
 // Importar middlewares de optimización
-const { requestLogger, concurrencyLimiter } = require('./middleware/request-limiter');
+const { requestLogger, concurrencyLimiter, earlyRateLimiter } = require('./middleware/request-limiter');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,17 +33,20 @@ app.use(express.json());
 // Configurar trust proxy para obtener IP real
 app.set('trust proxy', true);
 
-// Middleware de logging optimizado y limitadores
+// Rate limiting temprano (antes de autenticación)
+app.use(earlyRateLimiter);
+
+// Middleware de logging básico solo para peticiones importantes
 app.use((req, res, next) => {
-    // Solo loggear peticiones problemáticas o importantes
-    if (req.url.includes('/auth') || req.url.includes('/stats') || req.method !== 'GET') {
+    // Solo loggear peticiones que no sean GET o que tengan problemas
+    if ((req.url.includes('/auth') && req.method !== 'GET') || req.url.includes('/stats') || req.method === 'POST') {
         const timestamp = new Date().toISOString();
         console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${req.ip}`);
     }
     next();
 });
 
-app.use(requestLogger);
+// El requestLogger se aplicará en las rutas específicas después de la autenticación
 app.use(concurrencyLimiter);
 
 // Configurar almacenamiento de archivos

@@ -28,14 +28,14 @@ const requestLimiter = (options = {}) => {
             }
         }
 
-        // Para peticiones de estadísticas, ser más restrictivo
-        if (req.path.includes('/stats') || req.path.includes('/updated-stats')) {
-            if (!authCache.checkRateLimit(`stats:${requestKey}`, 2)) { // máximo 2 por minuto
+        // Para peticiones de estadísticas, ser extremadamente permisivo (operación compleja)
+        if (req.path.includes('/stats') || req.path.includes('/updated-stats') || req.path.includes('/estadisticas/')) {
+            if (!authCache.checkRateLimit(`stats:${requestKey}`, 30)) { // máximo 30 por minuto
                 console.log(`Stats request rate limited: ${requestKey} from IP: ${clientIP}`);
                 return res.status(429).json({
                     error: 'Stats rate limit',
                     message: 'Demasiadas peticiones de estadísticas. Espere un momento.',
-                    retryAfter: 30
+                    retryAfter: 5
                 });
             }
         }
@@ -46,6 +46,7 @@ const requestLimiter = (options = {}) => {
 
 /**
  * Middleware para logging de peticiones repetitivas (solo para debug)
+ * Se ejecuta DESPUÉS del middleware de autenticación
  */
 const requestLogger = (req, res, next) => {
     const userId = req.user?.id || 'anonymous';
@@ -55,6 +56,37 @@ const requestLogger = (req, res, next) => {
     // Solo loggear peticiones problemáticas
     if (req.path.includes('/auth') || req.path.includes('/stats')) {
         console.log(`🔍 Request: ${requestKey} | User: ${userEmail} (${userId}) | IP: ${req.ip || 'unknown'}`);
+    }
+    
+    next();
+};
+
+/**
+ * Middleware de rate limiting temprano (antes de autenticación)
+ */
+const earlyRateLimiter = (req, res, next) => {
+    const clientIP = req.ip || req.connection.remoteAddress;
+    
+    // Rate limiting muy permisivo para estadísticas (operación compleja)
+    if (req.path.includes('/auth/profile/updated-stats') || req.path.includes('/estadisticas/')) {
+        if (!authCache.checkRateLimit(`early:${clientIP}:stats`, 50)) { // máximo 50 por minuto
+            console.log(`🚫 Early rate limit exceeded for stats: IP ${clientIP}`);
+            return res.status(429).json({
+                error: 'Too many requests',
+                message: 'Demasiadas peticiones a estadísticas. Espere un momento.',
+                retryAfter: 10
+            });
+        }
+    }
+    
+    // Rate limiting general por IP - muy permisivo
+    if (!authCache.checkRateLimit(`early:${clientIP}`, 100)) { // máximo 100 por minuto
+        console.log(`🚫 Early rate limit exceeded: IP ${clientIP}`);
+        return res.status(429).json({
+            error: 'Too many requests',
+            message: 'Demasiadas peticiones. Espere un momento.',
+            retryAfter: 20
+        });
     }
     
     next();
@@ -97,5 +129,6 @@ const concurrencyLimiter = (req, res, next) => {
 module.exports = {
     requestLimiter,
     requestLogger,
-    concurrencyLimiter
+    concurrencyLimiter,
+    earlyRateLimiter
 }; 

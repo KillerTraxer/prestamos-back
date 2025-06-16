@@ -658,8 +658,11 @@ router.post('/debug-refresh', async (req, res) => {
     }
 });
 
+// Importar middleware de logging
+const { requestLogger } = require('../middleware/request-limiter');
+
 // Ruta para obtener los datos actualizados del usuario
-router.get('/profile/updated-stats', authenticateJWT, async (req, res) => {
+router.get('/profile/updated-stats', authenticateJWT, requestLogger, async (req, res) => {
     try {
         console.log('Obteniendo estadísticas actualizadas para usuario:', req.user?.email);
         

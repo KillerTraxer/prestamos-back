@@ -15,6 +15,13 @@ router.get('/', authenticateJWT, async (req, res) => {
     console.log(req.user);
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedWorkers = authCache.getChartData(req.user.id, 'admin', 'workers_list', 'all');
+        if (cachedWorkers) {
+            console.log('👷 Lista de trabajadores obtenida desde cache');
+            return res.json(cachedWorkers);
+        }
         // Obtener solo los trabajadores asociados al admin que hace la petición
         const trabajadores = await Trabajador.findAll({
             usuario_id: req.user.id
@@ -31,6 +38,10 @@ router.get('/', authenticateJWT, async (req, res) => {
             })
         );
 
+        // Guardar en cache
+        authCache.setChartData(req.user.id, 'admin', 'workers_list', 'all', trabajadoresConConteo);
+        console.log('👷 Lista de trabajadores guardada en cache');
+        
         res.json(trabajadoresConConteo);
     } catch (error) {
         console.error('Error obteniendo datos de trabajadores:', error);
@@ -46,6 +57,13 @@ router.get('/daily-collections', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedCollections = authCache.getChartData(req.user.id, 'admin', 'daily_collections', 'today');
+        if (cachedCollections) {
+            console.log('📊 Recolecciones diarias obtenidas desde cache');
+            return res.json(cachedCollections);
+        }
         // Obtener fecha de hoy en timezone de México y convertir a UTC
         const ahora = moment().tz('America/Mexico_City');
         const inicioHoyLocal = ahora.clone().startOf('day');
@@ -76,7 +94,13 @@ router.get('/daily-collections', authenticateJWT, async (req, res) => {
             recoleccionesPorTrabajador[trabajadorId] += parseFloat(movimiento.monto);
         });
 
-        res.json({ recolecciones: recoleccionesPorTrabajador });
+        const result = { recolecciones: recoleccionesPorTrabajador };
+        
+        // Guardar en cache
+        authCache.setChartData(req.user.id, 'admin', 'daily_collections', 'today', result);
+        console.log('📊 Recolecciones diarias guardadas en cache');
+        
+        res.json(result);
     } catch (error) {
         console.error('Error obteniendo recolecciones diarias:', error);
         res.status(500).json({
@@ -91,6 +115,13 @@ router.get('/monthly-collections', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cachedCollections = authCache.getChartData(req.user.id, 'admin', 'monthly_collections', 'this_month');
+        if (cachedCollections) {
+            console.log('📊 Recolecciones mensuales obtenidas desde cache');
+            return res.json(cachedCollections);
+        }
         // Obtener fecha de inicio y fin del mes actual en timezone de México y convertir a UTC
         const ahora = moment().tz('America/Mexico_City');
         const inicioMesLocal = ahora.clone().startOf('month');
@@ -121,7 +152,13 @@ router.get('/monthly-collections', authenticateJWT, async (req, res) => {
             recoleccionesPorTrabajador[trabajadorId] += parseFloat(movimiento.monto);
         });
 
-        res.json({ recolecciones: recoleccionesPorTrabajador });
+        const result = { recolecciones: recoleccionesPorTrabajador };
+        
+        // Guardar en cache
+        authCache.setChartData(req.user.id, 'admin', 'monthly_collections', 'this_month', result);
+        console.log('📊 Recolecciones mensuales guardadas en cache');
+        
+        res.json(result);
     } catch (error) {
         console.error('Error obteniendo recolecciones mensuales:', error);
         res.status(500).json({

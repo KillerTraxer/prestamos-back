@@ -38,6 +38,14 @@ router.get('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cacheKey = req.query.collectorId ? `clients_by_collector:${req.query.collectorId}` : `clients:${req.user.id}`;
+        const cachedClients = authCache.getChartData(req.user.id, req.user.role, 'clients_list', cacheKey);
+        if (cachedClients) {
+            console.log('👥 Lista de clientes obtenida desde cache');
+            return res.json(cachedClients);
+        }
         let clientes;
         // Si es admin y hay un collectorId, obtener clientes de ese trabajador
         if (req.user.role === 'admin' && req.query.collectorId) {
@@ -46,6 +54,10 @@ router.get('/', authenticateJWT, async (req, res) => {
             // Si no es admin o no hay collectorId, obtener clientes del trabajador actual
             clientes = await Client.findByWorkerId(req.user.id);
         }
+        // Guardar en cache
+        authCache.setChartData(req.user.id, req.user.role, 'clients_list', cacheKey, clientes);
+        console.log('👥 Lista de clientes guardada en cache');
+        
         res.json(clientes);
     } catch (error) {
         console.error('Error obteniendo clientes:', error);

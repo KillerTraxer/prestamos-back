@@ -12,6 +12,14 @@ router.get('/', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const cacheKey = req.query.collectorId ? `loans_by_collector:${req.query.collectorId}` : `loans:${req.user.id}`;
+        const cachedLoans = authCache.getChartData(req.user.id, req.user.role, 'loans_list', cacheKey);
+        if (cachedLoans) {
+            console.log('💳 Lista de préstamos obtenida desde cache');
+            return res.json(cachedLoans);
+        }
         let prestamos;
         // Si es admin y hay un collectorId, obtener préstamos de ese trabajador
         if (req.user.role === 'admin' && req.query.collectorId) {
@@ -20,6 +28,10 @@ router.get('/', authenticateJWT, async (req, res) => {
             // Si no es admin o no hay collectorId, obtener préstamos del trabajador actual
             prestamos = await Loan.findByWorkerId(req.user.id);
         }
+        // Guardar en cache
+        authCache.setChartData(req.user.id, req.user.role, 'loans_list', cacheKey, prestamos);
+        console.log('💳 Lista de préstamos guardada en cache');
+        
         res.json(prestamos);
     } catch (error) {
         console.error('Error obteniendo préstamos:', error);

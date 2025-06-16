@@ -383,17 +383,31 @@ router.get('/finanzas/resumen', authenticateJWT, async (req, res) => {
     const { fechaInicio, fechaFin } = req.query;
 
     try {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        const periodKey = fechaInicio && fechaFin ? `${fechaInicio}_${fechaFin}` : 'all_time';
+        const cachedSummary = authCache.getChartData(req.user.id, 'admin', 'financial_summary', periodKey);
+        if (cachedSummary) {
+            console.log('💰 Resumen financiero obtenido desde cache');
+            return res.json(cachedSummary);
+        }
         const resumen = await Movimiento.getFinancialSummaryByAdmin(
             req.user.id, 
             fechaInicio || null, 
             fechaFin || null
         );
         
-        res.json({
+        const result = {
             message: 'Resumen financiero obtenido exitosamente',
             data: resumen,
             periodo: fechaInicio && fechaFin ? `${fechaInicio} a ${fechaFin}` : 'Todos los tiempos'
-        });
+        };
+        
+        // Guardar en cache
+        authCache.setChartData(req.user.id, 'admin', 'financial_summary', periodKey, result);
+        console.log('💰 Resumen financiero guardado en cache');
+        
+        res.json(result);
     } catch (error) {
         console.error('Error obteniendo resumen financiero:', error);
         res.status(500).json({
