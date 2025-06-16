@@ -2,9 +2,9 @@ const { auth } = require('../config/supabase');
 const User = require('../models/User');
 const Trabajador = require('../models/Trabajador');
 const SessionManager = require('../utils/session-manager');
+const authCache = require('../utils/auth-cache');
 
 const authenticateJWT = async (req, res, next) => {
-    console.log('Iniciando proceso de autenticación...');
     const authHeader = req.headers.authorization;
     const refreshTokenHeader = req.headers['x-refresh-token'];
 
@@ -17,10 +17,38 @@ const authenticateJWT = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
+    const clientIP = req.ip || req.connection.remoteAddress;
+    
+    // Rate limiting - máximo 15 peticiones por minuto por IP
+    if (!authCache.checkRateLimit(`auth:${clientIP}`, 15)) {
+        console.log(`Rate limit exceeded for IP: ${clientIP}`);
+        return res.status(429).json({
+            error: 'Too many requests',
+            message: 'Demasiadas peticiones. Intente nuevamente en un momento.',
+            retryAfter: 60
+        });
+    }
 
     try {
-        console.log('Verificando token con Supabase...');
-        const { data: { user }, error: authError } = await auth.supabaseAdmin.auth.getUser(token);
+        // Verificar cache de token primero
+        let cachedTokenVerification = authCache.getTokenVerification(token);
+        let user, authError;
+        
+        if (cachedTokenVerification) {
+            console.log('Token encontrado en cache');
+            user = cachedTokenVerification.user;
+            authError = cachedTokenVerification.error;
+        } else {
+            console.log('Verificando token con Supabase...');
+            const result = await auth.supabaseAdmin.auth.getUser(token);
+            user = result.data?.user;
+            authError = result.error;
+            
+            // Guardar en cache solo si no hay error
+            if (!authError && user) {
+                authCache.setTokenVerification(token, { user, error: null });
+            }
+        }
 
         // Si hay error de autenticación (token expirado o inválido)
         if (authError) {
@@ -211,11 +239,26 @@ const authenticateJWT = async (req, res, next) => {
 
         // Si el token es válido, continuar con la autenticación normal
         console.log('Token válido, buscando usuario en la base de datos con auth_id:', user.id);
-        let dbUser = await User.findByAuthId(user.id);
-        if (!dbUser) {
-            console.log('No encontrado en usuarios, buscando en trabajadores...');
-            dbUser = await Trabajador.findByAuthId(user.id);
+        
+        // Verificar cache de usuario primero
+        let dbUser = authCache.getUserData(user.id);
+        
+        if (dbUser) {
+            console.log('Usuario encontrado en cache');
+        } else {
+            console.log('Usuario no en cache, consultando base de datos...');
+            dbUser = await User.findByAuthId(user.id);
+            if (!dbUser) {
+                console.log('No encontrado en usuarios, buscando en trabajadores...');
+                dbUser = await Trabajador.findByAuthId(user.id);
+            }
+            
+            // Guardar en cache si se encontró el usuario
+            if (dbUser && dbUser.isActive()) {
+                authCache.setUserData(user.id, dbUser);
+            }
         }
+        
         console.log('Resultado de búsqueda de usuario normal:', {
             found: !!dbUser,
             email: dbUser?.email,

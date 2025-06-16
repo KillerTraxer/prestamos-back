@@ -16,9 +16,12 @@ const adeudoRoutes = require('./routes/adeudos');
 const movimientoRoutes = require('./routes/movimientos');
 const expenseRoutes = require('./routes/expenses');
 const userRoutes = require('./routes/users');
+const cacheDebugRoutes = require('./routes/cache-debug');
 
 // Importar configuración de trabajos cron
 const { initCronJobs } = require('./jobs/cron');
+// Importar middlewares de optimización
+const { requestLogger, concurrencyLimiter } = require('./middleware/request-limiter');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +29,22 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Configurar trust proxy para obtener IP real
+app.set('trust proxy', true);
+
+// Middleware de logging optimizado y limitadores
+app.use((req, res, next) => {
+    // Solo loggear peticiones problemáticas o importantes
+    if (req.url.includes('/auth') || req.url.includes('/stats') || req.method !== 'GET') {
+        const timestamp = new Date().toISOString();
+        console.log(`[${timestamp}] ${req.method} ${req.url} - IP: ${req.ip}`);
+    }
+    next();
+});
+
+app.use(requestLogger);
+app.use(concurrencyLimiter);
 
 // Configurar almacenamiento de archivos
 const storage = multer.diskStorage({
@@ -64,6 +83,7 @@ app.use('/adeudos', adeudoRoutes);
 app.use('/movimientos', movimientoRoutes);
 app.use('/gastos', expenseRoutes);
 app.use('/users', userRoutes);
+app.use('/cache', cacheDebugRoutes);
 
 // Health check routes
 app.get('/', (req, res) => {

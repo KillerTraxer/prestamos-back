@@ -21,6 +21,7 @@
     "moment-timezone": "^0.6.0",
     "multer": "^2.0.0",
     "mysql2": "^3.10.2",
+    "node-cache": "^5.1.2",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.15",
     "pg": "^8.12.0"

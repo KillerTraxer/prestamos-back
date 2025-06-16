@@ -666,7 +666,21 @@ router.get('/profile/updated-stats', authenticateJWT, async (req, res) => {
         const userId = req.user.id;
         const userRole = req.user.role;
         
-        let updatedStats = {
+        // Verificar cache primero
+        const authCache = require('../utils/auth-cache');
+        let updatedStats = authCache.getUserStats(userId, userRole);
+        
+        if (updatedStats) {
+            console.log('Estadísticas encontradas en cache');
+            return res.json({
+                message: 'Estadísticas actualizadas exitosamente (desde cache)',
+                stats: updatedStats,
+                cached: true
+            });
+        }
+        
+        // Si no está en cache, calcular
+        updatedStats = {
             workers_count: 0,
             clients_count: 0
         };
@@ -683,15 +697,25 @@ router.get('/profile/updated-stats', authenticateJWT, async (req, res) => {
                 usuario_id: userId
             });
             updatedStats.workers_count = trabajadores.length;
-            // Sumar todos los clients_count de los trabajadores
-            updatedStats.clients_count = trabajadores.reduce((total, trabajador) => total + (trabajador.clients_count || 0), 0);
+            
+            // Obtener conteo total de clientes de todos los trabajadores de manera más eficiente
+            let totalClients = 0;
+            for (const trabajador of trabajadores) {
+                const clientes = await Client.findByWorkerId(trabajador.id);
+                totalClients += clientes.length;
+            }
+            updatedStats.clients_count = totalClients;
         }
+        
+        // Guardar en cache
+        authCache.setUserStats(userId, userRole, updatedStats);
         
         console.log('Estadísticas actualizadas:', updatedStats);
         
         res.json({
             message: 'Estadísticas actualizadas exitosamente',
-            stats: updatedStats
+            stats: updatedStats,
+            cached: false
         });
         
     } catch (error) {
