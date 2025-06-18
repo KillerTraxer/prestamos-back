@@ -152,14 +152,30 @@ router.post('/login', async (req, res) => {
         if (!user) {
             console.error('Usuario no encontrado en base de datos con auth_id:', authId);
             
-            // Intentar limpiar la sesión problemática usando SessionManager
-            await SessionManager.cleanupProblematicSession(authId, 'user-not-found-in-db');
+            // En lugar de limpiar la sesión inmediatamente, verificar si el usuario realmente existe en Auth
+            const userExistsInAuth = await SessionManager.userExistsInAuth(authId);
             
-            return res.status(403).json({ 
-                error: 'Cuenta no encontrada',
-                message: 'La cuenta no existe en la base de datos. La sesión ha sido limpiada, por favor intente nuevamente.',
-                requiresLogin: true
-            });
+            if (userExistsInAuth) {
+                console.log('Usuario existe en Auth pero no en BD - posible problema de sincronización');
+                // Usar limpieza suave en lugar de agresiva para permitir reintento
+                await SessionManager.softCleanupSession(authId, 'user-not-found-in-db-but-exists-auth');
+                
+                return res.status(403).json({ 
+                    error: 'Cuenta no encontrada',
+                    message: 'Hubo un problema de sincronización. Por favor, intente iniciar sesión nuevamente.',
+                    requiresLogin: true,
+                    canRetry: true // Indica que puede reintentar
+                });
+            } else {
+                // Usuario realmente no existe en Auth, limpieza normal
+                await SessionManager.cleanupProblematicSession(authId, 'user-not-found-in-db');
+                
+                return res.status(403).json({ 
+                    error: 'Cuenta no encontrada',
+                    message: 'La cuenta no existe en la base de datos. La sesión ha sido limpiada, por favor intente nuevamente.',
+                    requiresLogin: true
+                });
+            }
         }
 
         if (!user.isActive()) {
@@ -652,6 +668,257 @@ router.post('/debug-refresh', async (req, res) => {
         console.error('Error en diagnóstico de refresh:', error);
         res.status(500).json({
             error: 'Error ejecutando diagnóstico',
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// Ruta de diagnóstico específico para investigar el problema del auth_id
+router.post('/debug-auth-id', async (req, res) => {
+    const { auth_id, email } = req.body;
+    
+    if (!auth_id && !email) {
+        return res.status(400).json({ error: 'Se requiere auth_id o email' });
+    }
+    
+    try {
+        console.log(`\n=== DIAGNÓSTICO ESPECÍFICO PARA: ${auth_id || email} ===`);
+        
+        const diagnosticData = {
+            input: { auth_id, email },
+            timestamp: new Date().toISOString(),
+            searches: {},
+            raw_data: {},
+            recommendations: []
+        };
+        
+        // 1. Buscar en Auth de Supabase si tenemos auth_id
+        if (auth_id) {
+            try {
+                const { data: { user: authUser }, error: authError } = await auth.supabaseAdmin.auth.admin.getUserById(auth_id);
+                diagnosticData.supabase_auth = {
+                    exists: !authError && !!authUser,
+                    error: authError?.message || null,
+                    user_data: authUser ? {
+                        id: authUser.id,
+                        email: authUser.email,
+                        created_at: authUser.created_at,
+                        last_sign_in_at: authUser.last_sign_in_at
+                    } : null
+                };
+            } catch (error) {
+                diagnosticData.supabase_auth = {
+                    exists: false,
+                    error: error.message
+                };
+            }
+        }
+        
+        // 2. Buscar en tabla usuarios
+        try {
+            const { data: usuarios, error: usuariosError } = await auth.supabaseAdmin
+                .from('usuarios')
+                .select('*')
+                .or(auth_id ? `auth_id.eq.${auth_id}` : `email.eq.${email}`);
+                
+            diagnosticData.searches.usuarios = {
+                error: usuariosError?.message || null,
+                count: usuarios?.length || 0,
+                data: usuarios || []
+            };
+        } catch (error) {
+            diagnosticData.searches.usuarios = {
+                error: error.message,
+                count: 0,
+                data: []
+            };
+        }
+        
+        // 3. Buscar en tabla trabajadores
+        try {
+            const { data: trabajadores, error: trabajadoresError } = await auth.supabaseAdmin
+                .from('trabajadores')
+                .select('*')
+                .or(auth_id ? `auth_id.eq.${auth_id}` : `email.eq.${email}`);
+                
+            diagnosticData.searches.trabajadores = {
+                error: trabajadoresError?.message || null,
+                count: trabajadores?.length || 0,
+                data: trabajadores || []
+            };
+        } catch (error) {
+            diagnosticData.searches.trabajadores = {
+                error: error.message,
+                count: 0,
+                data: []
+            };
+        }
+        
+        // 4. Si tenemos email, buscar todos los registros con ese email
+        if (email) {
+            try {
+                const { data: allByEmail, error: allByEmailError } = await auth.supabaseAdmin
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', email);
+                    
+                diagnosticData.raw_data.usuarios_by_email = {
+                    error: allByEmailError?.message || null,
+                    data: allByEmail || []
+                };
+            } catch (error) {
+                diagnosticData.raw_data.usuarios_by_email = {
+                    error: error.message,
+                    data: []
+                };
+            }
+            
+            try {
+                const { data: allWorkersByEmail, error: allWorkersByEmailError } = await auth.supabaseAdmin
+                    .from('trabajadores')
+                    .select('*')
+                    .eq('email', email);
+                    
+                diagnosticData.raw_data.trabajadores_by_email = {
+                    error: allWorkersByEmailError?.message || null,
+                    data: allWorkersByEmail || []
+                };
+            } catch (error) {
+                diagnosticData.raw_data.trabajadores_by_email = {
+                    error: error.message,
+                    data: []
+                };
+            }
+        }
+        
+        // 5. Generar recomendaciones
+        const totalFound = (diagnosticData.searches.usuarios?.count || 0) + (diagnosticData.searches.trabajadores?.count || 0);
+        
+        if (totalFound === 0) {
+            if (diagnosticData.supabase_auth?.exists) {
+                diagnosticData.recommendations.push('Usuario existe en Auth pero no en BD - necesita sincronización');
+            } else {
+                diagnosticData.recommendations.push('Usuario no existe ni en Auth ni en BD');
+            }
+        } else if (totalFound > 1) {
+            diagnosticData.recommendations.push('Múltiples registros encontrados - posible duplicación');
+        } else {
+            diagnosticData.recommendations.push('Usuario encontrado correctamente');
+        }
+        
+        // Log completo para debugging
+        console.log('Diagnóstico completo:', JSON.stringify(diagnosticData, null, 2));
+        
+        res.json(diagnosticData);
+        
+    } catch (error) {
+        console.error('Error en diagnóstico específico:', error);
+        res.status(500).json({
+            error: 'Error ejecutando diagnóstico',
+            message: error.message,
+            timestamp: new Date().toISOString()
+        });
+    }
+});
+
+// Ruta para sincronizar usuario desde Auth a BD
+router.post('/sync-user-from-auth', async (req, res) => {
+    const { auth_id, force = false } = req.body;
+    
+    if (!auth_id) {
+        return res.status(400).json({ error: 'Se requiere auth_id' });
+    }
+    
+    try {
+        console.log(`\n=== SINCRONIZANDO USUARIO DESDE AUTH: ${auth_id} ===`);
+        
+        // 1. Verificar que el usuario existe en Auth
+        const { data: { user: authUser }, error: authError } = await auth.supabaseAdmin.auth.admin.getUserById(auth_id);
+        
+        if (authError || !authUser) {
+            return res.status(404).json({
+                error: 'Usuario no encontrado en Auth',
+                message: 'El auth_id proporcionado no existe en Supabase Auth',
+                auth_error: authError?.message
+            });
+        }
+        
+        // 2. Verificar si ya existe en BD
+        const existingUser = await User.findByAuthId(auth_id);
+        const existingWorker = await Trabajador.findByAuthId(auth_id);
+        
+        if ((existingUser || existingWorker) && !force) {
+            return res.status(409).json({
+                error: 'Usuario ya existe en BD',
+                message: 'El usuario ya existe en la base de datos. Use force=true para sobrescribir.',
+                existing_in: existingUser ? 'usuarios' : 'trabajadores',
+                user_data: existingUser || existingWorker
+            });
+        }
+        
+        // 3. Intentar determinar el tipo de usuario basado en el email
+        const email = authUser.email;
+        const isAdminEmail = email?.includes('admin') || email?.endsWith('@admin.com');
+        
+        // 4. Crear el usuario en la tabla apropiada
+        let newUser;
+        
+        if (isAdminEmail) {
+            // Crear como admin
+            const userData = {
+                email: authUser.email,
+                nombre: authUser.user_metadata?.nombre || authUser.email?.split('@')[0] || 'Admin',
+                role: 'admin',
+                auth_id: authUser.id,
+                status: 'active',
+                password: 'synced_from_auth' // Placeholder ya que la auth real está en Supabase
+            };
+            
+            newUser = await User.create(userData);
+            
+        } else {
+            // Crear como trabajador
+            const trabajadorData = {
+                email: authUser.email,
+                nombre: authUser.user_metadata?.nombre || authUser.email?.split('@')[0] || 'Trabajador',
+                auth_id: authUser.id,
+                status: 'active',
+                phone: authUser.user_metadata?.phone || '0000000000',
+                password: 'synced_from_auth', // Placeholder
+                usuario_id: 1 // Asignar a admin por defecto - esto debe ajustarse según tu lógica
+            };
+            
+            newUser = await Trabajador.create(trabajadorData);
+        }
+        
+        console.log('Usuario sincronizado exitosamente:', {
+            auth_id: authUser.id,
+            email: authUser.email,
+            type: isAdminEmail ? 'admin' : 'trabajador',
+            db_id: newUser.id
+        });
+        
+        res.json({
+            message: 'Usuario sincronizado exitosamente desde Auth',
+            auth_user: {
+                id: authUser.id,
+                email: authUser.email,
+                created_at: authUser.created_at
+            },
+            db_user: {
+                id: newUser.id,
+                email: newUser.email,
+                nombre: newUser.nombre,
+                type: isAdminEmail ? 'admin' : 'trabajador'
+            },
+            timestamp: new Date().toISOString()
+        });
+        
+    } catch (error) {
+        console.error('Error sincronizando usuario:', error);
+        res.status(500).json({
+            error: 'Error sincronizando usuario',
             message: error.message,
             timestamp: new Date().toISOString()
         });

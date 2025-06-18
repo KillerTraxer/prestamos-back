@@ -51,7 +51,8 @@ router.post('/', authenticateJWT, async (req, res) => {
         fecha_inicio,
         fecha_fin,
         observaciones,
-        pago_diario
+        pago_diario,
+        es_registro_manual
     } = req.body;
 
     if (!cliente_id || !trabajador_id || !monto || !interes || !fecha_inicio || !fecha_fin) {
@@ -77,7 +78,8 @@ router.post('/', authenticateJWT, async (req, res) => {
             fecha_fin,
             estado: 'activo',
             observaciones: observaciones || '',
-            pago_diario: pago_diario || 0
+            pago_diario: pago_diario || 0,
+            es_registro_manual: es_registro_manual || false
         };
 
         const newPrestamo = await Loan.create(prestamoData);

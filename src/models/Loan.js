@@ -12,6 +12,7 @@ class Loan {
         this.estado = data.estado;
         this.observaciones = data.observaciones;
         this.pago_diario = data.pago_diario;
+        this.es_registro_manual = data.es_registro_manual;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
     }
