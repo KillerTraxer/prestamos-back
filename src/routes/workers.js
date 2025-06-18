@@ -268,6 +268,10 @@ router.post('/', authenticateJWT, async (req, res) => {
             auth_id: authData.user.id
         });
 
+        // Invalidar cache de trabajadores para que aparezcan inmediatamente
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateWorkersCache(req.user.id);
+
         res.status(201).json({
             message: 'Trabajador creado',
             trabajador: {
@@ -329,6 +333,10 @@ router.put('/:id', authenticateJWT, async (req, res) => {
             phone: phone || trabajador.phone
         });
 
+        // Invalidar cache de trabajadores después de actualizar
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateWorkersCache(req.user.id);
+
         res.json({
             message: 'Trabajador actualizado exitosamente',
             trabajador: {
@@ -372,6 +380,11 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
         }
 
         await trabajador.delete();
+        
+        // Invalidar cache de trabajadores después de eliminar
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateWorkersCache(req.user.id);
+        
         res.json({
             message: 'Trabajador y cuenta de autenticación eliminados exitosamente',
             id: trabajadorId

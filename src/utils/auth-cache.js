@@ -88,6 +88,40 @@ class AuthCache {
         return true;
     }
 
+    // Rate limiting inteligente con escalamiento progresivo
+    checkSmartRateLimit(identifier, baseLimit, userRole = 'trabajador') {
+        const current = this.requestCounts.get(identifier) || 0;
+        
+        // Límites más generosos para admins
+        const roleMultiplier = userRole === 'admin' ? 1.5 : 1;
+        const effectiveLimit = Math.floor(baseLimit * roleMultiplier);
+        
+        if (current >= effectiveLimit) {
+            return {
+                allowed: false,
+                current,
+                limit: effectiveLimit,
+                retryAfter: this.calculateRetryTime(current, effectiveLimit)
+            };
+        }
+        
+        this.requestCounts.set(identifier, current + 1);
+        return {
+            allowed: true,
+            current: current + 1,
+            limit: effectiveLimit,
+            retryAfter: 0
+        };
+    }
+
+    // Calcular tiempo de retry basado en qué tan por encima del límite está
+    calculateRetryTime(current, limit) {
+        const overage = current - limit;
+        if (overage <= 5) return 2; // Pequeño exceso = 2 segundos
+        if (overage <= 15) return 3; // Exceso medio = 3 segundos
+        return 5; // Exceso grande = 5 segundos máximo
+    }
+
     // Limpiar cache de un usuario específico
     clearUserCache(authId) {
         this.userCache.del(`user:${authId}`);
@@ -105,6 +139,66 @@ class AuthCache {
                 this.chartCache.del(key);
             }
         });
+    }
+
+    // Invalidar cache específico de clientes para un trabajador
+    invalidateClientsCache(trabajadorId) {
+        const cacheKey = `clients:${trabajadorId}`;
+        const adminCacheKey = `clients_by_collector:${trabajadorId}`;
+        
+        // Limpiar claves específicas
+        this.chartCache.del(`chart:${trabajadorId}:trabajador:clients_list:${cacheKey}`);
+        this.chartCache.del(`chart:${trabajadorId}:admin:clients_list:${adminCacheKey}`);
+        
+        // Limpiar cualquier cache que incluya este trabajador y clientes
+        const allKeys = this.chartCache.keys();
+        allKeys.forEach(key => {
+            if (key.includes('clients_list') && key.includes(trabajadorId)) {
+                this.chartCache.del(key);
+            }
+        });
+        
+        console.log('💾 Cache de clientes invalidado para trabajador:', trabajadorId);
+    }
+
+    // Invalidar cache específico de préstamos para un trabajador
+    invalidateLoansCache(trabajadorId) {
+        const cacheKey = `loans:${trabajadorId}`;
+        const adminCacheKey = `loans_by_collector:${trabajadorId}`;
+        
+        // Limpiar claves específicas
+        this.chartCache.del(`chart:${trabajadorId}:trabajador:loans_list:${cacheKey}`);
+        this.chartCache.del(`chart:${trabajadorId}:admin:loans_list:${adminCacheKey}`);
+        
+        // Limpiar cualquier cache que incluya este trabajador y préstamos
+        const allKeys = this.chartCache.keys();
+        allKeys.forEach(key => {
+            if (key.includes('loans_list') && key.includes(trabajadorId)) {
+                this.chartCache.del(key);
+            }
+        });
+        
+        console.log('💾 Cache de préstamos invalidado para trabajador:', trabajadorId);
+    }
+
+    // Invalidar cache específico de trabajadores para un admin
+    invalidateWorkersCache(adminId) {
+        // Limpiar cache de lista de trabajadores
+        this.chartCache.del(`chart:${adminId}:admin:workers_list:all`);
+        
+        // Limpiar cache de recolecciones diarias y mensuales
+        this.chartCache.del(`chart:${adminId}:admin:daily_collections:today`);
+        this.chartCache.del(`chart:${adminId}:admin:monthly_collections:this_month`);
+        
+        // Limpiar cualquier cache que incluya workers para este admin
+        const allKeys = this.chartCache.keys();
+        allKeys.forEach(key => {
+            if ((key.includes('workers_list') || key.includes('daily_collections') || key.includes('monthly_collections')) && key.includes(adminId)) {
+                this.chartCache.del(key);
+            }
+        });
+        
+        console.log('💾 Cache de trabajadores invalidado para admin:', adminId);
     }
 
     // Limpiar todo el cache

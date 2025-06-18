@@ -19,16 +19,17 @@ const authenticateJWT = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const clientIP = req.ip || req.connection.remoteAddress;
     
-    // Rate limiting específico para estadísticas vs otras rutas - muy permisivo
-    const isStatsRoute = req.path.includes('/stats') || req.path.includes('/updated-stats') || req.path.includes('/estadisticas/');
-    const maxRequests = isStatsRoute ? 80 : 60; // Muy permisivo para estadísticas
+    // Rate limiting DESACTIVADO para desarrollo - Solo para casos extremos
+    const maxRequests = 1000; // Límite muy alto, solo para casos extremos
     
+    // Solo activar rate limiting en casos extremos
     if (!authCache.checkRateLimit(`auth:${clientIP}`, maxRequests)) {
-        console.log(`Rate limit exceeded for IP: ${clientIP}`);
+        console.log(`Rate limit extremo excedido para IP: ${clientIP}`);
         return res.status(429).json({
             error: 'Too many requests',
-            message: 'Demasiadas peticiones. Intente nuevamente en un momento.',
-            retryAfter: 15
+            message: 'La aplicación está muy ocupada. Por favor espere un momento.',
+            retryAfter: 1,
+            suggestion: 'Evite refrescar la página repetidamente'
         });
     }
 

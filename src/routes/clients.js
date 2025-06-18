@@ -124,6 +124,10 @@ router.post('/', authenticateJWT, async (req, res) => {
 
         const newClient = await Client.create(clientData);
         
+        // Invalidar cache de clientes para que aparezcan inmediatamente
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateClientsCache(trabajador_id);
+        
         res.status(201).json({
             message: 'Cliente creado exitosamente',
             client: newClient
@@ -214,6 +218,11 @@ router.put('/:id', authenticateJWT, async (req, res) => {
         };
 
         const updatedClient = await cliente.update(updates);
+        
+        // Invalidar cache de clientes después de actualizar
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateClientsCache(cliente.trabajador_id);
+        
         res.json({ 
             message: 'Cliente actualizado correctamente',
             client: updatedClient
@@ -236,7 +245,15 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
             return res.status(404).json({ message: 'Cliente no encontrado' });
         }
 
+        // Guardar el trabajador_id antes de eliminar
+        const trabajadorId = cliente.trabajador_id;
+        
         await cliente.delete();
+        
+        // Invalidar cache de clientes después de eliminar
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateClientsCache(trabajadorId);
+        
         res.json({ message: 'Cliente eliminado correctamente' });
     } catch (error) {
         console.error('Error eliminando cliente:', error);

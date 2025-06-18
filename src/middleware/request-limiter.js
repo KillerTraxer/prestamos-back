@@ -30,12 +30,14 @@ const requestLimiter = (options = {}) => {
 
         // Para peticiones de estadísticas, ser extremadamente permisivo (operación compleja)
         if (req.path.includes('/stats') || req.path.includes('/updated-stats') || req.path.includes('/estadisticas/')) {
-            if (!authCache.checkRateLimit(`stats:${requestKey}`, 30)) { // máximo 30 por minuto
+            if (!authCache.checkRateLimit(`stats:${requestKey}`, 60)) { // Aumentado de 30 a 60
                 console.log(`Stats request rate limited: ${requestKey} from IP: ${clientIP}`);
                 return res.status(429).json({
                     error: 'Stats rate limit',
-                    message: 'Demasiadas peticiones de estadísticas. Espere un momento.',
-                    retryAfter: 5
+                    message: 'Actualizando datos... Un momento por favor.',
+                    retryAfter: 2, // Reducido de 5 a 2 segundos
+                    isRetryable: true,
+                    isStatsRequest: true
                 });
             }
         }
@@ -67,25 +69,15 @@ const requestLogger = (req, res, next) => {
 const earlyRateLimiter = (req, res, next) => {
     const clientIP = req.ip || req.connection.remoteAddress;
     
-    // Rate limiting muy permisivo para estadísticas (operación compleja)
-    if (req.path.includes('/auth/profile/updated-stats') || req.path.includes('/estadisticas/')) {
-        if (!authCache.checkRateLimit(`early:${clientIP}:stats`, 50)) { // máximo 50 por minuto
-            console.log(`🚫 Early rate limit exceeded for stats: IP ${clientIP}`);
-            return res.status(429).json({
-                error: 'Too many requests',
-                message: 'Demasiadas peticiones a estadísticas. Espere un momento.',
-                retryAfter: 10
-            });
-        }
-    }
-    
-    // Rate limiting general por IP - muy permisivo
-    if (!authCache.checkRateLimit(`early:${clientIP}`, 100)) { // máximo 100 por minuto
-        console.log(`🚫 Early rate limit exceeded: IP ${clientIP}`);
+    // DESACTIVADO TEMPORALMENTE - Rate limiting muy permisivo para desarrollo
+    // Solo activar en casos extremos (más de 1000 peticiones por minuto)
+    if (!authCache.checkRateLimit(`early:${clientIP}`, 1000)) { 
+        console.log(`🚫 Rate limit extremo excedido: IP ${clientIP}`);
         return res.status(429).json({
             error: 'Too many requests',
-            message: 'Demasiadas peticiones. Espere un momento.',
-            retryAfter: 20
+            message: 'Demasiadas peticiones detectadas.',
+            retryAfter: 1,
+            isRetryable: true
         });
     }
     

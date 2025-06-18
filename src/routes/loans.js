@@ -84,6 +84,10 @@ router.post('/', authenticateJWT, async (req, res) => {
 
         const newPrestamo = await Loan.create(prestamoData);
 
+        // Invalidar cache de préstamos para que aparezcan inmediatamente
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateLoansCache(trabajador_id);
+
         res.status(201).json({
             message: 'Préstamo creado exitosamente',
             id: newPrestamo.id,
@@ -137,6 +141,11 @@ router.put('/:id', authenticateJWT, async (req, res) => {
         };
 
         const updatedPrestamo = await prestamo.update(updates);
+        
+        // Invalidar cache de préstamos después de actualizar
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateLoansCache(prestamo.trabajador_id);
+        
         res.json({
             message: 'Préstamo actualizado correctamente',
             prestamo: updatedPrestamo
