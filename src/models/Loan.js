@@ -13,6 +13,7 @@ class Loan {
         this.observaciones = data.observaciones;
         this.pago_diario = data.pago_diario;
         this.es_registro_manual = data.es_registro_manual;
+        this.plazo_cuatro_semanas = data.plazo_cuatro_semanas;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
     }

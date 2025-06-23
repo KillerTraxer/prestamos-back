@@ -52,7 +52,8 @@ router.post('/', authenticateJWT, async (req, res) => {
         fecha_fin,
         observaciones,
         pago_diario,
-        es_registro_manual
+        es_registro_manual,
+        plazo_cuatro_semanas
     } = req.body;
 
     if (!cliente_id || !trabajador_id || !monto || !interes || !fecha_inicio || !fecha_fin) {
@@ -69,6 +70,18 @@ router.post('/', authenticateJWT, async (req, res) => {
             return res.status(404).json({ error: 'Cliente no encontrado' });
         }
 
+        // Calcular si el préstamo es de 4 semanas (28 días)
+        const fechaInicio = new Date(fecha_inicio);
+        const fechaFin = new Date(fecha_fin);
+        const duracionDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24)) + 1;
+        const esCuatroSemanas = plazo_cuatro_semanas !== undefined ? plazo_cuatro_semanas : (duracionDias === 28);
+        
+        console.log(`Préstamo regular: duración ${duracionDias} días, plazo_cuatro_semanas: ${esCuatroSemanas}`);
+        console.log('=== DEBUGGING BACKEND LOAN CREATION ===');
+        console.log('Valor recibido plazo_cuatro_semanas:', plazo_cuatro_semanas);
+        console.log('Valor calculado esCuatroSemanas:', esCuatroSemanas);
+        console.log('typeof esCuatroSemanas:', typeof esCuatroSemanas);
+
         const prestamoData = {
             cliente_id,
             trabajador_id,
@@ -79,10 +92,18 @@ router.post('/', authenticateJWT, async (req, res) => {
             estado: 'activo',
             observaciones: observaciones || '',
             pago_diario: pago_diario || 0,
-            es_registro_manual: es_registro_manual || false
+            es_registro_manual: es_registro_manual || false,
+            plazo_cuatro_semanas: esCuatroSemanas
         };
 
+        console.log('prestamoData completo:', prestamoData);
+
         const newPrestamo = await Loan.create(prestamoData);
+        
+        console.log('Préstamo creado:', {
+            id: newPrestamo.id,
+            plazo_cuatro_semanas: newPrestamo.plazo_cuatro_semanas
+        });
 
         // Invalidar cache de préstamos para que aparezcan inmediatamente
         const authCache = require('../utils/auth-cache');

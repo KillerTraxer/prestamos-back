@@ -29,12 +29,31 @@ router.post('/admin', async (req, res) => {
     console.log('Creando administrador desde panel admin:', email);
 
     try {
-        // Verificar si ya existe en Auth
-        const { data: existingList, error: listError } =
-            await auth.supabaseAdmin.auth.admin.listUsers({ filter: `email=eq.${email}` });
-        if (listError) throw listError;
+        // Verificar si ya existe en Auth usando método más robusto
+        console.log(`Verificando email en Supabase Auth: ${email}`);
+        
+        // Obtener todos los usuarios y filtrar manualmente (más confiable)
+        const { data: allUsers, error: listError } = 
+            await auth.supabaseAdmin.auth.admin.listUsers();
+        
+        if (listError) {
+            console.error('Error al listar usuarios:', listError);
+            throw listError;
+        }
 
-        if (existingList.users.length > 0) {
+        // Filtrar manualmente por email
+        const existingUsers = allUsers.users.filter(user => 
+            user.email && user.email.toLowerCase() === email.toLowerCase()
+        );
+
+        console.log(`Total de usuarios en Supabase: ${allUsers.users.length}`);
+        console.log(`Usuarios que coinciden con email ${email}: ${existingUsers.length}`);
+        
+        if (existingUsers.length > 0) {
+            console.log('Usuario(s) existente(s):', JSON.stringify(existingUsers, null, 2));
+        }
+
+        if (existingUsers.length > 0) {
             console.log(`Email duplicado detectado en admin: ${email}`);
             return res.status(400).json({ 
                 error: 'Email ya registrado',
@@ -108,13 +127,27 @@ router.post('/trabajador', async (req, res) => {
     }
 
     try {
-        // Verificar si ya existe en Auth
-        const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers({ filter: `email=eq.${email}` });
-        if (authError) throw authError;
+        // Verificar si ya existe en Auth usando método más robusto
+        console.log(`Verificando email del trabajador en Supabase Auth: ${email}`);
+        
+        // Obtener todos los usuarios y filtrar manualmente
+        const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers();
+        if (authError) {
+            console.error('Error al listar usuarios para trabajador:', authError);
+            throw authError;
+        }
 
-        const existingAuthUser = authUsers.users.find(u => u.email === email);
-        if (existingAuthUser) {
+        // Filtrar manualmente por email
+        const existingAuthUsers = authUsers.users.filter(user => 
+            user.email && user.email.toLowerCase() === email.toLowerCase()
+        );
+
+        console.log(`Total de usuarios en Supabase para trabajador: ${authUsers.users.length}`);
+        console.log(`Usuarios que coinciden con email del trabajador ${email}: ${existingAuthUsers.length}`);
+
+                 if (existingAuthUsers.length > 0) {
             console.log(`Email duplicado detectado en trabajador: ${email}`);
+            console.log('Usuario(s) existente(s):', JSON.stringify(existingAuthUsers, null, 2));
             return res.status(400).json({
                 error: 'Usuario ya registrado',
                 message: `Ya existe un trabajador con el email: ${email}`,
@@ -224,7 +257,8 @@ router.post('/prestamo', async (req, res) => {
         observaciones, 
         pago_diario,
         es_registro_manual,
-        estado
+        estado,
+        plazo_cuatro_semanas
     } = req.body;
 
     if (!cliente_id || !trabajador_id || !monto || !interes || !fecha_inicio || !fecha_fin || !pago_diario) {
@@ -235,6 +269,14 @@ router.post('/prestamo', async (req, res) => {
     }
 
     try {
+        // Calcular si el préstamo es de 4 semanas (28 días)
+        const fechaInicio = new Date(fecha_inicio);
+        const fechaFin = new Date(fecha_fin);
+        const duracionDias = Math.ceil((fechaFin - fechaInicio) / (1000 * 60 * 60 * 24)) + 1;
+        const esCuatroSemanas = plazo_cuatro_semanas !== undefined ? plazo_cuatro_semanas : (duracionDias === 28);
+        
+        console.log(`Préstamo: duración ${duracionDias} días, plazo_cuatro_semanas: ${esCuatroSemanas}`);
+
         const loanData = {
             cliente_id,
             trabajador_id,
@@ -245,7 +287,8 @@ router.post('/prestamo', async (req, res) => {
             observaciones: observaciones || '',
             pago_diario,
             es_registro_manual: es_registro_manual || false,
-            estado: estado || 'activo'
+            estado: estado || 'activo',
+            plazo_cuatro_semanas: esCuatroSemanas
         };
 
         const newLoan = await Loan.create(loanData);
@@ -264,6 +307,7 @@ router.post('/prestamo', async (req, res) => {
                 observaciones: newLoan.observaciones,
                 pago_diario: newLoan.pago_diario,
                 es_registro_manual: newLoan.es_registro_manual,
+                plazo_cuatro_semanas: newLoan.plazo_cuatro_semanas,
                 created_at: newLoan.created_at
             }
         });
