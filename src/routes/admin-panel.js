@@ -18,6 +18,14 @@ router.post('/admin', async (req, res) => {
         });
     }
 
+    // Validar que el email no esté vacío o solo contenga espacios
+    if (email.trim() === '') {
+        return res.status(400).json({
+            error: 'Email inválido',
+            details: 'El email no puede estar vacío'
+        });
+    }
+
     console.log('Creando administrador desde panel admin:', email);
 
     try {
@@ -27,9 +35,11 @@ router.post('/admin', async (req, res) => {
         if (listError) throw listError;
 
         if (existingList.users.length > 0) {
+            console.log(`Email duplicado detectado en admin: ${email}`);
             return res.status(400).json({ 
                 error: 'Email ya registrado',
-                message: 'Ya existe un usuario con este email' 
+                message: `Ya existe un usuario con el email: ${email}`,
+                details: 'Por favor use un email diferente para el administrador'
             });
         }
 
@@ -89,6 +99,14 @@ router.post('/trabajador', async (req, res) => {
         });
     }
 
+    // Validar que el email no esté vacío o solo contenga espacios
+    if (email.trim() === '') {
+        return res.status(400).json({
+            error: 'Email inválido',
+            details: 'El email del trabajador no puede estar vacío'
+        });
+    }
+
     try {
         // Verificar si ya existe en Auth
         const { data: authUsers, error: authError } = await auth.supabaseAdmin.auth.admin.listUsers({ filter: `email=eq.${email}` });
@@ -96,9 +114,11 @@ router.post('/trabajador', async (req, res) => {
 
         const existingAuthUser = authUsers.users.find(u => u.email === email);
         if (existingAuthUser) {
+            console.log(`Email duplicado detectado en trabajador: ${email}`);
             return res.status(400).json({
                 error: 'Usuario ya registrado',
-                details: 'Ya existe un usuario con este email en el sistema'
+                message: `Ya existe un trabajador con el email: ${email}`,
+                details: 'Por favor use un email diferente para este trabajador'
             });
         }
 
