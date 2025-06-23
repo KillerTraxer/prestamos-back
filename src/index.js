@@ -17,6 +17,7 @@ const movimientoRoutes = require('./routes/movimientos');
 const expenseRoutes = require('./routes/expenses');
 const userRoutes = require('./routes/users');
 const cacheDebugRoutes = require('./routes/cache-debug');
+const adminPanelRoutes = require('./routes/admin-panel');
 
 // Importar configuración de trabajos cron
 const { initCronJobs } = require('./jobs/cron');
@@ -87,6 +88,7 @@ app.use('/movimientos', movimientoRoutes);
 app.use('/gastos', expenseRoutes);
 app.use('/users', userRoutes);
 app.use('/cache', cacheDebugRoutes);
+app.use('/admin-panel', adminPanelRoutes);
 
 // Health check routes
 app.get('/', (req, res) => {
