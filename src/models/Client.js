@@ -11,6 +11,7 @@ class Client {
         this.trabajador_id = data.trabajador_id;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
+        this.deleted_at = data.deleted_at;
     }
 
     static async findAll() {
@@ -23,7 +24,8 @@ class Client {
                     nombre,
                     email
                 )
-            `);
+            `)
+            .is('deleted_at', null);
         if (error) throw error;
         return data.map(client => new Client(client));
     }
@@ -40,6 +42,7 @@ class Client {
                 )
             `)
             .eq('id', id)
+            .is('deleted_at', null)
             .single();
         
         if (error) {
@@ -59,7 +62,8 @@ class Client {
                     email
                 )
             `)
-            .eq('trabajador_id', trabajadorId);
+            .eq('trabajador_id', trabajadorId)
+            .is('deleted_at', null);
         if (error) throw error;
         return data.map(client => new Client(client));
     }
@@ -86,6 +90,47 @@ class Client {
         return this;
     }
 
+    async softDelete() {
+        const deletedAt = new Date().toISOString();
+        
+        // Eliminar el cliente
+        const { data, error } = await auth.supabaseAdmin
+            .from('clientes')
+            .update({ deleted_at: deletedAt })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+
+        // Eliminar todos los préstamos del cliente
+        const { error: loansError } = await auth.supabaseAdmin
+            .from('prestamos')
+            .update({ deleted_at: deletedAt })
+            .eq('cliente_id', this.id);
+        if (loansError) throw loansError;
+
+        // Eliminar todas las multas del cliente
+        const { error: finesError } = await auth.supabaseAdmin
+            .from('multas')
+            .update({ deleted_at: deletedAt })
+            .eq('cliente_id', this.id);
+        if (finesError) throw finesError;
+
+        // Eliminar todos los adeudos del cliente
+        const { error: debtsError } = await auth.supabaseAdmin
+            .from('adeudos')
+            .update({ deleted_at: deletedAt })
+            .eq('cliente_id', this.id);
+        if (debtsError) throw debtsError;
+
+        // Invalidar TODO el cache relacionado con este trabajador
+        const authCache = require('../utils/auth-cache');
+        authCache.invalidateAllDataCache(this.trabajador_id);
+
+        Object.assign(this, new Client(data));
+        return this;
+    }
+
     async delete() {
         const { error } = await auth.supabaseAdmin
             .from('clientes')
@@ -93,6 +138,18 @@ class Client {
             .eq('id', this.id);
         if (error) throw error;
         return true;
+    }
+
+    async restore() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('clientes')
+            .update({ deleted_at: null })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, new Client(data));
+        return this;
     }
 
     async getPayments() {

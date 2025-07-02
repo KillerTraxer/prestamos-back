@@ -177,4 +177,45 @@ function generatePerformanceRecommendations(cacheStats, memUsage) {
     return recommendations;
 }
 
+// Limpiar todo el cache (solo admin)
+router.post('/clear-all', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Solo admin puede limpiar cache' });
+    }
+
+    try {
+        authCache.clearAll();
+        console.log('🧹 Todo el cache limpiado por admin:', req.user.id);
+        res.json({ 
+            message: 'Cache limpiado exitosamente',
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error limpiando cache:', error);
+        res.status(500).json({ error: 'Error limpiando cache' });
+    }
+});
+
+// Limpiar cache específico de un trabajador (solo admin)
+router.post('/clear-worker/:workerId', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Solo admin puede limpiar cache' });
+    }
+
+    const { workerId } = req.params;
+
+    try {
+        authCache.invalidateAllDataCache(workerId);
+        console.log('🧹 Cache limpiado para trabajador:', workerId);
+        res.json({ 
+            message: `Cache limpiado para trabajador ${workerId}`,
+            workerId,
+            timestamp: new Date().toISOString()
+        });
+    } catch (error) {
+        console.error('Error limpiando cache del trabajador:', error);
+        res.status(500).json({ error: 'Error limpiando cache del trabajador' });
+    }
+});
+
 module.exports = router; 

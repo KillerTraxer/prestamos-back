@@ -233,9 +233,9 @@ router.put('/:id', authenticateJWT, async (req, res) => {
     }
 });
 
-// Eliminar cliente
+// Eliminar cliente (soft delete)
 router.delete('/:id', authenticateJWT, async (req, res) => {
-    if (req.user.role !== 'admin') return res.sendStatus(403);
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const clienteId = req.params.id;
 
@@ -245,14 +245,16 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
             return res.status(404).json({ message: 'Cliente no encontrado' });
         }
 
+        // Verificar que el trabajador puede eliminar este cliente
+        if (req.user.role === 'trabajador' && cliente.trabajador_id !== req.user.id) {
+            return res.status(403).json({ error: 'No tienes permisos para eliminar este cliente' });
+        }
+
         // Guardar el trabajador_id antes de eliminar
         const trabajadorId = cliente.trabajador_id;
         
-        await cliente.delete();
-        
-        // Invalidar cache de clientes después de eliminar
-        const authCache = require('../utils/auth-cache');
-        authCache.invalidateClientsCache(trabajadorId);
+        // Usar soft delete
+        await cliente.softDelete();
         
         res.json({ message: 'Cliente eliminado correctamente' });
     } catch (error) {

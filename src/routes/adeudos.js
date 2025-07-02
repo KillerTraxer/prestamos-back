@@ -68,4 +68,41 @@ router.put('/:id/pagar', authenticateJWT, async (req, res) => {
     }
 });
 
+// Eliminar adeudo (soft delete)
+router.delete('/:id', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        // Buscar el adeudo por ID directamente usando el modelo
+        const { data, error } = await require('../config/supabase').auth.supabaseAdmin
+            .from('adeudos')
+            .select('*')
+            .eq('id', req.params.id)
+            .is('deleted_at', null)
+            .single();
+
+        if (error || !data) {
+            return res.status(404).json({
+                error: 'Adeudo no encontrado'
+            });
+        }
+
+        // Crear instancia del adeudo para poder usar el método softDelete
+        const adeudoInstance = new Adeudo(data);
+        
+        // Eliminar el adeudo (soft delete)
+        await adeudoInstance.softDelete();
+
+        res.json({
+            message: 'Adeudo eliminado exitosamente'
+        });
+    } catch (error) {
+        console.error('Error eliminando adeudo:', error);
+        res.status(500).json({
+            error: 'Error eliminando adeudo',
+            message: error.message
+        });
+    }
+});
+
 module.exports = router; 

@@ -59,6 +59,61 @@ router.post('/', authenticateJWT, async (req, res) => {
     }
 });
 
+// Eliminar multa (soft delete)
+router.delete('/:id', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        // Buscar la multa a eliminar
+        const multa = await Fine.findById(req.params.id);
+        if (!multa) {
+            return res.status(404).json({
+                error: 'Multa no encontrada'
+            });
+        }
+
+        const { prestamo_id, cliente_id } = multa;
+
+        // Eliminar la multa (soft delete)
+        await multa.softDelete();
+
+        // Contar multas activas restantes para este préstamo
+        const multasActivas = await Fine.findByLoanId(prestamo_id);
+        const numeroMultasActivas = multasActivas.length;
+
+        // Obtener adeudos pendientes para este préstamo
+        const adeudosPendientes = await Adeudo.findByLoanId(prestamo_id, { estado: 'pendiente' });
+        
+        // Calcular cuántos adeudos deberían existir basándose en las multas actuales
+        const adeudosEsperados = Math.floor(numeroMultasActivas / 3);
+        const adeudosActuales = adeudosPendientes.length;
+
+        // Si hay más adeudos de los que deberían existir, eliminar los excedentes
+        if (adeudosActuales > adeudosEsperados) {
+            const adeudosAEliminar = adeudosActuales - adeudosEsperados;
+            
+            // Ordenar adeudos por fecha de creación (los más recientes primero) y eliminar los necesarios
+            adeudosPendientes.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            for (let i = 0; i < adeudosAEliminar; i++) {
+                await adeudosPendientes[i].softDelete();
+            }
+        }
+
+        res.json({
+            message: 'Multa eliminada exitosamente',
+            multasRestantes: numeroMultasActivas,
+            adeudosEliminados: Math.max(0, adeudosActuales - adeudosEsperados)
+        });
+    } catch (error) {
+        console.error('Error eliminando multa:', error);
+        res.status(500).json({
+            error: 'Error eliminando multa',
+            message: error.message
+        });
+    }
+});
+
 // Obtener multas por préstamo
 router.get('/prestamo/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
@@ -70,6 +125,22 @@ router.get('/prestamo/:id', authenticateJWT, async (req, res) => {
         console.error('Error obteniendo multas:', error);
         res.status(500).json({
             error: 'Error obteniendo multas',
+            message: error.message
+        });
+    }
+});
+
+// Obtener multas por cliente
+router.get('/cliente/:id', authenticateJWT, async (req, res) => {
+    if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
+
+    try {
+        const multas = await Fine.findByClientId(req.params.id);
+        res.json(multas);
+    } catch (error) {
+        console.error('Error obteniendo multas del cliente:', error);
+        res.status(500).json({
+            error: 'Error obteniendo multas del cliente',
             message: error.message
         });
     }

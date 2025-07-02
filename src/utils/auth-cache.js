@@ -201,6 +201,36 @@ class AuthCache {
         console.log('💾 Cache de trabajadores invalidado para admin:', adminId);
     }
 
+    // Invalidar todo el cache relacionado con un trabajador después de eliminar cliente
+    invalidateAllDataCache(trabajadorId) {
+        // Invalidar clientes
+        this.invalidateClientsCache(trabajadorId);
+        
+        // Invalidar préstamos
+        this.invalidateLoansCache(trabajadorId);
+        
+        // Invalidar estadísticas
+        this.statsCache.del(`stats:${trabajadorId}:trabajador`);
+        
+        // Limpiar todo el cache de gráficas para este trabajador
+        const allKeys = this.chartCache.keys();
+        allKeys.forEach(key => {
+            if (key.includes(`:${trabajadorId}:`)) {
+                this.chartCache.del(key);
+            }
+        });
+        
+        // Si hay un admin viendo estos datos, también limpiar su cache
+        const adminKeys = this.chartCache.keys();
+        adminKeys.forEach(key => {
+            if (key.includes('admin') && key.includes(trabajadorId)) {
+                this.chartCache.del(key);
+            }
+        });
+        
+        console.log('💾 Todo el cache invalidado para trabajador:', trabajadorId);
+    }
+
     // Limpiar todo el cache
     clearAll() {
         this.userCache.flushAll();

@@ -10,12 +10,14 @@ class Fine {
         this.cliente_id = data.cliente_id;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
+        this.deleted_at = data.deleted_at;
     }
 
     static async findAll() {
         const { data, error } = await auth.supabaseAdmin
             .from('multas')
-            .select('*');
+            .select('*')
+            .is('deleted_at', null); // Solo multas no eliminadas
         if (error) throw error;
         return data.map(fine => new Fine(fine));
     }
@@ -25,6 +27,7 @@ class Fine {
             .from('multas')
             .select('*')
             .eq('id', id)
+            .is('deleted_at', null) // Solo multas no eliminadas
             .single();
         if (error) throw error;
         return data ? new Fine(data) : null;
@@ -34,7 +37,8 @@ class Fine {
         let query = auth.supabaseAdmin
             .from('multas')
             .select('*')
-            .eq('prestamo_id', prestamoId);
+            .eq('prestamo_id', prestamoId)
+            .is('deleted_at', null); // Solo multas no eliminadas
 
         // Si vino filtro por estado, lo aplicamos
         if (filters.estado) {
@@ -51,7 +55,8 @@ class Fine {
         const { data, error } = await auth.supabaseAdmin
             .from('multas')
             .select('*')
-            .eq('cliente_id', clienteId);
+            .eq('cliente_id', clienteId)
+            .is('deleted_at', null); // Solo multas no eliminadas
         if (error) throw error;
         return data.map(fine => new Fine(fine));
     }
@@ -78,6 +83,20 @@ class Fine {
         return this;
     }
 
+    // Soft delete - marca como eliminada en lugar de eliminar físicamente
+    async softDelete() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('multas')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, new Fine(data));
+        return this;
+    }
+
+    // Mantener el método delete original para compatibilidad (hard delete)
     async delete() {
         const { error } = await auth.supabaseAdmin
             .from('multas')
@@ -87,12 +106,26 @@ class Fine {
         return true;
     }
 
+    // Método para restaurar multa eliminada (opcional)
+    async restore() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('multas')
+            .update({ deleted_at: null })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, new Fine(data));
+        return this;
+    }
+
     // Métodos específicos para multas
     static async getDailyFines(fecha) {
         const { data, error } = await auth.supabaseAdmin
             .from('multas')
             .select('*')
-            .eq('fecha', fecha);
+            .eq('fecha', fecha)
+            .is('deleted_at', null); // Solo multas no eliminadas
         if (error) throw error;
         return data.map(fine => new Fine(fine));
     }
@@ -107,7 +140,8 @@ class Fine {
             .select('*')
             .eq('cliente_id', clienteId)
             .gte('fecha', sevenDaysAgo.toISOString().split('T')[0])
-            .lte('fecha', today.toISOString().split('T')[0]);
+            .lte('fecha', today.toISOString().split('T')[0])
+            .is('deleted_at', null); // Solo multas no eliminadas
         if (error) throw error;
         return data.map(fine => new Fine(fine));
     }
@@ -116,7 +150,8 @@ class Fine {
         const { data, error } = await auth.supabaseAdmin
             .from('multas')
             .select('monto')
-            .eq('cliente_id', clienteId);
+            .eq('cliente_id', clienteId)
+            .is('deleted_at', null); // Solo multas no eliminadas
         if (error) throw error;
         return data.reduce((total, fine) => total + fine.monto, 0);
     }

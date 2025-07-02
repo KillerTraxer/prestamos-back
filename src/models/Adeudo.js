@@ -9,6 +9,7 @@ class Adeudo {
         this.fecha = data.fecha;
         this.estado = data.estado || 'pendiente';
         this.created_at = data.created_at;
+        this.deleted_at = data.deleted_at;
     }
 
     static async create(data) {
@@ -32,7 +33,8 @@ class Adeudo {
         let query = auth.supabaseAdmin
             .from('adeudos')
             .select('*')
-            .eq('prestamo_id', prestamoId);
+            .eq('prestamo_id', prestamoId)
+            .is('deleted_at', null); // Solo adeudos no eliminados
 
         if (filters.estado) {
             query = query.eq('estado', filters.estado);
@@ -47,7 +49,8 @@ class Adeudo {
         const { data, error } = await auth.supabaseAdmin
             .from('adeudos')
             .select('*')
-            .eq('cliente_id', clienteId);
+            .eq('cliente_id', clienteId)
+            .is('deleted_at', null); // Solo adeudos no eliminados
 
         if (error) throw error;
         return data.map(row => new Adeudo(row));
@@ -58,7 +61,8 @@ class Adeudo {
             .from('adeudos')
             .select('*')
             .eq('cliente_id', clienteId)
-            .eq('estado', 'pendiente');
+            .eq('estado', 'pendiente')
+            .is('deleted_at', null); // Solo adeudos no eliminados
 
         if (error) throw error;
         return data.map(row => new Adeudo(row));
@@ -80,11 +84,48 @@ class Adeudo {
         return new Adeudo(result);
     }
 
+    // Soft delete - marca como eliminado en lugar de eliminar físicamente
+    async softDelete() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('adeudos')
+            .update({ deleted_at: new Date().toISOString() })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, new Adeudo(data));
+        return this;
+    }
+
+    // Método para eliminar físicamente (opcional)
+    async delete() {
+        const { error } = await auth.supabaseAdmin
+            .from('adeudos')
+            .delete()
+            .eq('id', this.id);
+        if (error) throw error;
+        return true;
+    }
+
+    // Método para restaurar adeudo eliminado (opcional)
+    async restore() {
+        const { data, error } = await auth.supabaseAdmin
+            .from('adeudos')
+            .update({ deleted_at: null })
+            .eq('id', this.id)
+            .select()
+            .single();
+        if (error) throw error;
+        Object.assign(this, new Adeudo(data));
+        return this;
+    }
+
     static async countByLoanId(prestamoId) {
         const { count, error } = await auth.supabaseAdmin
             .from('adeudos')
             .select('*', { count: 'exact', head: true })
-            .eq('prestamo_id', prestamoId);
+            .eq('prestamo_id', prestamoId)
+            .is('deleted_at', null); // Solo adeudos no eliminados
 
         if (error) throw error;
         return count;
