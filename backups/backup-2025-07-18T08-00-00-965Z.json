@@ -1,0 +1,4592 @@
+{
+  "timestamp": "2025-07-18T08:00:00.965Z",
+  "metadata": {
+    "totalUsers": 3,
+    "totalClients": 87,
+    "totalPayments": 178,
+    "totalFines": 234
+  },
+  "data": {
+    "users": [
+      {
+        "id": 18,
+        "email": "admin@gmail.com",
+        "nombre": "Joaquin Lopez",
+        "role": "admin",
+        "auth_id": "2cdc59fe-de8c-49a0-ad56-ca29e5521c37",
+        "password": "Admin123",
+        "status": "active",
+        "created_at": "2025-06-15T22:09:08.780798+00:00"
+      },
+      {
+        "id": 23,
+        "email": "joaquin_lopez@gmail.com",
+        "nombre": "Joaquin Lopez",
+        "role": "admin",
+        "auth_id": "6bd81408-9fbc-4c72-987c-5efbd476ac47",
+        "password": "Joaquin01",
+        "status": "active",
+        "created_at": "2025-06-25T15:50:49.436112+00:00"
+      },
+      {
+        "id": 24,
+        "email": "luis_lopez28@gmail.com",
+        "nombre": "Luis Lopez",
+        "role": "admin",
+        "auth_id": "dd4c91a5-0016-4613-b19d-7b31b80fc2ae",
+        "password": "Luis_28",
+        "status": "active",
+        "created_at": "2025-07-05T00:09:48.109843+00:00"
+      }
+    ],
+    "clients": [
+      {
+        "id": 173,
+        "nombre": " 100 Emmanuel Durán Hernández",
+        "telefono": "5651147989",
+        "direccion": "Circuito paseo de los ríos # 202 L3M4 edificio F",
+        "ocupacion": "Miniero",
+        "trabajador_id": 20,
+        "created_at": "2025-06-28T02:31:30.181582+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 174,
+        "nombre": "56 Nora Aide Sifuentes Rodriguez ",
+        "telefono": "6188006369",
+        "direccion": "Paseo de los ríos 129 F202 L3M4",
+        "ocupacion": "Ama de casa ",
+        "trabajador_id": 20,
+        "created_at": "2025-06-28T02:35:38.825501+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 176,
+        "nombre": "Yubisella Reyes pulgarín",
+        "telefono": "6751008509",
+        "direccion": "Lote 2 manzana 2 edificio c303 fraccionamiento río dorado",
+        "ocupacion": "Comerciante",
+        "trabajador_id": 20,
+        "created_at": "2025-06-28T03:32:13.309514+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 177,
+        "nombre": "Gerardo Manuel analis Deras",
+        "telefono": "6182221671",
+        "direccion": "Valle de las rosas 12  Valle de Guadalupe",
+        "ocupacion": "Taxista",
+        "trabajador_id": 20,
+        "created_at": "2025-06-29T01:12:52.579641+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 178,
+        "nombre": "67 Luis Fernández Rosales cejas",
+        "telefono": "6181538502",
+        "direccion": "Segunda privada de inde 619 fraccionamiento ajinos",
+        "ocupacion": "Uber",
+        "trabajador_id": 20,
+        "created_at": "2025-06-29T01:28:27.005647+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 179,
+        "nombre": "Erika Beltrán Castillo",
+        "telefono": "6182180499",
+        "direccion": "12 de octubre 406 Tierra y libertad",
+        "ocupacion": "Empleada",
+        "trabajador_id": 20,
+        "created_at": "2025-06-29T01:42:16.936106+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 180,
+        "nombre": "45 Héctor Adrián flores galaviz",
+        "telefono": "6182064811",
+        "direccion": "Tlatelolco 111 rosas del Tepeyac",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-06-30T05:17:20.144396+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 181,
+        "nombre": "85 Maria del Rocío Galarza Martínez ",
+        "telefono": "8126063223",
+        "direccion": "Paseo de los ríos 168 lote1 manzana 11 ",
+        "ocupacion": "Maquiladora ",
+        "trabajador_id": 20,
+        "created_at": "2025-06-30T19:37:28.283498+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 182,
+        "nombre": "182 jesús Eduardo olazaran lores",
+        "telefono": "6182328136",
+        "direccion": "Benito Juárez , .J Guadalupe Rodríguez ",
+        "ocupacion": "Chofer aeropuerto ",
+        "trabajador_id": 20,
+        "created_at": "2025-06-30T19:46:21.636796+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 183,
+        "nombre": "Nury Samantha Velázquez Cruz",
+        "telefono": "6181460287",
+        "direccion": "Providencia 104 Colonia Santa María",
+        "ocupacion": "Empleando el hospital 450",
+        "trabajador_id": 20,
+        "created_at": "2025-06-30T21:59:25.553402+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 184,
+        "nombre": "86 Perla Jacqueline Rodríguez aldaba",
+        "telefono": "6183024819",
+        "direccion": "Circuito paseo de los ríos 136 lote 1 manzana 4 edificio D 401",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-06-30T22:24:47.620951+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 186,
+        "nombre": "Cindy Nallely Esparza Burciaga ",
+        "telefono": "6183085461",
+        "direccion": "Hipódromo sta Clara #607",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T00:03:19.688447+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 187,
+        "nombre": "Perla Diosdel Morales Olivas ",
+        "telefono": "6181317677",
+        "direccion": "Valle dorado 310 valle oriente",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T02:03:25.631476+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 189,
+        "nombre": "Fidel Germán Páez Álvarez ",
+        "telefono": "6188382036",
+        "direccion": "Jardines del Real del huerto 107",
+        "ocupacion": "Bolt y uber ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T20:44:54.273474+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 190,
+        "nombre": "Nestor Andres Márquez Pizarro ",
+        "telefono": "6182677324",
+        "direccion": "Milenio 450 atmósfera 121",
+        "ocupacion": "Bolt ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T21:19:19.150144+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 191,
+        "nombre": "María fernanda caballero García ",
+        "telefono": "6181524076",
+        "direccion": "Avenida estaño 229 fraccionamiento Fidel Velázquez 2",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T21:25:29.804291+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 192,
+        "nombre": "María del rosario Gallegos ",
+        "telefono": "6183273286",
+        "direccion": "Ebano 222 fraccionamiento los Encinos ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T21:35:36.353405+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 193,
+        "nombre": "Fátima Montserrat Calvillo Maldonado ",
+        "telefono": "6181549547",
+        "direccion": "Durango 213 colonia villa de Guadalupe ",
+        "ocupacion": "Enfermera ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:21:39.337375+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 194,
+        "nombre": "Frida yesenia Ontiveros Herrera ",
+        "telefono": "6242653028",
+        "direccion": "Los álamos 3ra rinconada 115",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:28:47.411804+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 195,
+        "nombre": "Yesenia Flores Flores ",
+        "telefono": "6181469748",
+        "direccion": "Cecilia Valdez de vela 230 colonia amalia sorlozano ",
+        "ocupacion": "Empleada de una guardería ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:33:49.369655+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 196,
+        "nombre": "Ana Elizabeth Ramirez López ",
+        "telefono": "6182299392",
+        "direccion": "Chile 404 colonia Lázaro Cárdenas ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:35:50.087179+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 197,
+        "nombre": "Andrea Armendaris Carrete ",
+        "telefono": "6181699745",
+        "direccion": "Tule 506 col azcapotzalco ",
+        "ocupacion": "Maestra ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:38:02.907644+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 198,
+        "nombre": "Jaqueline Martínez Muñoz ",
+        "telefono": "6182703658",
+        "direccion": "Villa ahumada 129 villas del carmen ",
+        "ocupacion": "Empleada de afores ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:46:36.495331+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 199,
+        "nombre": "María angélica Jaquez Lira ",
+        "telefono": "6182304848",
+        "direccion": "Zacatecas 1206 col profirió natera ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-01T22:50:12.352235+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 200,
+        "nombre": "Santa Susana Torres Torres ",
+        "telefono": "6181699347",
+        "direccion": "Juan e García 1015 barrio de tierra blanca ",
+        "ocupacion": "Cocinera ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-02T00:45:47.05353+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 201,
+        "nombre": "Yesenia Martínez Ceniceros ",
+        "telefono": "6188032404",
+        "direccion": "Primero de mayo 104 col Isabel Almanza ",
+        "ocupacion": "Estilista ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-02T03:22:20.732278+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 202,
+        "nombre": "Angel Ernesto Gonzales Duarte ",
+        "telefono": "6751048972",
+        "direccion": "Andador jardines 103 Frac Chapultepec ",
+        "ocupacion": "Trabaja en el municipio ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-02T03:52:28.258752+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 203,
+        "nombre": "Jesús Alberto Valdez Salas ",
+        "telefono": "6183672429",
+        "direccion": "Suchil 109 villas del Guadiana 7",
+        "ocupacion": "Operador de maquila ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-02T05:05:18.470914+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 204,
+        "nombre": "Alejandra montiel moreno ",
+        "telefono": "6183626557",
+        "direccion": "Cannes mayor 228 Frac villas del Guadiana 3",
+        "ocupacion": "Mesera ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-02T16:41:11.049557+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 210,
+        "nombre": "188 Ángel Ramiro Ortega Chávez",
+        "telefono": "6183654208",
+        "direccion": "Camino de la Estrella 235 el manantial ",
+        "ocupacion": "Asesor en sopory",
+        "trabajador_id": 20,
+        "created_at": "2025-07-02T19:54:29.435843+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 211,
+        "nombre": "196 Juan Martín López Pérez",
+        "telefono": "6182438804",
+        "direccion": "Circuito paseo de los ríos 132 lote 3 manzana 14 D 104",
+        "ocupacion": "Maquiladora ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-02T20:02:26.287356+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 212,
+        "nombre": "175 Rosalba Cabral Márquez",
+        "telefono": "6183003997",
+        "direccion": "Quinta privada de tule 137 interior 4 la forestal ",
+        "ocupacion": "Empleada de gobierno",
+        "trabajador_id": 20,
+        "created_at": "2025-07-02T20:12:11.664124+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 213,
+        "nombre": "21 Víctor Alejandro Villanueva Robles",
+        "telefono": "6182564650",
+        "direccion": "Pilar orona 908 ",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-02T20:22:34.143273+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 214,
+        "nombre": "69 Alberto Morales Quiñones",
+        "telefono": "6183235869",
+        "direccion": "Paseo de los ríos 107 lote 3 manzana 2",
+        "ocupacion": "Comerciante",
+        "trabajador_id": 20,
+        "created_at": "2025-07-02T20:47:36.423323+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 215,
+        "nombre": "Briseida Avitia Aragon",
+        "telefono": "6183817407",
+        "direccion": "Col. Miguel cruz José everardo Villalobos ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-03T02:56:23.014111+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 216,
+        "nombre": "159 Jesús Armando Herrera Burgos ",
+        "telefono": "6182564650",
+        "direccion": "Perla 207 ampliación rosas",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-03T21:05:06.06378+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 208,
+        "nombre": "Test 5",
+        "telefono": "6058282050",
+        "direccion": "Lokit",
+        "ocupacion": "Limit",
+        "trabajador_id": 11,
+        "created_at": "2025-07-02T17:37:54.797198+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 217,
+        "nombre": "Axel misael Vázquez santiago ",
+        "telefono": "6183625165",
+        "direccion": "Colonia san juan 2 san juditas H 25",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-04T14:53:39.328629+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 218,
+        "nombre": "América nayeli Esquivel Flores ",
+        "telefono": "6182981097",
+        "direccion": "Ricardo lazema 619 colonia cerro del mercado ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-04T14:58:49.198636+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 219,
+        "nombre": "Norma Alicia Rodriguez sustaita ",
+        "telefono": "6181168894",
+        "direccion": "Colonia Hidalgo ermenehildo 34510",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-04T15:03:29.350643+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 220,
+        "nombre": "Emmanuel Pérez Carrizoza ",
+        "telefono": "6181237675",
+        "direccion": "Ciudad san Isidro gordolobo 217",
+        "ocupacion": "Bolt ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-04T15:28:19.468818+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 221,
+        "nombre": "72 Luis Ángel larreta Herrera",
+        "telefono": "6188001840",
+        "direccion": "Lote 4 manzana 14 edificio g 302 río dorado ",
+        "ocupacion": "Repartidor Didi ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-04T18:54:51.63476+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 222,
+        "nombre": "14 Jesús Francisco larreta Herrera",
+        "telefono": "6188001802",
+        "direccion": "Lote 4 manzana 14 G paseo los ríos 130 río dorado",
+        "ocupacion": "Repartidor Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-04T18:59:02.23078+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 223,
+        "nombre": "105 Patricia María González Cepeda",
+        "telefono": "6188033193",
+        "direccion": "Paseo los ríos 147 no te doy manzana tres en Río dorado",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-07-04T19:07:30.810412+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 224,
+        "nombre": "32 Cristian Osvaldo Roman cisneros ",
+        "telefono": "6181315008",
+        "direccion": "Luis blanco 227 asentamientos humanos ",
+        "ocupacion": "Empleado de gobierno",
+        "trabajador_id": 20,
+        "created_at": "2025-07-04T19:12:08.411317+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 225,
+        "nombre": "123 Evelyn Karen Sandoval Rodríguez",
+        "telefono": "6182964825",
+        "direccion": "Río dorado",
+        "ocupacion": "Taxista",
+        "trabajador_id": 20,
+        "created_at": "2025-07-04T19:17:18.208911+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 226,
+        "nombre": "Josue Juarez",
+        "telefono": "6181558734",
+        "direccion": "Calle Rodolfo Fierro #430 Col Division del Norte",
+        "ocupacion": "Pintor",
+        "trabajador_id": 22,
+        "created_at": "2025-07-05T00:09:49.853232+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 228,
+        "nombre": "Víctor Ontiveros Galvan ",
+        "telefono": "6679516749",
+        "direccion": "Raúl ortega 117 colonia las encinas ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-07T15:30:53.469165+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 229,
+        "nombre": "Anayeli torres Hernández ",
+        "telefono": "6181108677",
+        "direccion": "Suchil 113 fraccionamiento villas del Guadiana 7",
+        "ocupacion": "Empleada ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-07T15:44:24.91326+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 230,
+        "nombre": "Esther Paez Lozano ",
+        "telefono": "6188000549",
+        "direccion": "Los de cuatro manzana 14 G#303  fraccionamiento río dorado",
+        "ocupacion": "Maquiladora ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:07:26.432334+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 231,
+        "nombre": "Jacobo emiliano Martinez ",
+        "telefono": "8114836033",
+        "direccion": "M5 L3 C101 Rio Dorado ",
+        "ocupacion": "Minero ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:22:30.786135+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 232,
+        "nombre": "Romualdo Reyes cumplido ",
+        "telefono": "6182135760",
+        "direccion": "Paseo de los ríos 164 A 102 Rio Dorado ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:35:18.935796+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 233,
+        "nombre": "35 Perla Yolanda Lerma Pérez",
+        "telefono": "6183264093",
+        "direccion": "Ideales de justicia 130 Lucio Cabañas",
+        "ocupacion": "Comerciante",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:38:15.477882+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 234,
+        "nombre": "Soledad Covarrubias soto ",
+        "telefono": "6183316678",
+        "direccion": "Lote 3 manzana 11 L 204 Rio Dorado ",
+        "ocupacion": "Empleado maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:38:30.936583+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 235,
+        "nombre": "Milagros Araceli Rodríguez Díaz ",
+        "telefono": "6183090894",
+        "direccion": "Paseo de los ríos 143 D 204 Rio dorado ",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:40:19.378+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 236,
+        "nombre": "Rosalba Díaz Medina ",
+        "telefono": "6181340192",
+        "direccion": "Paseo de los ríos J 101 Rio dorado ",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:41:49.445997+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 237,
+        "nombre": "93 José leobardo delgado Herrera",
+        "telefono": "6181384563",
+        "direccion": "Tampico 503 jardines de Cancún",
+        "ocupacion": "Taxista",
+        "trabajador_id": 20,
+        "created_at": "2025-07-08T21:49:29.571124+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 238,
+        "nombre": "Carlos Miguel Alba Morales ",
+        "telefono": "6671106566",
+        "direccion": "Valle del malpis 101 los Fresnos ",
+        "ocupacion": "Técnico ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-10T02:39:02.846528+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 239,
+        "nombre": "Juana Fierro Hernández ",
+        "telefono": "6183332205",
+        "direccion": "Lázaro Cárdenas 807 colonia j Guadalupe Rodriguez ",
+        "ocupacion": "Empleada doméstica ",
+        "trabajador_id": 19,
+        "created_at": "2025-07-10T02:50:34.029392+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 240,
+        "nombre": "Nahomi Cristina sarmiento ",
+        "telefono": "6183651008",
+        "direccion": "Lote 3 manzana 14 F 302 Rio Dorado ",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-10T19:09:19.641044+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 241,
+        "nombre": "Andrea Eunice Díaz mena",
+        "telefono": "6183514175",
+        "direccion": "Encinos 203 El cipres",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-10T19:10:44.314206+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 242,
+        "nombre": "Hugo Daniel Pulgarín Gonzáles ",
+        "telefono": "6185846380",
+        "direccion": "Rio Aguanaval 116 F ",
+        "ocupacion": "Taxista ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-10T19:28:03.65847+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 243,
+        "nombre": "Luis David Castañeda Ramírez ",
+        "telefono": "6182333877",
+        "direccion": "Yucatán #201 Fresnos ",
+        "ocupacion": "Empleado 450 ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-10T23:35:40.402345+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 244,
+        "nombre": "Luis Fernando rosales cejas ",
+        "telefono": "6181538502",
+        "direccion": "Priv Inde #619 Ajincos ",
+        "ocupacion": "DiDi ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-10T23:37:14.314198+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 245,
+        "nombre": "120 Sebastián León ruzo ariza",
+        "telefono": "6181684433",
+        "direccion": "Badajoz  104 Galicia ",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-11T00:26:06.893282+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 246,
+        "nombre": "Sebastián León ruzo Ariza",
+        "telefono": "6181684433",
+        "direccion": "Badajoz #104 Galicia",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-11T00:27:29.89403+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 247,
+        "nombre": "Claudia López flores ",
+        "telefono": "6185833063",
+        "direccion": "10 de abril Tierra y Libertad ",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-11T05:03:07.987036+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 248,
+        "nombre": "Diana Celina Soto Sánchez",
+        "telefono": "6182743218",
+        "direccion": "Paseo de los ríos 157 fraccionamiento Río",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T01:33:45.886431+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 249,
+        "nombre": "Laura Galarza Martínez ",
+        "telefono": "6182982370",
+        "direccion": "Circuito paseo de los ríos lote 2 manzana 11. Edificio I 304",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T01:40:48.430865+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 250,
+        "nombre": "Eusebio Silva we Guevara",
+        "telefono": "6183318548",
+        "direccion": "Guadalupe Victoria 301 Mayagoitia",
+        "ocupacion": "Carpintero ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T01:53:35.802426+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 251,
+        "nombre": "Eber Omar Morales moreno",
+        "telefono": "6181028134",
+        "direccion": "Abedu 231 San Miguel",
+        "ocupacion": "Didi",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T02:09:25.367474+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 252,
+        "nombre": "Manuel Alberto Fernández mercado",
+        "telefono": "6181321085",
+        "direccion": "Isla Magdalena 142 puertas de San Ignacio",
+        "ocupacion": "Mecánico ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T02:30:29.721403+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 253,
+        "nombre": "María Guadalupe Martínez canales",
+        "telefono": "6181025437",
+        "direccion": "Circuito paseo de los ríos 105 edificio I  302 río dorado",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T02:42:51.710417+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 254,
+        "nombre": "Julia Díaz Medina",
+        "telefono": "6182979502",
+        "direccion": "Infla Magdalena 142 puertas de San Ignacio",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T03:01:32.890155+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 255,
+        "nombre": "Patricia Gregoria Hernández Martínez",
+        "telefono": "6183017961",
+        "direccion": "Lote 4 manzana 2 edificio I 104",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T03:18:07.644757+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 256,
+        "nombre": "Evelyn Rivas Lara",
+        "telefono": "6181263706",
+        "direccion": "Movimiento del 66 141 Sergio Méndez Salcedo",
+        "ocupacion": "Mesera",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T03:19:16.769482+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 257,
+        "nombre": "Erika Hortensia nevares cossio",
+        "telefono": "6183628968",
+        "direccion": "Salvador Nava 509 Norte zona centro",
+        "ocupacion": "Dentista ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T03:41:48.933274+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 258,
+        "nombre": "Maria Manuela Sánchez huerta ",
+        "telefono": "6182712949",
+        "direccion": "Felipe pescador 214 5 de mayo ",
+        "ocupacion": "Empleada ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-13T18:26:00.696611+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 259,
+        "nombre": "Arturo Alejandro Gurrola Arjon",
+        "telefono": "6181534067",
+        "direccion": "Héctor Mayagoitia 219 Colonia gobernadores",
+        "ocupacion": "Empelado",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T02:38:57.989104+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 260,
+        "nombre": "José Cipriano vela Reyes ",
+        "telefono": "6181821270",
+        "direccion": "Lote 5 manzana 4 D103 Rio Dorado ",
+        "ocupacion": "Carpintero ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T02:53:05.281934+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 261,
+        "nombre": "Lilia roquinto Amaya ",
+        "telefono": "6183022354",
+        "direccion": "Gandhy 107 Arturo Gámiz ",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T04:22:43.463337+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 262,
+        "nombre": "Zulema Isabel sanchez Nevares ",
+        "telefono": "6183720996",
+        "direccion": "San Juan  #419 15 de octubre ",
+        "ocupacion": "Comerciante ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T17:30:02.592099+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 263,
+        "nombre": "Juana Moreno Mendoza",
+        "telefono": "6188071629",
+        "direccion": "Lote 4 manzana 3 A #304",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T19:30:26.191196+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 264,
+        "nombre": "Dora Nayeli Yepes Medina ",
+        "telefono": "6183230718",
+        "direccion": "L3 M3 circuito paseo de los ríos edJ ",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T19:32:50.280775+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 265,
+        "nombre": "Sandra Sarai Gallardo Salas ",
+        "telefono": "6182102345",
+        "direccion": "L4 M14 D#303 río dorado ",
+        "ocupacion": "Maquila",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T19:34:22.31826+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 266,
+        "nombre": "Marisol soto villa",
+        "telefono": "6182701003",
+        "direccion": "Lote 4 Manzana 4. I 404",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T20:03:17.603489+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": 267,
+        "nombre": "Maria del Rocío Galarza Martínez ",
+        "telefono": "8126063223",
+        "direccion": "Paseo de los ríos 168 lote 2 manzana 11 edif I Río Dorado",
+        "ocupacion": "Maquila ",
+        "trabajador_id": 20,
+        "created_at": "2025-07-15T20:15:06.595729+00:00",
+        "updated_at": null,
+        "deleted_at": null
+      }
+    ],
+    "payments": [
+      {
+        "id": 77,
+        "prestamo_id": 172,
+        "monto": 276,
+        "fecha": "2025-06-27",
+        "created_at": "2025-06-28T01:04:38.918182+00:00"
+      },
+      {
+        "id": 78,
+        "prestamo_id": 173,
+        "monto": 1050,
+        "fecha": "2025-06-27",
+        "created_at": "2025-06-29T01:28:37.35834+00:00"
+      },
+      {
+        "id": 79,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-06-29",
+        "created_at": "2025-07-01T05:33:21.816991+00:00"
+      },
+      {
+        "id": 80,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-06-29",
+        "created_at": "2025-07-01T13:05:28.535657+00:00"
+      },
+      {
+        "id": 81,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-01T13:05:29.793462+00:00"
+      },
+      {
+        "id": 82,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-01T13:51:51.383599+00:00"
+      },
+      {
+        "id": 83,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-06-26",
+        "created_at": "2025-07-01T20:45:17.194611+00:00"
+      },
+      {
+        "id": 84,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-06-27",
+        "created_at": "2025-07-01T20:45:57.882999+00:00"
+      },
+      {
+        "id": 85,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-06-28",
+        "created_at": "2025-07-01T20:46:11.765371+00:00"
+      },
+      {
+        "id": 86,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-01T20:46:27.483646+00:00"
+      },
+      {
+        "id": 87,
+        "prestamo_id": 192,
+        "monto": 65,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-01T21:25:45.49691+00:00"
+      },
+      {
+        "id": 88,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-01T21:35:49.879479+00:00"
+      },
+      {
+        "id": 89,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-02T02:27:31.106485+00:00"
+      },
+      {
+        "id": 90,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-02T16:30:24.514119+00:00"
+      },
+      {
+        "id": 91,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-02T16:30:58.028748+00:00"
+      },
+      {
+        "id": 92,
+        "prestamo_id": 192,
+        "monto": 65,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-02T17:13:14.569166+00:00"
+      },
+      {
+        "id": 93,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-02T19:54:52.576101+00:00"
+      },
+      {
+        "id": 94,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-02T20:01:04.525544+00:00"
+      },
+      {
+        "id": 95,
+        "prestamo_id": 201,
+        "monto": 138,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-02T21:53:10.023662+00:00"
+      },
+      {
+        "id": 96,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-03T01:49:37.384743+00:00"
+      },
+      {
+        "id": 97,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-03T01:50:29.428282+00:00"
+      },
+      {
+        "id": 98,
+        "prestamo_id": 205,
+        "monto": 260,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-03T06:09:28.869197+00:00"
+      },
+      {
+        "id": 99,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-03T15:31:26.962693+00:00"
+      },
+      {
+        "id": 100,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T00:24:28.452376+00:00"
+      },
+      {
+        "id": 101,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-04T00:25:02.547088+00:00"
+      },
+      {
+        "id": 102,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T00:25:04.174387+00:00"
+      },
+      {
+        "id": 103,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T00:27:39.997838+00:00"
+      },
+      {
+        "id": 104,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T02:49:49.431338+00:00"
+      },
+      {
+        "id": 105,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T03:13:35.576963+00:00"
+      },
+      {
+        "id": 106,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T05:13:16.819505+00:00"
+      },
+      {
+        "id": 107,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-04T05:13:30.330483+00:00"
+      },
+      {
+        "id": 108,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T05:13:45.008704+00:00"
+      },
+      {
+        "id": 109,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T14:32:58.595954+00:00"
+      },
+      {
+        "id": 110,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T14:33:07.492391+00:00"
+      },
+      {
+        "id": 111,
+        "prestamo_id": 201,
+        "monto": 138,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T14:33:44.179325+00:00"
+      },
+      {
+        "id": 112,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T14:59:06.391744+00:00"
+      },
+      {
+        "id": 113,
+        "prestamo_id": 220,
+        "monto": 325,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-04T15:03:45.306628+00:00"
+      },
+      {
+        "id": 114,
+        "prestamo_id": 220,
+        "monto": 325,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T15:03:53.529027+00:00"
+      },
+      {
+        "id": 115,
+        "prestamo_id": 220,
+        "monto": 325,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T15:04:01.324105+00:00"
+      },
+      {
+        "id": 116,
+        "prestamo_id": 221,
+        "monto": 130,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-04T15:28:33.161583+00:00"
+      },
+      {
+        "id": 117,
+        "prestamo_id": 221,
+        "monto": 130,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T15:28:40.114161+00:00"
+      },
+      {
+        "id": 118,
+        "prestamo_id": 221,
+        "monto": 130,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T15:28:48.498762+00:00"
+      },
+      {
+        "id": 119,
+        "prestamo_id": 221,
+        "monto": 130,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-04T15:28:56.250941+00:00"
+      },
+      {
+        "id": 120,
+        "prestamo_id": 221,
+        "monto": 130,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-04T15:29:04.219705+00:00"
+      },
+      {
+        "id": 121,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-04T19:17:31.979983+00:00"
+      },
+      {
+        "id": 122,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-01",
+        "created_at": "2025-07-04T19:17:40.824958+00:00"
+      },
+      {
+        "id": 123,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-02",
+        "created_at": "2025-07-04T19:17:49.485733+00:00"
+      },
+      {
+        "id": 124,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-04T19:17:58.367858+00:00"
+      },
+      {
+        "id": 125,
+        "prestamo_id": 176,
+        "monto": 1225,
+        "fecha": "2025-06-27",
+        "created_at": "2025-07-05T02:40:04.395973+00:00"
+      },
+      {
+        "id": 126,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T02:43:10.363952+00:00"
+      },
+      {
+        "id": 127,
+        "prestamo_id": 201,
+        "monto": 138,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T15:14:16.642656+00:00"
+      },
+      {
+        "id": 128,
+        "prestamo_id": 205,
+        "monto": 260,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-05T15:15:38.56293+00:00"
+      },
+      {
+        "id": 129,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T15:16:10.637139+00:00"
+      },
+      {
+        "id": 130,
+        "prestamo_id": 220,
+        "monto": 325,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T15:17:39.734075+00:00"
+      },
+      {
+        "id": 131,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T15:18:26.554547+00:00"
+      },
+      {
+        "id": 132,
+        "prestamo_id": 198,
+        "monto": 875,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-05T15:19:10.966056+00:00"
+      },
+      {
+        "id": 133,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-05T15:20:18.621674+00:00"
+      },
+      {
+        "id": 134,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T15:20:46.285714+00:00"
+      },
+      {
+        "id": 135,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T18:41:42.452726+00:00"
+      },
+      {
+        "id": 136,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T18:42:36.636665+00:00"
+      },
+      {
+        "id": 137,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-05T18:42:53.743137+00:00"
+      },
+      {
+        "id": 138,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T18:43:43.874792+00:00"
+      },
+      {
+        "id": 139,
+        "prestamo_id": 223,
+        "monto": 65,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-05T18:44:28.226291+00:00"
+      },
+      {
+        "id": 140,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-05T18:47:30.226591+00:00"
+      },
+      {
+        "id": 141,
+        "prestamo_id": 199,
+        "monto": 1050,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-05T19:36:19.521805+00:00"
+      },
+      {
+        "id": 142,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-06T03:16:17.141166+00:00"
+      },
+      {
+        "id": 143,
+        "prestamo_id": 175,
+        "monto": 525,
+        "fecha": "2025-06-28",
+        "created_at": "2025-07-06T03:16:31.668292+00:00"
+      },
+      {
+        "id": 144,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-06T03:17:34.76631+00:00"
+      },
+      {
+        "id": 145,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-06T03:17:55.377057+00:00"
+      },
+      {
+        "id": 146,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-07T14:52:53.291037+00:00"
+      },
+      {
+        "id": 147,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-07T14:53:08.942088+00:00"
+      },
+      {
+        "id": 148,
+        "prestamo_id": 190,
+        "monto": 195,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-07T14:53:23.512027+00:00"
+      },
+      {
+        "id": 149,
+        "prestamo_id": 194,
+        "monto": 875,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T14:53:45.445472+00:00"
+      },
+      {
+        "id": 150,
+        "prestamo_id": 188,
+        "monto": 700,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T14:53:56.432698+00:00"
+      },
+      {
+        "id": 151,
+        "prestamo_id": 201,
+        "monto": 138,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-07T14:54:28.006753+00:00"
+      },
+      {
+        "id": 152,
+        "prestamo_id": 187,
+        "monto": 350,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T15:44:36.708627+00:00"
+      },
+      {
+        "id": 153,
+        "prestamo_id": 195,
+        "monto": 875,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T15:44:50.40304+00:00"
+      },
+      {
+        "id": 154,
+        "prestamo_id": 202,
+        "monto": 350,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T15:45:12.137684+00:00"
+      },
+      {
+        "id": 155,
+        "prestamo_id": 203,
+        "monto": 350,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-07T15:46:14.541544+00:00"
+      },
+      {
+        "id": 156,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-06",
+        "created_at": "2025-07-08T21:06:24.544079+00:00"
+      },
+      {
+        "id": 157,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-08T21:07:56.127676+00:00"
+      },
+      {
+        "id": 158,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-08T21:08:32.131818+00:00"
+      },
+      {
+        "id": 159,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-08T21:08:33.889988+00:00"
+      },
+      {
+        "id": 160,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-08T21:09:16.275815+00:00"
+      },
+      {
+        "id": 161,
+        "prestamo_id": 223,
+        "monto": 65,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-08T21:10:32.486581+00:00"
+      },
+      {
+        "id": 162,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-08T21:11:00.969593+00:00"
+      },
+      {
+        "id": 163,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-08T21:35:41.58786+00:00"
+      },
+      {
+        "id": 164,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-08T21:38:30.13871+00:00"
+      },
+      {
+        "id": 165,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-08T21:49:45.232107+00:00"
+      },
+      {
+        "id": 166,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-09T23:18:23.544126+00:00"
+      },
+      {
+        "id": 167,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-09T23:18:32.075908+00:00"
+      },
+      {
+        "id": 168,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-09T23:18:41.346222+00:00"
+      },
+      {
+        "id": 169,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-09T23:19:17.216259+00:00"
+      },
+      {
+        "id": 170,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-09T23:19:18.978802+00:00"
+      },
+      {
+        "id": 171,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-10T14:54:35.353158+00:00"
+      },
+      {
+        "id": 172,
+        "prestamo_id": 191,
+        "monto": 260,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-10T14:54:43.72034+00:00"
+      },
+      {
+        "id": 173,
+        "prestamo_id": 193,
+        "monto": 390,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-10T14:55:32.769569+00:00"
+      },
+      {
+        "id": 174,
+        "prestamo_id": 197,
+        "monto": 1750,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-10T14:55:56.237794+00:00"
+      },
+      {
+        "id": 175,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-10T14:57:27.359055+00:00"
+      },
+      {
+        "id": 176,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-10T14:57:36.985968+00:00"
+      },
+      {
+        "id": 177,
+        "prestamo_id": 219,
+        "monto": 325,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-10T14:57:45.905745+00:00"
+      },
+      {
+        "id": 178,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:51:04.091412+00:00"
+      },
+      {
+        "id": 179,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:51:15.707343+00:00"
+      },
+      {
+        "id": 180,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:52:44.912916+00:00"
+      },
+      {
+        "id": 181,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:52:59.011551+00:00"
+      },
+      {
+        "id": 182,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:54:23.190457+00:00"
+      },
+      {
+        "id": 183,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-11T00:54:41.041176+00:00"
+      },
+      {
+        "id": 184,
+        "prestamo_id": 176,
+        "monto": 1225,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-13T01:30:53.479883+00:00"
+      },
+      {
+        "id": 185,
+        "prestamo_id": 176,
+        "monto": 1225,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T01:31:40.832099+00:00"
+      },
+      {
+        "id": 186,
+        "prestamo_id": 176,
+        "monto": 1225,
+        "fecha": "2025-07-18",
+        "created_at": "2025-07-13T01:32:06.206459+00:00"
+      },
+      {
+        "id": 187,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T01:41:04.572915+00:00"
+      },
+      {
+        "id": 188,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T01:41:15.099587+00:00"
+      },
+      {
+        "id": 189,
+        "prestamo_id": 234,
+        "monto": 65,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T01:54:11.802795+00:00"
+      },
+      {
+        "id": 190,
+        "prestamo_id": 234,
+        "monto": 65,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T01:54:20.344821+00:00"
+      },
+      {
+        "id": 191,
+        "prestamo_id": 234,
+        "monto": 65,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T01:54:31.077289+00:00"
+      },
+      {
+        "id": 192,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T02:05:06.453808+00:00"
+      },
+      {
+        "id": 193,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T02:05:23.31947+00:00"
+      },
+      {
+        "id": 194,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T02:05:50.827836+00:00"
+      },
+      {
+        "id": 195,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-13T02:06:21.813618+00:00"
+      },
+      {
+        "id": 196,
+        "prestamo_id": 179,
+        "monto": 260,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-13T02:06:44.227329+00:00"
+      },
+      {
+        "id": 197,
+        "prestamo_id": 177,
+        "monto": 700,
+        "fecha": "2025-06-27",
+        "created_at": "2025-07-13T02:17:29.212902+00:00"
+      },
+      {
+        "id": 198,
+        "prestamo_id": 177,
+        "monto": 700,
+        "fecha": "2025-07-04",
+        "created_at": "2025-07-13T02:17:39.007334+00:00"
+      },
+      {
+        "id": 199,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T02:26:01.2986+00:00"
+      },
+      {
+        "id": 200,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-13T02:26:09.887813+00:00"
+      },
+      {
+        "id": 201,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T02:26:31.746065+00:00"
+      },
+      {
+        "id": 202,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-13T02:26:43.847401+00:00"
+      },
+      {
+        "id": 203,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-13T02:27:00.318291+00:00"
+      },
+      {
+        "id": 204,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-13T02:27:12.039095+00:00"
+      },
+      {
+        "id": 205,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-07",
+        "created_at": "2025-07-13T02:39:49.941363+00:00"
+      },
+      {
+        "id": 206,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T02:40:01.690635+00:00"
+      },
+      {
+        "id": 207,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-13T02:40:13.920392+00:00"
+      },
+      {
+        "id": 208,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-13T02:40:24.43674+00:00"
+      },
+      {
+        "id": 209,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-13T03:05:37.272705+00:00"
+      },
+      {
+        "id": 210,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-13T03:06:05.716957+00:00"
+      },
+      {
+        "id": 211,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-13T03:06:08.610974+00:00"
+      },
+      {
+        "id": 212,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-13T03:06:16.287056+00:00"
+      },
+      {
+        "id": 213,
+        "prestamo_id": 238,
+        "monto": 130,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T03:06:23.641522+00:00"
+      },
+      {
+        "id": 214,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-13T03:43:00.746793+00:00"
+      },
+      {
+        "id": 215,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-13T03:43:12.963648+00:00"
+      },
+      {
+        "id": 216,
+        "prestamo_id": 214,
+        "monto": 325,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-13T03:43:23.791397+00:00"
+      },
+      {
+        "id": 217,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-14",
+        "created_at": "2025-07-15T02:40:10.313335+00:00"
+      },
+      {
+        "id": 218,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-15T02:40:29.475346+00:00"
+      },
+      {
+        "id": 219,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-15T02:40:44.335842+00:00"
+      },
+      {
+        "id": 220,
+        "prestamo_id": 223,
+        "monto": 65,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-15T03:30:31.24198+00:00"
+      },
+      {
+        "id": 221,
+        "prestamo_id": 223,
+        "monto": 65,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-15T03:30:40.587655+00:00"
+      },
+      {
+        "id": 222,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-06-30",
+        "created_at": "2025-07-15T03:33:58.706357+00:00"
+      },
+      {
+        "id": 223,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-15T03:34:13.469072+00:00"
+      },
+      {
+        "id": 224,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-15T03:34:35.313814+00:00"
+      },
+      {
+        "id": 225,
+        "prestamo_id": 174,
+        "monto": 700,
+        "fecha": "2025-06-28",
+        "created_at": "2025-07-15T04:23:31.883792+00:00"
+      },
+      {
+        "id": 226,
+        "prestamo_id": 174,
+        "monto": 700,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-15T04:23:44.475338+00:00"
+      },
+      {
+        "id": 227,
+        "prestamo_id": 175,
+        "monto": 525,
+        "fecha": "2025-07-05",
+        "created_at": "2025-07-15T04:24:09.215509+00:00"
+      },
+      {
+        "id": 228,
+        "prestamo_id": 226,
+        "monto": 260,
+        "fecha": "2025-07-14",
+        "created_at": "2025-07-15T04:31:54.852459+00:00"
+      },
+      {
+        "id": 229,
+        "prestamo_id": 253,
+        "monto": 260,
+        "fecha": "2025-07-14",
+        "created_at": "2025-07-15T04:32:41.363172+00:00"
+      },
+      {
+        "id": 230,
+        "prestamo_id": 181,
+        "monto": 227.5,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-15T04:33:33.360055+00:00"
+      },
+      {
+        "id": 231,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-09",
+        "created_at": "2025-07-15T19:16:00.302197+00:00"
+      },
+      {
+        "id": 232,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-10",
+        "created_at": "2025-07-15T19:16:08.252172+00:00"
+      },
+      {
+        "id": 233,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-08",
+        "created_at": "2025-07-15T19:16:18.536979+00:00"
+      },
+      {
+        "id": 234,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-15T19:16:29.503986+00:00"
+      },
+      {
+        "id": 235,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-15T19:17:38.962928+00:00"
+      },
+      {
+        "id": 236,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-15T19:17:48.157015+00:00"
+      },
+      {
+        "id": 237,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-14",
+        "created_at": "2025-07-15T19:17:59.228539+00:00"
+      },
+      {
+        "id": 238,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-15",
+        "created_at": "2025-07-16T03:12:02.796942+00:00"
+      },
+      {
+        "id": 239,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-16T03:14:26.446395+00:00"
+      },
+      {
+        "id": 240,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-12",
+        "created_at": "2025-07-16T03:14:47.149445+00:00"
+      },
+      {
+        "id": 241,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-11",
+        "created_at": "2025-07-16T03:15:01.7116+00:00"
+      },
+      {
+        "id": 242,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-14",
+        "created_at": "2025-07-16T03:15:05.43232+00:00"
+      },
+      {
+        "id": 243,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-15",
+        "created_at": "2025-07-16T03:15:22.803701+00:00"
+      },
+      {
+        "id": 244,
+        "prestamo_id": 243,
+        "monto": 195,
+        "fecha": "2025-07-15",
+        "created_at": "2025-07-16T03:15:27.390678+00:00"
+      },
+      {
+        "id": 245,
+        "prestamo_id": 233,
+        "monto": 65,
+        "fecha": "2025-07-16",
+        "created_at": "2025-07-17T02:58:25.606035+00:00"
+      },
+      {
+        "id": 246,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-17",
+        "created_at": "2025-07-17T19:21:25.956587+00:00"
+      },
+      {
+        "id": 247,
+        "prestamo_id": 178,
+        "monto": 195,
+        "fecha": "2025-07-17",
+        "created_at": "2025-07-17T19:21:39.766935+00:00"
+      },
+      {
+        "id": 248,
+        "prestamo_id": 215,
+        "monto": 2100,
+        "fecha": "2025-07-03",
+        "created_at": "2025-07-17T19:23:55.356852+00:00"
+      },
+      {
+        "id": 249,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-15",
+        "created_at": "2025-07-17T19:30:18.922194+00:00"
+      },
+      {
+        "id": 250,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-16",
+        "created_at": "2025-07-17T19:30:38.076281+00:00"
+      },
+      {
+        "id": 251,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-17",
+        "created_at": "2025-07-17T19:31:07.81274+00:00"
+      },
+      {
+        "id": 252,
+        "prestamo_id": 246,
+        "monto": 130,
+        "fecha": "2025-07-17",
+        "created_at": "2025-07-17T19:31:07.863178+00:00"
+      },
+      {
+        "id": 253,
+        "prestamo_id": 253,
+        "monto": 260,
+        "fecha": "2025-07-15",
+        "created_at": "2025-07-17T19:31:55.702707+00:00"
+      },
+      {
+        "id": 254,
+        "prestamo_id": 253,
+        "monto": 260,
+        "fecha": "2025-07-16",
+        "created_at": "2025-07-17T19:32:04.469775+00:00"
+      }
+    ],
+    "fines": [
+      {
+        "id": 136,
+        "prestamo_id": 192,
+        "fecha": "2025-07-01",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-02T06:00:04.70957+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 143,
+        "prestamo_id": 192,
+        "fecha": "2025-07-02",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-03T06:00:05.475883+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 146,
+        "prestamo_id": 172,
+        "fecha": "2025-07-03",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-04T06:00:03.784043+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 147,
+        "prestamo_id": 186,
+        "fecha": "2025-07-03",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-04T06:00:03.981976+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 149,
+        "prestamo_id": 192,
+        "fecha": "2025-07-03",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-04T06:00:04.592216+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 153,
+        "prestamo_id": 206,
+        "fecha": "2025-07-03",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-04T06:00:05.405034+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 154,
+        "prestamo_id": 207,
+        "fecha": "2025-07-03",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-04T06:00:05.556711+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 155,
+        "prestamo_id": 208,
+        "fecha": "2025-07-03",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-04T06:00:05.862658+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 156,
+        "prestamo_id": 209,
+        "fecha": "2025-07-03",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-04T06:00:06.057872+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 139,
+        "prestamo_id": 181,
+        "fecha": "2025-07-02",
+        "monto": 70,
+        "estado": "pagado",
+        "cliente_id": 180,
+        "created_at": "2025-07-03T06:00:03.649878+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 158,
+        "prestamo_id": 172,
+        "fecha": "2025-07-04",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-05T06:00:04.888863+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 159,
+        "prestamo_id": 186,
+        "fecha": "2025-07-04",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-05T06:00:05.100055+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 160,
+        "prestamo_id": 218,
+        "fecha": "2025-07-04",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-05T06:00:05.314871+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 164,
+        "prestamo_id": 190,
+        "fecha": "2025-07-04",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-05T06:00:06.386845+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 166,
+        "prestamo_id": 192,
+        "fecha": "2025-07-04",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-05T06:00:07.080542+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 170,
+        "prestamo_id": 206,
+        "fecha": "2025-07-04",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-05T06:00:07.859296+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 171,
+        "prestamo_id": 207,
+        "fecha": "2025-07-04",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-05T06:00:08.003641+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 172,
+        "prestamo_id": 208,
+        "fecha": "2025-07-04",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-05T06:00:08.148051+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 176,
+        "prestamo_id": 227,
+        "fecha": "2025-07-04",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 226,
+        "created_at": "2025-07-05T06:00:08.883562+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 177,
+        "prestamo_id": 172,
+        "fecha": "2025-07-05",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-06T06:00:03.356151+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 178,
+        "prestamo_id": 186,
+        "fecha": "2025-07-05",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-06T06:00:03.886414+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 179,
+        "prestamo_id": 218,
+        "fecha": "2025-07-05",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-06T06:00:04.236708+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 181,
+        "prestamo_id": 190,
+        "fecha": "2025-07-05",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-06T06:00:05.707484+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 183,
+        "prestamo_id": 192,
+        "fecha": "2025-07-05",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-06T06:00:06.287852+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 186,
+        "prestamo_id": 205,
+        "fecha": "2025-07-05",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-06T06:00:06.859675+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 187,
+        "prestamo_id": 206,
+        "fecha": "2025-07-05",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-06T06:00:07.05027+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 188,
+        "prestamo_id": 207,
+        "fecha": "2025-07-05",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-06T06:00:07.341487+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 189,
+        "prestamo_id": 208,
+        "fecha": "2025-07-05",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-06T06:00:07.585464+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 190,
+        "prestamo_id": 209,
+        "fecha": "2025-07-05",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-06T06:00:07.965686+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 191,
+        "prestamo_id": 220,
+        "fecha": "2025-07-05",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-06T06:00:08.15912+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 192,
+        "prestamo_id": 227,
+        "fecha": "2025-07-05",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 226,
+        "created_at": "2025-07-06T06:00:08.447624+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 194,
+        "prestamo_id": 172,
+        "fecha": "2025-07-07",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-08T06:00:02.952079+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 195,
+        "prestamo_id": 186,
+        "fecha": "2025-07-07",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-08T06:00:03.41291+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 196,
+        "prestamo_id": 218,
+        "fecha": "2025-07-07",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-08T06:00:03.6972+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 201,
+        "prestamo_id": 190,
+        "fecha": "2025-07-07",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-08T06:00:05.139353+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 203,
+        "prestamo_id": 192,
+        "fecha": "2025-07-07",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-08T06:00:05.720007+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 205,
+        "prestamo_id": 201,
+        "fecha": "2025-07-07",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-08T06:00:06.283127+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 206,
+        "prestamo_id": 205,
+        "fecha": "2025-07-07",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-08T06:00:06.533286+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 207,
+        "prestamo_id": 206,
+        "fecha": "2025-07-07",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-08T06:00:06.785458+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 208,
+        "prestamo_id": 207,
+        "fecha": "2025-07-07",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-08T06:00:07.145184+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 209,
+        "prestamo_id": 208,
+        "fecha": "2025-07-07",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-08T06:00:07.480624+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 210,
+        "prestamo_id": 209,
+        "fecha": "2025-07-07",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-08T06:00:07.696246+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 211,
+        "prestamo_id": 220,
+        "fecha": "2025-07-07",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-08T06:00:07.98561+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 212,
+        "prestamo_id": 221,
+        "fecha": "2025-07-07",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-08T06:00:08.259042+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 213,
+        "prestamo_id": 223,
+        "fecha": "2025-07-07",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-08T06:00:08.630025+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 215,
+        "prestamo_id": 229,
+        "fecha": "2025-07-07",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-08T06:00:08.991882+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 217,
+        "prestamo_id": 172,
+        "fecha": "2025-07-08",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-09T06:00:04.316406+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 218,
+        "prestamo_id": 186,
+        "fecha": "2025-07-08",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-09T06:00:04.642026+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 219,
+        "prestamo_id": 218,
+        "fecha": "2025-07-08",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-09T06:00:04.979549+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 223,
+        "prestamo_id": 190,
+        "fecha": "2025-07-08",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-09T06:00:06.155493+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 225,
+        "prestamo_id": 192,
+        "fecha": "2025-07-08",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-09T06:00:06.66391+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 227,
+        "prestamo_id": 201,
+        "fecha": "2025-07-08",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-09T06:00:07.230195+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 228,
+        "prestamo_id": 205,
+        "fecha": "2025-07-08",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-09T06:00:07.682723+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 229,
+        "prestamo_id": 206,
+        "fecha": "2025-07-08",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-09T06:00:07.944922+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 230,
+        "prestamo_id": 207,
+        "fecha": "2025-07-08",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-09T06:00:08.153957+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 231,
+        "prestamo_id": 208,
+        "fecha": "2025-07-08",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-09T06:00:08.364263+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 232,
+        "prestamo_id": 209,
+        "fecha": "2025-07-08",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-09T06:00:08.582749+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 233,
+        "prestamo_id": 220,
+        "fecha": "2025-07-08",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-09T06:00:08.785702+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 234,
+        "prestamo_id": 221,
+        "fecha": "2025-07-08",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-09T06:00:08.959734+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 235,
+        "prestamo_id": 223,
+        "fecha": "2025-07-08",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-09T06:00:09.187095+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 237,
+        "prestamo_id": 229,
+        "fecha": "2025-07-08",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-09T06:00:09.604946+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 240,
+        "prestamo_id": 172,
+        "fecha": "2025-07-09",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-10T06:00:03.35728+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 241,
+        "prestamo_id": 186,
+        "fecha": "2025-07-09",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-10T06:00:03.642342+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 242,
+        "prestamo_id": 218,
+        "fecha": "2025-07-09",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-10T06:00:03.829214+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 246,
+        "prestamo_id": 181,
+        "fecha": "2025-07-09",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-10T06:00:04.595516+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 247,
+        "prestamo_id": 190,
+        "fecha": "2025-07-09",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-10T06:00:04.781318+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 249,
+        "prestamo_id": 192,
+        "fecha": "2025-07-09",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-10T06:00:05.082176+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 251,
+        "prestamo_id": 201,
+        "fecha": "2025-07-09",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-10T06:00:05.448391+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 252,
+        "prestamo_id": 205,
+        "fecha": "2025-07-09",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-10T06:00:05.603231+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 253,
+        "prestamo_id": 206,
+        "fecha": "2025-07-09",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-10T06:00:05.744241+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 254,
+        "prestamo_id": 207,
+        "fecha": "2025-07-09",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-10T06:00:05.926986+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 255,
+        "prestamo_id": 208,
+        "fecha": "2025-07-09",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-10T06:00:06.115896+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 256,
+        "prestamo_id": 209,
+        "fecha": "2025-07-09",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-10T06:00:06.259626+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 257,
+        "prestamo_id": 220,
+        "fecha": "2025-07-09",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-10T06:00:06.389268+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 258,
+        "prestamo_id": 221,
+        "fecha": "2025-07-09",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-10T06:00:06.662283+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 259,
+        "prestamo_id": 223,
+        "fecha": "2025-07-09",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-10T06:00:06.816936+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 261,
+        "prestamo_id": 229,
+        "fecha": "2025-07-09",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-10T06:00:07.172379+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 263,
+        "prestamo_id": 234,
+        "fecha": "2025-07-09",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-10T06:00:07.669378+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 265,
+        "prestamo_id": 172,
+        "fecha": "2025-07-10",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-11T06:00:05.520753+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 266,
+        "prestamo_id": 186,
+        "fecha": "2025-07-10",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-11T06:00:05.748177+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 267,
+        "prestamo_id": 218,
+        "fecha": "2025-07-10",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-11T06:00:05.959111+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 268,
+        "prestamo_id": 219,
+        "fecha": "2025-07-10",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-11T06:00:06.191507+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 270,
+        "prestamo_id": 190,
+        "fecha": "2025-07-10",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-11T06:00:06.882343+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 271,
+        "prestamo_id": 191,
+        "fecha": "2025-07-10",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-11T06:00:07.11715+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 272,
+        "prestamo_id": 192,
+        "fecha": "2025-07-10",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-11T06:00:07.289157+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 273,
+        "prestamo_id": 193,
+        "fecha": "2025-07-10",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-11T06:00:07.488752+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 274,
+        "prestamo_id": 201,
+        "fecha": "2025-07-10",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-11T06:00:07.687701+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 275,
+        "prestamo_id": 205,
+        "fecha": "2025-07-10",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-11T06:00:07.856401+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 276,
+        "prestamo_id": 206,
+        "fecha": "2025-07-10",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-11T06:00:08.097221+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 277,
+        "prestamo_id": 207,
+        "fecha": "2025-07-10",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-11T06:00:08.29337+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 278,
+        "prestamo_id": 208,
+        "fecha": "2025-07-10",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-11T06:00:08.474967+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 279,
+        "prestamo_id": 209,
+        "fecha": "2025-07-10",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-11T06:00:08.636143+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 280,
+        "prestamo_id": 220,
+        "fecha": "2025-07-10",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-11T06:00:08.837079+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 281,
+        "prestamo_id": 221,
+        "fecha": "2025-07-10",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-11T06:00:09.027343+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 284,
+        "prestamo_id": 229,
+        "fecha": "2025-07-10",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-11T06:00:09.561167+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 288,
+        "prestamo_id": 214,
+        "fecha": "2025-07-11",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-12T06:00:03.226708+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 289,
+        "prestamo_id": 172,
+        "fecha": "2025-07-11",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-12T06:00:03.605749+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 290,
+        "prestamo_id": 186,
+        "fecha": "2025-07-11",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-12T06:00:03.890715+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 291,
+        "prestamo_id": 218,
+        "fecha": "2025-07-11",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-12T06:00:04.240246+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 292,
+        "prestamo_id": 219,
+        "fecha": "2025-07-11",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-12T06:00:04.467079+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 295,
+        "prestamo_id": 181,
+        "fecha": "2025-07-11",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-12T06:00:05.318172+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 296,
+        "prestamo_id": 190,
+        "fecha": "2025-07-11",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-12T06:00:05.556531+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 297,
+        "prestamo_id": 191,
+        "fecha": "2025-07-11",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-12T06:00:05.80281+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 298,
+        "prestamo_id": 192,
+        "fecha": "2025-07-11",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-12T06:00:06.049007+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 299,
+        "prestamo_id": 193,
+        "fecha": "2025-07-11",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-12T06:00:06.243132+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 300,
+        "prestamo_id": 201,
+        "fecha": "2025-07-11",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-12T06:00:06.438829+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 301,
+        "prestamo_id": 205,
+        "fecha": "2025-07-11",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-12T06:00:06.754843+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 302,
+        "prestamo_id": 206,
+        "fecha": "2025-07-11",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-12T06:00:07.054412+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 303,
+        "prestamo_id": 207,
+        "fecha": "2025-07-11",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-12T06:00:07.329721+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 304,
+        "prestamo_id": 208,
+        "fecha": "2025-07-11",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-12T06:00:07.558905+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 305,
+        "prestamo_id": 209,
+        "fecha": "2025-07-11",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-12T06:00:07.745153+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 306,
+        "prestamo_id": 220,
+        "fecha": "2025-07-11",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-12T06:00:08.024342+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 307,
+        "prestamo_id": 221,
+        "fecha": "2025-07-11",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-12T06:00:08.28214+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 310,
+        "prestamo_id": 229,
+        "fecha": "2025-07-11",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-12T06:00:08.931088+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 312,
+        "prestamo_id": 234,
+        "fecha": "2025-07-11",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-12T06:00:09.360485+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 313,
+        "prestamo_id": 238,
+        "fecha": "2025-07-11",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-12T06:00:09.540876+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 314,
+        "prestamo_id": 243,
+        "fecha": "2025-07-11",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 242,
+        "created_at": "2025-07-12T06:00:09.819481+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 316,
+        "prestamo_id": 214,
+        "fecha": "2025-07-12",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-13T06:00:03.761351+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 317,
+        "prestamo_id": 172,
+        "fecha": "2025-07-12",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-13T06:00:03.979351+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 318,
+        "prestamo_id": 186,
+        "fecha": "2025-07-12",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-13T06:00:04.15102+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 319,
+        "prestamo_id": 218,
+        "fecha": "2025-07-12",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-13T06:00:04.404566+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 320,
+        "prestamo_id": 219,
+        "fecha": "2025-07-12",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-13T06:00:04.889994+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 321,
+        "prestamo_id": 181,
+        "fecha": "2025-07-12",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-13T06:00:05.045943+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 322,
+        "prestamo_id": 190,
+        "fecha": "2025-07-12",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-13T06:00:05.333762+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 323,
+        "prestamo_id": 191,
+        "fecha": "2025-07-12",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-13T06:00:05.468408+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 324,
+        "prestamo_id": 192,
+        "fecha": "2025-07-12",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-13T06:00:05.62347+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 325,
+        "prestamo_id": 193,
+        "fecha": "2025-07-12",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-13T06:00:05.746706+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 326,
+        "prestamo_id": 201,
+        "fecha": "2025-07-12",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-13T06:00:05.891767+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 327,
+        "prestamo_id": 205,
+        "fecha": "2025-07-12",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-13T06:00:06.061251+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 328,
+        "prestamo_id": 206,
+        "fecha": "2025-07-12",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-13T06:00:06.241711+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 329,
+        "prestamo_id": 207,
+        "fecha": "2025-07-12",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-13T06:00:06.42137+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 330,
+        "prestamo_id": 208,
+        "fecha": "2025-07-12",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-13T06:00:06.578224+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 331,
+        "prestamo_id": 209,
+        "fecha": "2025-07-12",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-13T06:00:06.817383+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 332,
+        "prestamo_id": 220,
+        "fecha": "2025-07-12",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-13T06:00:06.936292+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 333,
+        "prestamo_id": 221,
+        "fecha": "2025-07-12",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-13T06:00:07.127897+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 335,
+        "prestamo_id": 229,
+        "fecha": "2025-07-12",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-13T06:00:07.480078+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 337,
+        "prestamo_id": 238,
+        "fecha": "2025-07-12",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-13T06:00:07.819342+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 338,
+        "prestamo_id": 243,
+        "fecha": "2025-07-12",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 242,
+        "created_at": "2025-07-13T06:00:07.943579+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 339,
+        "prestamo_id": 246,
+        "fecha": "2025-07-12",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 245,
+        "created_at": "2025-07-13T06:00:08.097242+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 340,
+        "prestamo_id": 214,
+        "fecha": "2025-07-14",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-15T06:00:05.360535+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 341,
+        "prestamo_id": 172,
+        "fecha": "2025-07-14",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-15T06:00:06.756503+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 342,
+        "prestamo_id": 186,
+        "fecha": "2025-07-14",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-15T06:00:07.124625+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 343,
+        "prestamo_id": 218,
+        "fecha": "2025-07-14",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-15T06:00:07.473234+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 344,
+        "prestamo_id": 219,
+        "fecha": "2025-07-14",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-15T06:00:07.710783+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 346,
+        "prestamo_id": 181,
+        "fecha": "2025-07-14",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-15T06:00:08.192628+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 347,
+        "prestamo_id": 190,
+        "fecha": "2025-07-14",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-15T06:00:08.812685+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 348,
+        "prestamo_id": 191,
+        "fecha": "2025-07-14",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-15T06:00:09.16566+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 349,
+        "prestamo_id": 192,
+        "fecha": "2025-07-14",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-15T06:00:09.391296+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 350,
+        "prestamo_id": 193,
+        "fecha": "2025-07-14",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-15T06:00:09.63344+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 351,
+        "prestamo_id": 201,
+        "fecha": "2025-07-14",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-15T06:00:09.928823+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 352,
+        "prestamo_id": 205,
+        "fecha": "2025-07-14",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-15T06:00:10.155027+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 353,
+        "prestamo_id": 206,
+        "fecha": "2025-07-14",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-15T06:00:10.347639+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 354,
+        "prestamo_id": 207,
+        "fecha": "2025-07-14",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-15T06:00:10.584686+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 355,
+        "prestamo_id": 208,
+        "fecha": "2025-07-14",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-15T06:00:10.834789+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 356,
+        "prestamo_id": 209,
+        "fecha": "2025-07-14",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-15T06:00:11.183924+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 357,
+        "prestamo_id": 220,
+        "fecha": "2025-07-14",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-15T06:00:11.399151+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 358,
+        "prestamo_id": 221,
+        "fecha": "2025-07-14",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-15T06:00:11.650472+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 359,
+        "prestamo_id": 223,
+        "fecha": "2025-07-14",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-15T06:00:11.861596+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 360,
+        "prestamo_id": 229,
+        "fecha": "2025-07-14",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-15T06:00:12.211497+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 361,
+        "prestamo_id": 233,
+        "fecha": "2025-07-14",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 232,
+        "created_at": "2025-07-15T06:00:12.417517+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 362,
+        "prestamo_id": 234,
+        "fecha": "2025-07-14",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-15T06:00:12.800158+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 363,
+        "prestamo_id": 238,
+        "fecha": "2025-07-14",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-15T06:00:13.273946+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 364,
+        "prestamo_id": 243,
+        "fecha": "2025-07-14",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 242,
+        "created_at": "2025-07-15T06:00:13.47772+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 365,
+        "prestamo_id": 214,
+        "fecha": "2025-07-15",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-16T06:00:02.896762+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 366,
+        "prestamo_id": 172,
+        "fecha": "2025-07-15",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-16T06:00:03.277778+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 367,
+        "prestamo_id": 186,
+        "fecha": "2025-07-15",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-16T06:00:03.571628+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 368,
+        "prestamo_id": 218,
+        "fecha": "2025-07-15",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-16T06:00:04.688194+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 369,
+        "prestamo_id": 219,
+        "fecha": "2025-07-15",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-16T06:00:05.039515+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 371,
+        "prestamo_id": 181,
+        "fecha": "2025-07-15",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-16T06:00:05.544453+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 372,
+        "prestamo_id": 190,
+        "fecha": "2025-07-15",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 189,
+        "created_at": "2025-07-16T06:00:05.73645+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 373,
+        "prestamo_id": 191,
+        "fecha": "2025-07-15",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-16T06:00:05.995173+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 374,
+        "prestamo_id": 192,
+        "fecha": "2025-07-15",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-16T06:00:06.281999+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 375,
+        "prestamo_id": 193,
+        "fecha": "2025-07-15",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-16T06:00:06.498224+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 376,
+        "prestamo_id": 201,
+        "fecha": "2025-07-15",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 200,
+        "created_at": "2025-07-16T06:00:06.801011+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 377,
+        "prestamo_id": 205,
+        "fecha": "2025-07-15",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-16T06:00:07.072511+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 378,
+        "prestamo_id": 206,
+        "fecha": "2025-07-15",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-16T06:00:07.335899+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 379,
+        "prestamo_id": 207,
+        "fecha": "2025-07-15",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-16T06:00:07.559089+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 380,
+        "prestamo_id": 208,
+        "fecha": "2025-07-15",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-16T06:00:07.82229+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 381,
+        "prestamo_id": 209,
+        "fecha": "2025-07-15",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-16T06:00:08.008343+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 382,
+        "prestamo_id": 220,
+        "fecha": "2025-07-15",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-16T06:00:08.374936+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 383,
+        "prestamo_id": 221,
+        "fecha": "2025-07-15",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-16T06:00:08.527936+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 384,
+        "prestamo_id": 223,
+        "fecha": "2025-07-15",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-16T06:00:08.741137+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 385,
+        "prestamo_id": 226,
+        "fecha": "2025-07-15",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 225,
+        "created_at": "2025-07-16T06:00:08.930801+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 386,
+        "prestamo_id": 229,
+        "fecha": "2025-07-15",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-16T06:00:09.149229+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 387,
+        "prestamo_id": 234,
+        "fecha": "2025-07-15",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-16T06:00:09.395441+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 388,
+        "prestamo_id": 238,
+        "fecha": "2025-07-15",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-16T06:00:09.736911+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 389,
+        "prestamo_id": 246,
+        "fecha": "2025-07-15",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 245,
+        "created_at": "2025-07-16T06:00:10.007563+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 390,
+        "prestamo_id": 253,
+        "fecha": "2025-07-15",
+        "monto": 33,
+        "estado": "pendiente",
+        "cliente_id": 178,
+        "created_at": "2025-07-16T06:00:10.337295+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 391,
+        "prestamo_id": 214,
+        "fecha": "2025-07-16",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-17T06:00:02.873891+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 392,
+        "prestamo_id": 172,
+        "fecha": "2025-07-16",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 171,
+        "created_at": "2025-07-17T06:00:03.116631+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 393,
+        "prestamo_id": 186,
+        "fecha": "2025-07-16",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-17T06:00:03.395258+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 394,
+        "prestamo_id": 218,
+        "fecha": "2025-07-16",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-17T06:00:04.091376+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 395,
+        "prestamo_id": 219,
+        "fecha": "2025-07-16",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-17T06:00:04.26373+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 396,
+        "prestamo_id": 178,
+        "fecha": "2025-07-16",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 177,
+        "created_at": "2025-07-17T06:00:04.44238+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 397,
+        "prestamo_id": 181,
+        "fecha": "2025-07-16",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-17T06:00:04.644782+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 398,
+        "prestamo_id": 191,
+        "fecha": "2025-07-16",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-17T06:00:04.798077+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 399,
+        "prestamo_id": 192,
+        "fecha": "2025-07-16",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 191,
+        "created_at": "2025-07-17T06:00:04.964278+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 400,
+        "prestamo_id": 193,
+        "fecha": "2025-07-16",
+        "monto": 120,
+        "estado": "pendiente",
+        "cliente_id": 192,
+        "created_at": "2025-07-17T06:00:05.11312+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 401,
+        "prestamo_id": 205,
+        "fecha": "2025-07-16",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-17T06:00:05.253371+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 402,
+        "prestamo_id": 206,
+        "fecha": "2025-07-16",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-17T06:00:05.399756+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 403,
+        "prestamo_id": 207,
+        "fecha": "2025-07-16",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-17T06:00:05.599032+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 404,
+        "prestamo_id": 208,
+        "fecha": "2025-07-16",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-17T06:00:05.812615+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 405,
+        "prestamo_id": 209,
+        "fecha": "2025-07-16",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-17T06:00:06.005382+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 406,
+        "prestamo_id": 220,
+        "fecha": "2025-07-16",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-17T06:00:06.155867+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 407,
+        "prestamo_id": 221,
+        "fecha": "2025-07-16",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-17T06:00:06.328991+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 408,
+        "prestamo_id": 223,
+        "fecha": "2025-07-16",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-17T06:00:06.503212+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 409,
+        "prestamo_id": 226,
+        "fecha": "2025-07-16",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 225,
+        "created_at": "2025-07-17T06:00:06.666207+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 410,
+        "prestamo_id": 229,
+        "fecha": "2025-07-16",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-17T06:00:07.079569+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 411,
+        "prestamo_id": 234,
+        "fecha": "2025-07-16",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-17T06:00:07.265978+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 412,
+        "prestamo_id": 238,
+        "fecha": "2025-07-16",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-17T06:00:07.405327+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 413,
+        "prestamo_id": 243,
+        "fecha": "2025-07-16",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 242,
+        "created_at": "2025-07-17T06:00:07.533919+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 414,
+        "prestamo_id": 246,
+        "fecha": "2025-07-16",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 245,
+        "created_at": "2025-07-17T06:00:07.703261+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 415,
+        "prestamo_id": 253,
+        "fecha": "2025-07-16",
+        "monto": 33,
+        "estado": "pendiente",
+        "cliente_id": 178,
+        "created_at": "2025-07-17T06:00:09.41476+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 416,
+        "prestamo_id": 214,
+        "fecha": "2025-07-17",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 213,
+        "created_at": "2025-07-18T06:00:04.75427+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 417,
+        "prestamo_id": 186,
+        "fecha": "2025-07-17",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 185,
+        "created_at": "2025-07-18T06:00:04.980775+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 418,
+        "prestamo_id": 218,
+        "fecha": "2025-07-17",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 217,
+        "created_at": "2025-07-18T06:00:05.186708+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 419,
+        "prestamo_id": 219,
+        "fecha": "2025-07-17",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 218,
+        "created_at": "2025-07-18T06:00:05.474596+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 420,
+        "prestamo_id": 181,
+        "fecha": "2025-07-17",
+        "monto": 70,
+        "estado": "pendiente",
+        "cliente_id": 180,
+        "created_at": "2025-07-18T06:00:05.794418+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 421,
+        "prestamo_id": 191,
+        "fecha": "2025-07-17",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 190,
+        "created_at": "2025-07-18T06:00:06.048882+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 422,
+        "prestamo_id": 205,
+        "fecha": "2025-07-17",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 204,
+        "created_at": "2025-07-18T06:00:06.442241+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 423,
+        "prestamo_id": 206,
+        "fecha": "2025-07-17",
+        "monto": 24,
+        "estado": "pendiente",
+        "cliente_id": 205,
+        "created_at": "2025-07-18T06:00:06.89953+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 424,
+        "prestamo_id": 207,
+        "fecha": "2025-07-17",
+        "monto": 30,
+        "estado": "pendiente",
+        "cliente_id": 206,
+        "created_at": "2025-07-18T06:00:07.128819+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 425,
+        "prestamo_id": 208,
+        "fecha": "2025-07-17",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 207,
+        "created_at": "2025-07-18T06:00:07.284673+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 426,
+        "prestamo_id": 209,
+        "fecha": "2025-07-17",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 208,
+        "created_at": "2025-07-18T06:00:07.415316+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 427,
+        "prestamo_id": 220,
+        "fecha": "2025-07-17",
+        "monto": 100,
+        "estado": "pendiente",
+        "cliente_id": 219,
+        "created_at": "2025-07-18T06:00:07.571015+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 428,
+        "prestamo_id": 221,
+        "fecha": "2025-07-17",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 220,
+        "created_at": "2025-07-18T06:00:07.842702+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 429,
+        "prestamo_id": 223,
+        "fecha": "2025-07-17",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 222,
+        "created_at": "2025-07-18T06:00:07.976152+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 430,
+        "prestamo_id": 226,
+        "fecha": "2025-07-17",
+        "monto": 80,
+        "estado": "pendiente",
+        "cliente_id": 225,
+        "created_at": "2025-07-18T06:00:08.141967+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 431,
+        "prestamo_id": 229,
+        "fecha": "2025-07-17",
+        "monto": 300,
+        "estado": "pendiente",
+        "cliente_id": 228,
+        "created_at": "2025-07-18T06:00:08.356135+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 432,
+        "prestamo_id": 233,
+        "fecha": "2025-07-17",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 232,
+        "created_at": "2025-07-18T06:00:08.497351+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 433,
+        "prestamo_id": 234,
+        "fecha": "2025-07-17",
+        "monto": 20,
+        "estado": "pendiente",
+        "cliente_id": 233,
+        "created_at": "2025-07-18T06:00:08.663615+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 434,
+        "prestamo_id": 238,
+        "fecha": "2025-07-17",
+        "monto": 40,
+        "estado": "pendiente",
+        "cliente_id": 237,
+        "created_at": "2025-07-18T06:00:08.827375+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 435,
+        "prestamo_id": 243,
+        "fecha": "2025-07-17",
+        "monto": 60,
+        "estado": "pendiente",
+        "cliente_id": 242,
+        "created_at": "2025-07-18T06:00:08.970244+00:00",
+        "deleted_at": null
+      },
+      {
+        "id": 436,
+        "prestamo_id": 253,
+        "fecha": "2025-07-17",
+        "monto": 33,
+        "estado": "pendiente",
+        "cliente_id": 178,
+        "created_at": "2025-07-18T06:00:09.196722+00:00",
+        "deleted_at": null
+      }
+    ]
+  }
+}

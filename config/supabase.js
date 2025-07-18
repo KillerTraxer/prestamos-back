@@ -10,6 +10,8 @@ if (!supabaseUrl || !supabaseKey || !supabaseServiceKey) {
 }
 
 // Configuración común para los clientes
+// NOTA: La aplicación está configurada para sesiones permanentes (sin expiración)
+// autoRefreshToken y persistSession están habilitados para máxima persistencia
 const clientOptions = {
     auth: {
         autoRefreshToken: true,
