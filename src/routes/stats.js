@@ -364,6 +364,7 @@ router.get('/clientes-detalle', authenticateJWT, async (req, res) => {
                 fecha_fin,
                 estado,
                 created_at,
+                renovado_con,
                 clientes!inner (
                     id,
                     nombre,
@@ -393,7 +394,8 @@ router.get('/clientes-detalle', authenticateJWT, async (req, res) => {
                     fecha_inicio: prestamo.fecha_inicio,
                     fecha_fin: prestamo.fecha_fin,
                     estado_prestamo: prestamo.estado,
-                    prestamo_created_at: prestamo.created_at
+                    prestamo_created_at: prestamo.created_at,
+                    renovado_con: prestamo.renovado_con
                 });
             }
         });
@@ -443,7 +445,8 @@ router.get('/clientes-detalle', authenticateJWT, async (req, res) => {
                     fecha_fin: cliente.fecha_fin,
                     estado: estado,
                     multas: totalMultas,
-                    adeudos: totalAdeudos
+                    adeudos: totalAdeudos,
+                    renovado_con: cliente.renovado_con
                 };
             })
         );
@@ -477,6 +480,7 @@ router.get('/trabajador-clientes-detalle', authenticateJWT, async (req, res) => 
                 fecha_fin,
                 estado,
                 created_at,
+                renovado_con,
                 clientes!inner (
                     id,
                     nombre,
@@ -506,7 +510,8 @@ router.get('/trabajador-clientes-detalle', authenticateJWT, async (req, res) => 
                     fecha_inicio: prestamo.fecha_inicio,
                     fecha_fin: prestamo.fecha_fin,
                     estado_prestamo: prestamo.estado,
-                    prestamo_created_at: prestamo.created_at
+                    prestamo_created_at: prestamo.created_at,
+                    renovado_con: prestamo.renovado_con
                 });
             }
         });
@@ -556,7 +561,8 @@ router.get('/trabajador-clientes-detalle', authenticateJWT, async (req, res) => 
                     fecha_fin: cliente.fecha_fin,
                     estado: estado,
                     multas: totalMultas,
-                    adeudos: totalAdeudos
+                    adeudos: totalAdeudos,
+                    renovado_con: cliente.renovado_con
                 };
             })
         );

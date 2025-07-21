@@ -442,6 +442,8 @@ router.post('/clear-session', async (req, res) => {
             console.log('Limpiando sesiones para auth_id proporcionado:', targetAuthId);
         }
         
+        // NOTA: Sesión permanente. No limpiar ni invalidar sesiones automáticamente.
+        // Comentar lógica de limpieza/invalidación automática si existiera.
         // Usar SessionManager para limpiar las sesiones
         const success = await SessionManager.invalidateUserSessions(targetAuthId, email || 'unknown');
         

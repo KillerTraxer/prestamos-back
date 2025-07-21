@@ -53,7 +53,10 @@ router.post('/', authenticateJWT, async (req, res) => {
         observaciones,
         pago_diario,
         es_registro_manual,
-        plazo_cuatro_semanas
+        plazo_cuatro_semanas,
+        liquidado_personalizado,
+        liquidacion_amount,
+        renovado_con
     } = req.body;
 
     if (!cliente_id || !trabajador_id || !monto || !interes || !fecha_inicio || !fecha_fin) {
@@ -93,7 +96,10 @@ router.post('/', authenticateJWT, async (req, res) => {
             observaciones: observaciones || '',
             pago_diario: pago_diario || 0,
             es_registro_manual: es_registro_manual || false,
-            plazo_cuatro_semanas: esCuatroSemanas
+            plazo_cuatro_semanas: esCuatroSemanas,
+            liquidado_personalizado: liquidado_personalizado || false,
+            liquidacion_amount: liquidacion_amount || null,
+            renovado_con: renovado_con || null,
         };
 
         console.log('prestamoData completo:', prestamoData);
@@ -148,7 +154,7 @@ router.put('/:id', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const prestamoId = req.params.id;
-    const { estado, observaciones } = req.body;
+    const { estado, observaciones, liquidado_personalizado, liquidacion_amount } = req.body;
 
     try {
         const prestamo = await Loan.findById(prestamoId);
@@ -158,7 +164,9 @@ router.put('/:id', authenticateJWT, async (req, res) => {
 
         const updates = {
             estado: estado || prestamo.estado,
-            observaciones: observaciones || prestamo.observaciones
+            observaciones: observaciones || prestamo.observaciones,
+            liquidado_personalizado: typeof liquidado_personalizado === 'boolean' ? liquidado_personalizado : prestamo.liquidado_personalizado,
+            liquidacion_amount: typeof liquidacion_amount !== 'undefined' ? liquidacion_amount : prestamo.liquidacion_amount
         };
 
         const updatedPrestamo = await prestamo.update(updates);
@@ -346,6 +354,13 @@ router.post('/:id/abonos', authenticateJWT, async (req, res) => {
 
         const abono = await Payment.create(abonoData);
 
+        // Si es liquidación personalizada, restar el abono del monto pendiente
+        if (prestamo.liquidado_personalizado && typeof prestamo.liquidacion_amount === 'number' && prestamo.liquidacion_amount > 0) {
+            let nuevoRestante = prestamo.liquidacion_amount - monto;
+            if (nuevoRestante < 0) nuevoRestante = 0;
+            await prestamo.update({ liquidacion_amount: nuevoRestante });
+        }
+
         // Verificar si con este abono se completa el préstamo
         // Contar el número de pagos realizados
         const pagosRealizados = await Payment.findByLoanId(prestamoId);
@@ -441,7 +456,7 @@ router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
     if (req.user.role !== 'trabajador' && req.user.role !== 'admin') return res.sendStatus(403);
 
     const prestamoId = req.params.id;
-    const { monto } = req.body; // Monto personalizado opcional
+    const { monto, liquidado_personalizado } = req.body; // Monto personalizado opcional y flag
 
     try {
         const prestamo = await Loan.findById(prestamoId);
@@ -456,6 +471,7 @@ router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
 
         // Calcular el monto de liquidación si no se proporciona uno personalizado
         let montoLiquidacion = monto;
+        let esPersonalizado = false;
         if (!monto) {
             // Calcular cuántos pagos faltan por realizar
             const pagosRealizados = await Payment.findByLoanId(prestamoId);
@@ -469,10 +485,16 @@ router.put('/:id/liquidar', authenticateJWT, async (req, res) => {
             // Calcular pagos pendientes y el monto de liquidación
             const pagosPendientes = Math.max(0, duracionDias - numeroPagos);
             montoLiquidacion = pagosPendientes * prestamo.pago_diario;
+        } else {
+            esPersonalizado = true;
         }
 
-        // Actualizar el estado del préstamo a liquidado
-        const updatedPrestamo = await prestamo.update({ estado: 'liquidado' });
+        // Actualizar el estado del préstamo a liquidado y guardar los nuevos campos
+        const updatedPrestamo = await prestamo.update({
+            estado: 'liquidado',
+            liquidado_personalizado: esPersonalizado,
+            liquidacion_amount: parseFloat(montoLiquidacion)
+        });
 
         res.json({
             message: 'Préstamo liquidado exitosamente',

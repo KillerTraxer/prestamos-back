@@ -56,189 +56,21 @@ const authenticateJWT = async (req, res, next) => {
 
         // Si hay error de autenticación (token expirado o inválido)
         if (authError) {
-            console.log('Token inválido o expirado, intentando renovar con refresh token...');
-
-            // Verificar si tenemos refresh token en las headers
-            if (!refreshTokenHeader) {
-                console.log('No se proporcionó refresh token en headers');
-                return res.status(401).json({
-                    error: 'Token expired',
-                    message: 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
-                    requiresLogin: true
-                });
-            }
-
-            try {
-                console.log('Intentando renovar sesión con refresh token...');
-                const { data: refreshData, error: refreshError } = await auth.supabaseAdmin.auth.refreshSession({
-                    refresh_token: refreshTokenHeader
-                });
-
-                if (refreshError || !refreshData?.session) {
-                    console.error('Error al renovar sesión:', refreshError);
-
-                    // Verificar si es un error de refresh token ya usado
-                    const isRefreshTokenUsed = refreshError?.message?.includes('Already Used') ||
-                        refreshError?.message?.includes('already_used') ||
-                        refreshError?.code === 'refresh_token_already_used';
-
-                    // Usar limpieza suave para evitar errores adicionales
-                    try {
-                        const { data: { user }, error: getUserError } = await auth.supabaseAdmin.auth.getUser(token);
-                        if (!getUserError && user) {
-                            await SessionManager.softCleanupSession(user.id, 'refresh-failed');
-                        }
-                    } catch (cleanupError) {
-                        console.warn('Error durante limpieza suave de sesión:', cleanupError);
-                    }
-
-                    const responseData = {
-                        error: isRefreshTokenUsed ? 'Refresh token already used' : 'Invalid refresh token',
-                        message: 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
-                        requiresLogin: true
-                    };
-
-                    if (refreshError) {
-                        responseData.refreshError = {
-                            message: refreshError.message,
-                            code: refreshError.code,
-                            status: refreshError.status
-                        };
-                    }
-
-                    return res.status(401).json(responseData);
-                }
-
-                // Sesión renovada exitosamente
-                console.log('Sesión renovada exitosamente');
-                const refreshedUser = refreshData.user;
-
-                console.log('DEBUG REFRESH - auth_id recibido:', refreshedUser.id);
-                console.log('DEBUG REFRESH - refreshedUser completo:', {
-                    id: refreshedUser.id,
-                    email: refreshedUser.email,
-                    created_at: refreshedUser.created_at
-                });
-
-                console.log('Buscando usuario renovado en BD con auth_id:', refreshedUser.id);
-
-                // Agregar delay para evitar problemas de sincronización
-                await new Promise(resolve => setTimeout(resolve, 100));
-
-                let dbUser = await User.findByAuthId(refreshedUser.id);
-                console.log('Resultado búsqueda en usuarios:', {
-                    found: !!dbUser,
-                    authIdBuscado: refreshedUser.id
-                });
-
-                if (!dbUser) {
-                    console.log('No encontrado en usuarios, buscando en trabajadores...');
-                    // Otro pequeño delay
-                    await new Promise(resolve => setTimeout(resolve, 100));
-                    dbUser = await Trabajador.findByAuthId(refreshedUser.id);
-                    console.log('Resultado búsqueda en trabajadores:', {
-                        found: !!dbUser,
-                        authIdBuscado: refreshedUser.id
-                    });
-                }
-
-                console.log('Resultado FINAL de búsqueda de usuario renovado:', {
-                    found: !!dbUser,
-                    email: dbUser?.email,
-                    status: dbUser?.status,
-                    authIdOriginal: refreshedUser.id
-                });
-
-                if (!dbUser || !dbUser.isActive()) {
-                    console.log(`\n=== USUARIO NO ENCONTRADO EN BD TRAS REFRESH ===`);
-                    console.log(`Auth ID: ${refreshedUser.id}`);
-                    console.log(`Email: ${refreshedUser.email}`);
-                    console.log(`Usuario encontrado: ${!!dbUser}`);
-                    console.log(`Usuario activo: ${dbUser?.isActive()}`);
-
-                    // Usar limpieza suave para evitar errores de JWT malformados
-                    await SessionManager.softCleanupSession(refreshedUser.id, 'refresh-user-not-found');
-
-                    return res.status(403).json({
-                        error: 'Cuenta inactiva',
-                        message: 'Tu cuenta está inactiva o no existe en la base de datos',
-                        requiresLogin: true
-                    });
-                }
-
-                // Construir datos del usuario según su tipo
-                const userData = {
-                    id: dbUser.id,
-                    email: dbUser.email,
-                    nombre: dbUser.nombre,
-                    role: dbUser.role || 'trabajador',
-                    status: dbUser.status,
-                    auth_id: refreshedUser.id // Agregamos el auth_id del usuario renovado
-                };
-
-                // Agregar datos específicos según el tipo de usuario
-                if (dbUser.role === 'trabajador' || !dbUser.role) {
-                    userData.phone = dbUser.phone;
-                    // Obtener conteo de clientes si es necesario
-                    try {
-                        const Client = require('../models/Client');
-                        const clientes = await Client.findByWorkerId(dbUser.id);
-                        userData.clients_count = clientes.length;
-                    } catch (clientError) {
-                        console.error('Error obteniendo clientes:', clientError);
-                        userData.clients_count = 0;
-                    }
-                } else if (dbUser.role === 'admin') {
-                    // Para admins, obtener conteos si es necesario
-                    userData.workers_count = 0;
-                    userData.clients_count = 0;
-                }
-
-                // Devolver los nuevos tokens con status 200 (exitoso) y flag especial
-                return res.status(200).json({
-                    message: 'Token renovado exitosamente',
-                    tokenRefreshed: true,
-                    newTokens: {
-                        access_token: refreshData.session.access_token,
-                        refresh_token: refreshData.session.refresh_token,
-                        expires_at: refreshData.session.expires_at
-                    },
-                    user: userData
-                });
-            } catch (refreshError) {
-                console.error('Error en el proceso de renovación:', refreshError);
-
-                // Usar limpieza suave para evitar errores adicionales
-                try {
-                    const { data: { user }, error: getUserError } = await auth.supabaseAdmin.auth.getUser(token);
-                    if (!getUserError && user) {
-                        await SessionManager.softCleanupSession(user.id, 'refresh-catch-error');
-                    }
-                } catch (cleanupError) {
-                    console.warn('Error durante limpieza suave de sesión:', cleanupError);
-                }
-
-                // Verificar si es un error de refresh token ya usado
-                const isRefreshTokenUsed = refreshError?.message?.includes('Already Used') ||
-                    refreshError?.message?.includes('already_used') ||
-                    refreshError?.code === 'refresh_token_already_used';
-
-                const responseData = {
-                    error: isRefreshTokenUsed ? 'Refresh token already used' : 'Refresh error',
-                    message: 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
-                    requiresLogin: true
-                };
-
-                if (refreshError) {
-                    responseData.refreshError = {
-                        message: refreshError.message,
-                        code: refreshError.code,
-                        status: refreshError.status
-                    };
-                }
-
-                return res.status(401).json(responseData);
-            }
+            console.log('Token inválido o expirado. Sesión permanente: NO renovar ni limpiar sesión.');
+            // return res.status(401).json({
+            //     error: 'Token expired',
+            //     message: 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
+            //     requiresLogin: true
+            // });
+            // --- Lógica de renovación y limpieza de sesión comentada para sesión permanente ---
+            // if (!refreshTokenHeader) { ... }
+            // try { ... } catch { ... }
+            // --- Fin de lógica comentada ---
+            return res.status(401).json({
+                error: 'Token expired',
+                message: 'Token inválido o expirado, pero la sesión es permanente. No se renueva ni se limpia.',
+                requiresLogin: false
+            });
         }
 
         // Si el token es válido, continuar con la autenticación normal

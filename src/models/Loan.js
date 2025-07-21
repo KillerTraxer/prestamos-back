@@ -14,6 +14,9 @@ class Loan {
         this.pago_diario = data.pago_diario;
         this.es_registro_manual = data.es_registro_manual;
         this.plazo_cuatro_semanas = data.plazo_cuatro_semanas;
+        this.liquidado_personalizado = data.liquidado_personalizado;
+        this.liquidacion_amount = data.liquidacion_amount;
+        this.renovado_con = data.renovado_con;
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
         this.deleted_at = data.deleted_at;
