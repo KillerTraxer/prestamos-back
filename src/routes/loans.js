@@ -359,6 +359,11 @@ router.post('/:id/abonos', authenticateJWT, async (req, res) => {
             let nuevoRestante = prestamo.liquidacion_amount - monto;
             if (nuevoRestante < 0) nuevoRestante = 0;
             await prestamo.update({ liquidacion_amount: nuevoRestante });
+            
+            // Invalidar cache de préstamos después de actualizar liquidacion_amount
+            const authCache = require('../utils/auth-cache');
+            authCache.invalidateLoansCache(prestamo.trabajador_id);
+            console.log(`💳 Cache de préstamos invalidado para liquidación personalizada - Worker ID: ${prestamo.trabajador_id}`);
         }
 
         // Verificar si con este abono se completa el préstamo
