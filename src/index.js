@@ -21,8 +21,6 @@ const adminPanelRoutes = require('./routes/admin-panel');
 
 // Importar configuración de trabajos cron
 const { initCronJobs } = require('./jobs/cron');
-// Importar middlewares de optimización
-const { requestLogger, concurrencyLimiter, earlyRateLimiter } = require('./middleware/request-limiter');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,9 +32,6 @@ app.use(express.json());
 // Configurar trust proxy para obtener IP real
 app.set('trust proxy', true);
 
-// Rate limiting temprano (antes de autenticación)
-app.use(earlyRateLimiter);
-
 // Middleware de logging básico solo para peticiones importantes
 app.use((req, res, next) => {
     // Solo loggear peticiones que no sean GET o que tengan problemas
@@ -46,9 +41,6 @@ app.use((req, res, next) => {
     }
     next();
 });
-
-// El requestLogger se aplicará en las rutas específicas después de la autenticación
-app.use(concurrencyLimiter);
 
 // Configurar almacenamiento de archivos
 const storage = multer.diskStorage({
