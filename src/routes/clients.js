@@ -127,6 +127,71 @@ router.post('/', authenticateJWT, async (req, res) => {
         // Invalidar cache de clientes para que aparezcan inmediatamente
         const authCache = require('../utils/auth-cache');
         authCache.invalidateClientsCache(trabajador_id);
+
+        // Actualizar user_metadata del trabajador con el nuevo conteo de clientes
+        try {
+            const clientes = await Client.findByWorkerId(trabajador_id);
+            
+            // Obtener el trabajador para acceder a su auth_id
+            const Trabajador = require('../models/Trabajador');
+            const trabajador = await Trabajador.findById(trabajador_id);
+            
+            if (trabajador && trabajador.auth_id) {
+                const metadataToUpdate = {
+                    nombre: trabajador.nombre,
+                    role: 'trabajador',
+                    id: trabajador.id,
+                    clients_count: clientes.length
+                };
+
+                const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                    trabajador.auth_id,
+                    { user_metadata: metadataToUpdate }
+                );
+
+                if (updateError) {
+                    console.error('Error actualizando user_metadata del trabajador:', updateError);
+                    // No fallar la creación si hay error actualizando metadata, solo loggear
+                } else {
+                    console.log('User metadata del trabajador actualizado exitosamente:', metadataToUpdate);
+                }
+            }
+
+            // Si es admin, también actualizar sus estadísticas
+            if (req.user.role === 'admin') {
+                const adminTrabajadores = await Trabajador.findAll({
+                    usuario_id: req.user.id
+                });
+                
+                let totalClients = 0;
+                for (const adminTrabajador of adminTrabajadores) {
+                    const adminClientes = await Client.findByWorkerId(adminTrabajador.id);
+                    totalClients += adminClientes.length;
+                }
+
+                const adminMetadataToUpdate = {
+                    nombre: req.user.nombre,
+                    role: req.user.role,
+                    id: req.user.id,
+                    workers_count: adminTrabajadores.length,
+                    clients_count: totalClients
+                };
+
+                const { error: adminUpdateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                    req.user.auth_id,
+                    { user_metadata: adminMetadataToUpdate }
+                );
+
+                if (adminUpdateError) {
+                    console.error('Error actualizando user_metadata del admin:', adminUpdateError);
+                } else {
+                    console.log('User metadata del admin actualizado exitosamente:', adminMetadataToUpdate);
+                }
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata:', metadataError);
+            // No fallar la creación si hay error actualizando metadata, solo loggear
+        }
         
         res.status(201).json({
             message: 'Cliente creado exitosamente',
@@ -255,6 +320,71 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
         
         // Usar soft delete
         await cliente.softDelete();
+
+        // Actualizar user_metadata del trabajador con el nuevo conteo de clientes
+        try {
+            const clientes = await Client.findByWorkerId(trabajadorId);
+            
+            // Obtener el trabajador para acceder a su auth_id
+            const Trabajador = require('../models/Trabajador');
+            const trabajador = await Trabajador.findById(trabajadorId);
+            
+            if (trabajador && trabajador.auth_id) {
+                const metadataToUpdate = {
+                    nombre: trabajador.nombre,
+                    role: 'trabajador',
+                    id: trabajador.id,
+                    clients_count: clientes.length
+                };
+
+                const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                    trabajador.auth_id,
+                    { user_metadata: metadataToUpdate }
+                );
+
+                if (updateError) {
+                    console.error('Error actualizando user_metadata del trabajador:', updateError);
+                    // No fallar la eliminación si hay error actualizando metadata, solo loggear
+                } else {
+                    console.log('User metadata del trabajador actualizado exitosamente:', metadataToUpdate);
+                }
+            }
+
+            // Si es admin, también actualizar sus estadísticas
+            if (req.user.role === 'admin') {
+                const adminTrabajadores = await Trabajador.findAll({
+                    usuario_id: req.user.id
+                });
+                
+                let totalClients = 0;
+                for (const adminTrabajador of adminTrabajadores) {
+                    const adminClientes = await Client.findByWorkerId(adminTrabajador.id);
+                    totalClients += adminClientes.length;
+                }
+
+                const adminMetadataToUpdate = {
+                    nombre: req.user.nombre,
+                    role: req.user.role,
+                    id: req.user.id,
+                    workers_count: adminTrabajadores.length,
+                    clients_count: totalClients
+                };
+
+                const { error: adminUpdateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                    req.user.auth_id,
+                    { user_metadata: adminMetadataToUpdate }
+                );
+
+                if (adminUpdateError) {
+                    console.error('Error actualizando user_metadata del admin:', adminUpdateError);
+                } else {
+                    console.log('User metadata del admin actualizado exitosamente:', adminMetadataToUpdate);
+                }
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata:', metadataError);
+            // No fallar la eliminación si hay error actualizando metadata, solo loggear
+        }
         
         res.json({ message: 'Cliente eliminado correctamente' });
     } catch (error) {

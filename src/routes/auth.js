@@ -268,6 +268,38 @@ router.post('/login', async (req, res) => {
             userData.clients_count = trabajadores.reduce((total, trabajador) => total + (trabajador.clients_count || 0), 0);
         }
 
+        // Actualizar user_metadata en Supabase con los conteos
+        try {
+            const metadataToUpdate = {
+                nombre: userData.nombre,
+                role: userData.role,
+                id: userData.id
+            };
+
+            // Agregar conteos según el rol
+            if (isTrabajador) {
+                metadataToUpdate.clients_count = userData.clients_count;
+            } else {
+                metadataToUpdate.workers_count = userData.workers_count;
+                metadataToUpdate.clients_count = userData.clients_count;
+            }
+
+            const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                authId,
+                { user_metadata: metadataToUpdate }
+            );
+
+            if (updateError) {
+                console.error('Error actualizando user_metadata en Supabase:', updateError);
+                // No fallar el login si hay error actualizando metadata, solo loggear
+            } else {
+                console.log('User metadata actualizado exitosamente en Supabase:', metadataToUpdate);
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata:', metadataError);
+            // No fallar el login si hay error actualizando metadata, solo loggear
+        }
+
         return res.json({
             token: loginData.session.access_token,
             refresh_token: loginData.session.refresh_token,
@@ -1073,6 +1105,38 @@ router.get('/profile/updated-stats', authenticateJWT, requestLogger, async (req,
         
         // Guardar en cache
         authCache.setUserStats(userId, userRole, updatedStats);
+        
+        // Actualizar user_metadata en Supabase con las estadísticas actualizadas
+        try {
+            const metadataToUpdate = {
+                nombre: req.user.nombre,
+                role: userRole,
+                id: userId
+            };
+
+            // Agregar conteos según el rol
+            if (userRole === 'trabajador') {
+                metadataToUpdate.clients_count = updatedStats.clients_count;
+            } else if (userRole === 'admin') {
+                metadataToUpdate.workers_count = updatedStats.workers_count;
+                metadataToUpdate.clients_count = updatedStats.clients_count;
+            }
+
+            const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                req.user.auth_id,
+                { user_metadata: metadataToUpdate }
+            );
+
+            if (updateError) {
+                console.error('Error actualizando user_metadata en Supabase:', updateError);
+                // No fallar la respuesta si hay error actualizando metadata, solo loggear
+            } else {
+                console.log('User metadata actualizado exitosamente en Supabase con estadísticas:', metadataToUpdate);
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata:', metadataError);
+            // No fallar la respuesta si hay error actualizando metadata, solo loggear
+        }
         
         console.log('Estadísticas actualizadas:', updatedStats);
         

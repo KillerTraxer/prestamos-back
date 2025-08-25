@@ -272,6 +272,43 @@ router.post('/', authenticateJWT, async (req, res) => {
         const authCache = require('../utils/auth-cache');
         authCache.invalidateWorkersCache(req.user.id);
 
+        // Actualizar user_metadata del admin con el nuevo conteo de trabajadores
+        try {
+            const trabajadores = await Trabajador.findAll({
+                usuario_id: req.user.id
+            });
+            
+            // Calcular el total de clientes de todos los trabajadores
+            let totalClients = 0;
+            for (const trabajador of trabajadores) {
+                const clientes = await Client.findByWorkerId(trabajador.id);
+                totalClients += clientes.length;
+            }
+
+            const metadataToUpdate = {
+                nombre: req.user.nombre,
+                role: req.user.role,
+                id: req.user.id,
+                workers_count: trabajadores.length,
+                clients_count: totalClients
+            };
+
+            const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                req.user.auth_id,
+                { user_metadata: metadataToUpdate }
+            );
+
+            if (updateError) {
+                console.error('Error actualizando user_metadata del admin:', updateError);
+                // No fallar la creación si hay error actualizando metadata, solo loggear
+            } else {
+                console.log('User metadata del admin actualizado exitosamente:', metadataToUpdate);
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata del admin:', metadataError);
+            // No fallar la creación si hay error actualizando metadata, solo loggear
+        }
+
         res.status(201).json({
             message: 'Trabajador creado',
             trabajador: {
@@ -384,6 +421,43 @@ router.delete('/:id', authenticateJWT, async (req, res) => {
         // Invalidar cache de trabajadores después de eliminar
         const authCache = require('../utils/auth-cache');
         authCache.invalidateWorkersCache(req.user.id);
+
+        // Actualizar user_metadata del admin con el nuevo conteo de trabajadores
+        try {
+            const trabajadores = await Trabajador.findAll({
+                usuario_id: req.user.id
+            });
+            
+            // Calcular el total de clientes de todos los trabajadores
+            let totalClients = 0;
+            for (const trabajador of trabajadores) {
+                const clientes = await Client.findByWorkerId(trabajador.id);
+                totalClients += clientes.length;
+            }
+
+            const metadataToUpdate = {
+                nombre: req.user.nombre,
+                role: req.user.role,
+                id: req.user.id,
+                workers_count: trabajadores.length,
+                clients_count: totalClients
+            };
+
+            const { error: updateError } = await auth.supabaseAdmin.auth.admin.updateUserById(
+                req.user.auth_id,
+                { user_metadata: metadataToUpdate }
+            );
+
+            if (updateError) {
+                console.error('Error actualizando user_metadata del admin:', updateError);
+                // No fallar la eliminación si hay error actualizando metadata, solo loggear
+            } else {
+                console.log('User metadata del admin actualizado exitosamente:', metadataToUpdate);
+            }
+        } catch (metadataError) {
+            console.error('Error en actualización de user_metadata del admin:', metadataError);
+            // No fallar la eliminación si hay error actualizando metadata, solo loggear
+        }
         
         res.json({
             message: 'Trabajador y cuenta de autenticación eliminados exitosamente',
