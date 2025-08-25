@@ -28,7 +28,11 @@ const authenticateJWT = async (req, res, next) => {
             user = cachedTokenVerification.user;
             authError = cachedTokenVerification.error;
         } else {
-            console.log('Verificando token con Supabase...');
+            // Reducir verbosidad para evitar spam en logs
+            if (!req._tokenChecked) {
+                console.log('Verificando token con Supabase...');
+                req._tokenChecked = true;
+            }
             const result = await auth.supabaseAdmin.auth.getUser(token);
             user = result.data?.user;
             authError = result.error;
@@ -42,20 +46,13 @@ const authenticateJWT = async (req, res, next) => {
         // Si hay error de autenticación (token expirado o inválido)
         if (authError) {
             console.log('Token inválido o expirado. Sesión permanente: NO renovar ni limpiar sesión.');
-            // return res.status(401).json({
-            //     error: 'Token expired',
-            //     message: 'Su sesión ha expirado. Por favor, inicie sesión nuevamente.',
-            //     requiresLogin: true
-            // });
-            // --- Lógica de renovación y limpieza de sesión comentada para sesión permanente ---
-            // if (!refreshTokenHeader) { ... }
-            // try { ... } catch { ... }
-            // --- Fin de lógica comentada ---
-            return res.status(401).json({
-                error: 'Token expired',
-                message: 'Token inválido o expirado, pero la sesión es permanente. No se renueva ni se limpia.',
-                requiresLogin: false
-            });
+            return res.status(401)
+                .set('WWW-Authenticate', 'Bearer error="invalid_token", error_description="expired or invalid"')
+                .json({
+                    error: 'Token expired',
+                    message: 'Token inválido o expirado, pero la sesión es permanente. No se renueva ni se limpia.',
+                    requiresLogin: false
+                });
         }
 
         // Si el token es válido, continuar con la autenticación normal

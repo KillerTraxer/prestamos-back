@@ -10,12 +10,11 @@ if (!supabaseUrl || !supabaseKey || !supabaseServiceKey) {
 }
 
 // Configuración común para los clientes
-// NOTA: La aplicación está configurada para sesiones permanentes (sin expiración)
-// autoRefreshToken y persistSession están habilitados para máxima persistencia
+// NOTA: Backend NUNCA refresca tokens - solo valida access tokens
 const clientOptions = {
     auth: {
-        autoRefreshToken: true,
-        persistSession: true,
+        autoRefreshToken: false,   // ⬅️ backend NUNCA refresca
+        persistSession: false,     // ⬅️ backend NO persiste sesiones
         detectSessionInUrl: false
     },
     global: {
@@ -37,13 +36,7 @@ const clientOptions = {
 const supabaseClient = createClient(supabaseUrl, supabaseKey, clientOptions);
 
 // Cliente para operaciones administrativas (backend)
-const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
-    ...clientOptions,
-    auth: {
-        ...clientOptions.auth,
-        persistSession: false // No necesitamos persistir la sesión en el backend
-    }
-});
+const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, clientOptions);
 
 // Funciones de autenticación
 const auth = {

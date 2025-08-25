@@ -148,6 +148,29 @@ const auth = {
             throw genericError;
         }
     },
+    refreshSession: async (refreshToken) => {
+        try {
+            console.log('🔄 Refrescando sesión con Supabase...');
+            
+            // Usar el cliente público para refresh (el admin no tiene refreshSession)
+            const { data, error } = await supabase.auth.refreshSession({ refresh_token: refreshToken });
+            
+            if (error) {
+                console.error('❌ Error en refresh de Supabase:', error.message);
+                throw error;
+            }
+            
+            if (!data?.session) {
+                throw new Error('No se obtuvo sesión válida del refresh');
+            }
+            
+            console.log('✅ Sesión refrescada exitosamente en Supabase');
+            return { data, error: null };
+        } catch (error) {
+            console.error('❌ Error en refreshSession:', error);
+            return { data: null, error };
+        }
+    },
     updatePassword: async (newPassword, resetToken, email) => {
         try {
             console.log('Iniciando actualización de contraseña');

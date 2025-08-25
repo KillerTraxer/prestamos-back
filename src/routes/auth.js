@@ -10,6 +10,53 @@ const SessionManager = require('../utils/session-manager');
 const SessionCleanupJob = require('../jobs/session-cleanup');
 const AuthDebugger = require('../utils/debug-auth');
 
+// Endpoint para refrescar token de acceso usando refresh_token
+// DESACTIVADO: El frontend maneja su propio refresh con Supabase
+// router.post('/refresh', async (req, res) => {
+//     const { refresh_token } = req.body;
+//     if (!refresh_token) {
+//         return res.status(400).json({ error: 'Falta refresh_token' });
+//     }
+
+//     try {
+//         console.log('🔄 Procesando refresh de token...');
+//         console.log('Refresh token recibido:', refresh_token.substring(0, 20) + '...');
+        
+//         // Usar el método personalizado para refrescar la sesión
+//         const { data, error } = await auth.refreshSession(refresh_token);
+        
+//         if (error) {
+//             console.error('❌ Error en refresh:', error.message);
+//             return res.status(401).json({ 
+//                 error: 'No se pudo refrescar la sesión',
+//                 details: error.message 
+//             });
+//         }
+
+//         if (!data?.session) {
+//             console.error('❌ No se obtuvo sesión en refresh');
+//             return res.status(401).json({ error: 'No se obtuvo sesión válida' });
+//         }
+
+//         const { access_token, refresh_token: newRefreshToken, expires_at } = data.session;
+        
+//         console.log('✅ Token refrescado exitosamente');
+//         console.log('Nuevo access token:', access_token.substring(0, 20) + '...');
+        
+//         return res.json({
+//             token: access_token,
+//             refresh_token: newRefreshToken,
+//             expires_at
+//         });
+//     } catch (e) {
+//         console.error('❌ Error inesperado en /auth/refresh:', e);
+//         return res.status(500).json({ 
+//             error: 'Error al refrescar token',
+//             details: e.message 
+//         });
+//     }
+// });
+
 // Ruta de registro
 router.post('/signup', async (req, res) => {
     const { email, password, nombre, role } = req.body;
@@ -822,6 +869,51 @@ router.post('/debug-auth-id', async (req, res) => {
             timestamp: new Date().toISOString()
         });
     }
+});
+
+// Endpoint de prueba para verificar estado de autenticación
+router.get('/test-auth', async (req, res) => {
+    const authHeader = req.headers.authorization;
+    const refreshTokenHeader = req.headers['x-refresh-token'];
+    
+    console.log('🧪 Test endpoint - Auth header:', authHeader ? 'Presente' : 'Ausente');
+    console.log('🧪 Test endpoint - Refresh token:', refreshTokenHeader ? 'Presente' : 'Ausente');
+    
+    if (authHeader) {
+        const token = authHeader.split(' ')[1];
+        console.log('🧪 Token recibido:', token.substring(0, 20) + '...');
+        
+        try {
+            const { data: { user }, error } = await auth.supabaseAdmin.auth.getUser(token);
+            if (error) {
+                console.log('🧪 Token inválido:', error.message);
+                return res.json({ 
+                    status: 'invalid_token',
+                    error: error.message,
+                    hasRefreshToken: !!refreshTokenHeader
+                });
+            } else {
+                console.log('🧪 Token válido para usuario:', user.email);
+                return res.json({ 
+                    status: 'valid_token',
+                    user: { id: user.id, email: user.email },
+                    hasRefreshToken: !!refreshTokenHeader
+                });
+            }
+        } catch (e) {
+            console.log('🧪 Error verificando token:', e.message);
+            return res.json({ 
+                status: 'error',
+                error: e.message,
+                hasRefreshToken: !!refreshTokenHeader
+            });
+        }
+    }
+    
+    return res.json({ 
+        status: 'no_token',
+        hasRefreshToken: !!refreshTokenHeader
+    });
 });
 
 // Ruta para sincronizar usuario desde Auth a BD
